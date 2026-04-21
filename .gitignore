@@ -1,3 +1,7 @@
 .DS_Store
 .idea
 mysql_data
+.gradle
+build
+out
+*.iml
