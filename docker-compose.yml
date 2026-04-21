@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: money-mate-mysql
+    restart: always
+    environment:
+      # 비밀번호는 보안을 위해 실제 배포 시에는 외부 환경변수로 관리하는 것이 좋으나,
+      # 로컬 개발용으로는 아래와 같이 설정합니다.
+      MYSQL_ROOT_PASSWORD: qwer1234
+      MYSQL_DATABASE: moneymate_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: qwer1234
+    ports:
+      # 포트 충돌이 일어나는 경우 앞단의 3306을 다른 번호로 변경해주세요.
+      - "3307:3306"
+    volumes:
+      # 컨테이너를 삭제해도 데이터가 날아가지 않도록 로컬 폴더와 연결합니다.
+      - ./mysql_data:/var/lib/mysql
