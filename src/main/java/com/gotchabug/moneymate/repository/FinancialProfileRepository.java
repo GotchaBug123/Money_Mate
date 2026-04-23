@@ -1,4 +1,12 @@
 package com.gotchabug.moneymate.repository;
 
-public class FinancialProfileRepository {
+
+
+import com.gotchabug.moneymate.entity.FinancialProfile;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface FinancialProfileRepository extends JpaRepository<FinancialProfile, Long> {
+    Optional<FinancialProfile> findByMember_MemberId(Long memberId);
 }
