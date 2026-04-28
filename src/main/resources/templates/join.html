@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 회원가입</title>
+    <link rel="stylesheet" href="/css/join.css">
+</head>
+<body>
+
+<div class="join-page">
+    <div class="join-box">
+        <h1>회원가입</h1>
+        <p class="join-desc">MoneyMate 계정을 생성해 맞춤 자산관리를 시작하세요.</p>
+
+        <form>
+            <label>이메일</label>
+            <div class="input-row">
+                <input type="email" placeholder="example@email.com">
+                <button type="button">인증번호 발송</button>
+            </div>
+
+            <label>인증번호</label>
+            <div class="input-row">
+                <input type="text" placeholder="6자리 인증번호 입력">
+                <button type="button" class="gray-btn">확인</button>
+            </div>
+
+            <label>비밀번호</label>
+            <input type="password" placeholder="8자리 이상, 영문/대문자/특수문자 포함">
+
+            <label>비밀번호 확인</label>
+            <input type="password" placeholder="비밀번호를 한 번 더 입력하세요">
+
+            <label>이름</label>
+            <input type="text" placeholder="이름 입력">
+
+            <label>전화번호</label>
+            <div class="input-row">
+                <input type="text" placeholder="- 없이 숫자만 입력">
+                <button type="button">인증번호 발송</button>
+            </div>
+
+            <label>전화 인증번호</label>
+            <div class="input-row">
+                <input type="text" placeholder="6자리 인증번호 입력">
+                <button type="button" class="gray-btn">확인</button>
+            </div>
+
+            <div class="terms-box">
+                <label>
+                    <input type="checkbox">
+                    이용약관 동의 <span>(필수)</span>
+                </label>
+                <label>
+                    <input type="checkbox">
+                    개인정보 수집 및 이용 동의 <span>(필수)</span>
+                </label>
+                <label>
+                    <input type="checkbox">
+                    마케팅 정보 수신 동의 <em>(선택)</em>
+                </label>
+            </div>
+
+            <button type="submit" class="join-submit">회원가입 완료</button>
+        </form>
+
+        <p class="login-link">
+            이미 계정이 있으신가요? <a href="/login">로그인</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>
