@@ -105,3 +105,21 @@ a {
     color: #6b7280;
     font-size: 14px;
 }
+
+.mypage-btn {
+    padding: 10px 18px;           /* login-btn이랑 동일 */
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+
+    background-color: #155eef;    /* 파란색 */
+    color: white;
+    border: 1px solid #155eef;
+
+    margin-right: 8px;
+}
+
+.mypage-btn:hover {
+    background-color: #0f4ad8;
+    border-color: #0f4ad8;
+}

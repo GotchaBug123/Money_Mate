@@ -32,6 +32,7 @@
       <div th:if="${loginUser != null}">
         <span class="welcome-text" th:text="|${session.loginUser.name}님 환영합니다 👋|">
         </span>
+        <a href="/mypage" class="mypage-btn">마이페이지</a>
         <a href="/logout" class="login-btn">로그아웃</a>
       </div>
 
