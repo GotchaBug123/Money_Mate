@@ -17,10 +17,6 @@ spring:
         format_sql: true
     open-in-view: false
 
-  security:
-    user:
-      name: user
-      password: qwer1234
 
 springdoc:
   api-docs:

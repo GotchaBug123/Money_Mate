@@ -1,25 +1,23 @@
 package com.gotchabug.moneymate.entity;
 
-
-import com.gotchabug.moneymate.common.BaseTimeEntity;
-import com.gotchabug.moneymate.enums.SignupStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-public class Member extends BaseTimeEntity {
+@Table(name = "member")
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
     private Long memberId;
+
+    @Column(nullable = false, unique = true, length = 50)
+    private String loginId;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
@@ -27,16 +25,35 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "signup_status", nullable = false, length = 20)
-    private SignupStatus signupStatus;
+    @Column(nullable = false)
+    private String signupStatus = "ACTIVE";
 
-    public void update(String name, LocalDate birthDate, SignupStatus signupStatus) {
+    @Column(nullable = false)
+    private String role = "USER";
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @Builder
+    public Member(String loginId, String email, String name, LocalDate birthDate) {
+        this.loginId = loginId;
+        this.email = email;
         this.name = name;
         this.birthDate = birthDate;
-        this.signupStatus = signupStatus;
+        this.signupStatus = "ACTIVE";
+        this.role = "USER";
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

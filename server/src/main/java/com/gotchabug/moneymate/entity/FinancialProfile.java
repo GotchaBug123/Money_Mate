@@ -1,66 +1,44 @@
 package com.gotchabug.moneymate.entity;
 
-
-
-import com.gotchabug.moneymate.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "financial_profile")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-public class FinancialProfile extends BaseTimeEntity {
+@Table(name = "financial_profile")
+public class FinancialProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "profile_id")
     private Long profileId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, unique = true)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(name = "monthly_income", nullable = false, precision = 15, scale = 2)
-    private BigDecimal monthlyIncome;
+    private BigDecimal monthlyIncome = BigDecimal.ZERO;
+    private BigDecimal monthlyFixedExpense = BigDecimal.ZERO;
+    private BigDecimal monthlyVariableExpense = BigDecimal.ZERO;
+    private BigDecimal totalAsset = BigDecimal.ZERO;
+    private BigDecimal totalLiability = BigDecimal.ZERO;
+    private BigDecimal cashAsset = BigDecimal.ZERO;
+    private BigDecimal investableAmount = BigDecimal.ZERO;
 
-    @Column(name = "monthly_fixed_expense", nullable = false, precision = 15, scale = 2)
-    private BigDecimal monthlyFixedExpense;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    @Column(name = "monthly_variable_expense", nullable = false, precision = 15, scale = 2)
-    private BigDecimal monthlyVariableExpense;
+    @Builder
+    public FinancialProfile(Member member) {
+        this.member = member;
+    }
 
-    @Column(name = "total_asset", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalAsset;
-
-    @Column(name = "total_liability", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalLiability;
-
-    @Column(name = "cash_asset", nullable = false, precision = 15, scale = 2)
-    private BigDecimal cashAsset;
-
-    @Column(name = "investable_amount", nullable = false, precision = 15, scale = 2)
-    private BigDecimal investableAmount;
-
-    public void update(
-            BigDecimal monthlyIncome,
-            BigDecimal monthlyFixedExpense,
-            BigDecimal monthlyVariableExpense,
-            BigDecimal totalAsset,
-            BigDecimal totalLiability,
-            BigDecimal cashAsset,
-            BigDecimal investableAmount
-    ) {
-        this.monthlyIncome = monthlyIncome;
-        this.monthlyFixedExpense = monthlyFixedExpense;
-        this.monthlyVariableExpense = monthlyVariableExpense;
-        this.totalAsset = totalAsset;
-        this.totalLiability = totalLiability;
-        this.cashAsset = cashAsset;
-        this.investableAmount = investableAmount;
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }
