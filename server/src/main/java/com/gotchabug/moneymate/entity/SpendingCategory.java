@@ -1,11 +1,12 @@
 package com.gotchabug.moneymate.entity;
 
 
-
-import  com.gotchabug.moneymate.enums.EssentialYn;
+import com.gotchabug.moneymate.enums.EssentialYn;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,6 +29,7 @@ public class SpendingCategory {
     private String parentCategory;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(Types.CHAR)
     @Column(name = "essential_yn", nullable = false, length = 1)
     private EssentialYn essentialYn;
 
