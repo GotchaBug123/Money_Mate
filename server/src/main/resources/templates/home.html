@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>MoneyMate - AI 로보어드바이저</title>
@@ -21,8 +21,21 @@
     </nav>
 
     <div class="header-buttons">
-      <a href="#" class="login-btn">로그인</a>
-      <a href="#" class="join-btn">회원가입</a>
+
+      <!-- 로그인 안된 상태 -->
+      <div th:if="${loginUser == null}">
+        <a href="/login" class="login-btn">로그인</a>
+        <a href="/signup" class="join-btn">회원가입</a>
+      </div>
+
+      <!-- 로그인 된 상태 -->
+      <div th:if="${loginUser != null}">
+        <span class="welcome-text" th:text="|${session.loginUser.name}님 환영합니다 👋|">
+        </span>
+        <a href="/mypage" class="mypage-btn">마이페이지</a>
+        <a href="/logout" class="login-btn">로그아웃</a>
+      </div>
+
     </div>
   </div>
 </header>
@@ -42,14 +55,26 @@
         </p>
 
         <div class="hero-actions">
-          <a href="#" class="primary-btn">무료 진단 시작하기</a>
+          <a th:href="${session.loginUser == null} ? '/signup' : '/main'" class="primary-btn">
+            무료 진단 시작하기
+          </a>
           <a href="#" class="secondary-btn">서비스 소개 보기</a>
         </div>
       </div>
 
       <div class="hero-card">
         <h3>나의 투자 가능 금액</h3>
-        <p class="amount">₩450,000</p>
+
+        <p class="amount"
+           th:if="${profile != null}"
+           th:text="${#numbers.formatInteger(profile.investableAmount, 3, 'COMMA')} + '원'">
+          0원
+        </p>
+
+        <p class="amount" th:if="${profile == null}">
+          ₩0
+        </p>
+
         <span class="small-text">이번 달 예상 투자 여력</span>
 
         <div class="mini-chart">
@@ -74,10 +99,12 @@
         <h3>무료 진단</h3>
         <p>나의 투자 여력을 확인해보세요.</p>
       </div>
+
       <div class="quick-card">
         <h3>시장 정보</h3>
         <p>국내·해외 주요 시장 흐름을 확인합니다.</p>
       </div>
+
       <div class="quick-card">
         <h3>환율 / 지수</h3>
         <p>환율과 주요 지수를 한눈에 확인합니다.</p>
@@ -136,7 +163,10 @@
         <h2>지금 바로 나의 투자 성향을 확인해보세요</h2>
         <p>간단한 무료 진단으로 나에게 맞는 투자 전략을 추천받을 수 있습니다.</p>
       </div>
-      <a href="#" class="primary-btn">무료 진단 시작</a>
+
+      <a th:href="${session.loginUser == null} ? '/signup' : '/main'" class="primary-btn">
+        무료 진단 시작
+      </a>
     </div>
   </section>
 </main>

@@ -1,7 +1,5 @@
 package com.gotchabug.moneymate.repository;
 
-
-
 import com.gotchabug.moneymate.entity.FinancialProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 

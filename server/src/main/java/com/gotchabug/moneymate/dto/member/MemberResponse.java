@@ -23,7 +23,7 @@ public class MemberResponse {
                 .email(member.getEmail())
                 .name(member.getName())
                 .birthDate(member.getBirthDate())
-                .signupStatus(member.getSignupStatus().name())
+                .signupStatus(member.getSignupStatus())
                 .build();
     }
 }
