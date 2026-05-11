@@ -41,4 +41,35 @@ public class FinancialProfile {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
+    /* 사용자의 지갑(수입/지출)을 받아, 실제로 투자에 쓸 수 있는
+        여윳 돈이 얼마인지 계산해주는 로직
+    */
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateFinancialInfo(
+            BigDecimal monthlyIncome,
+            BigDecimal monthlyFixedExpense,
+            BigDecimal monthlyVariableExpense,
+            BigDecimal totalAsset,
+            BigDecimal totalLiability,
+            BigDecimal cashAsset
+    ) {
+        this.monthlyIncome = monthlyIncome;
+        this.monthlyFixedExpense = monthlyFixedExpense;
+        this.monthlyVariableExpense = monthlyVariableExpense;
+        this.totalAsset = totalAsset;
+        this.totalLiability = totalLiability;
+        this.cashAsset = cashAsset;
+
+        this.investableAmount = monthlyIncome
+                .subtract(monthlyFixedExpense)
+                .subtract(monthlyVariableExpense);
+
+        this.updatedAt = LocalDateTime.now();
+    }
+
 }
