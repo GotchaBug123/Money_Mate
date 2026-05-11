@@ -1,34 +1,54 @@
 package com.gotchabug.moneymate.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "financial_profile")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "financial_profile")
 public class FinancialProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "profile_id")
     private Long profileId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
+    @Column(name = "monthly_income", nullable = false, precision = 15, scale = 2)
     private BigDecimal monthlyIncome = BigDecimal.ZERO;
+
+    @Column(name = "monthly_fixed_expense", nullable = false, precision = 15, scale = 2)
     private BigDecimal monthlyFixedExpense = BigDecimal.ZERO;
+
+    @Column(name = "monthly_variable_expense", nullable = false, precision = 15, scale = 2)
     private BigDecimal monthlyVariableExpense = BigDecimal.ZERO;
+
+    @Column(name = "total_asset", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalAsset = BigDecimal.ZERO;
+
+    @Column(name = "total_liability", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalLiability = BigDecimal.ZERO;
+
+    @Column(name = "cash_asset", nullable = false, precision = 15, scale = 2)
     private BigDecimal cashAsset = BigDecimal.ZERO;
+
+    @Column(name = "investable_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal investableAmount = BigDecimal.ZERO;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @Builder
@@ -36,20 +56,18 @@ public class FinancialProfile {
         this.member = member;
     }
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    /*
+    신규 재무정보 생성
+     */
+    public static FinancialProfile create(Member member) {
+        return FinancialProfile.builder()
+                .member(member)
+                .build();
     }
 
-    /* 사용자의 지갑(수입/지출)을 받아, 실제로 투자에 쓸 수 있는
-        여윳 돈이 얼마인지 계산해주는 로직
-    */
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
+    /*
+    재무정보 수정
+     */
     public void updateFinancialInfo(
             BigDecimal monthlyIncome,
             BigDecimal monthlyFixedExpense,
@@ -58,6 +76,7 @@ public class FinancialProfile {
             BigDecimal totalLiability,
             BigDecimal cashAsset
     ) {
+
         this.monthlyIncome = monthlyIncome;
         this.monthlyFixedExpense = monthlyFixedExpense;
         this.monthlyVariableExpense = monthlyVariableExpense;
@@ -65,11 +84,32 @@ public class FinancialProfile {
         this.totalLiability = totalLiability;
         this.cashAsset = cashAsset;
 
-        this.investableAmount = monthlyIncome
-                .subtract(monthlyFixedExpense)
-                .subtract(monthlyVariableExpense);
+        /*
+        투자 가능 금액 계산
+         */
+        this.investableAmount = this.monthlyIncome
+                .subtract(this.monthlyFixedExpense)
+                .subtract(this.monthlyVariableExpense);
+    }
+
+    /*
+    생성 시간 자동 저장
+     */
+    @PrePersist
+    protected void onCreate() {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    /*
+    수정 시간 자동 저장
+     */
+    @PreUpdate
+    protected void onUpdate() {
 
         this.updatedAt = LocalDateTime.now();
     }
-
 }

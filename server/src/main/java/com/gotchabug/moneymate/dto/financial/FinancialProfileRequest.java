@@ -3,10 +3,14 @@ package com.gotchabug.moneymate.dto.financial;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class FinancialProfileRequest {
 
     @NotNull(message = "월수입은 필수입니다.")
@@ -32,6 +36,4 @@ public class FinancialProfileRequest {
     @NotNull(message = "현금성 자산은 필수입니다.")
     @DecimalMin(value = "0.0", message = "현금성 자산은 0 이상이어야 합니다.")
     private BigDecimal cashAsset;
-
-
 }
