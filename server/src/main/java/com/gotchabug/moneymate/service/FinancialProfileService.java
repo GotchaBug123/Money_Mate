@@ -39,8 +39,7 @@ public class FinancialProfileService {
             investableAmount = BigDecimal.ZERO;
         }
 
-        profileUpdate(
-                profile,
+        profile.updateFinancialInfo(
                 monthlyIncome,
                 monthlyFixedExpense,
                 monthlyVariableExpense,
@@ -51,65 +50,5 @@ public class FinancialProfileService {
         );
 
         return financialProfileRepository.save(profile);
-    }
-
-    private void profileUpdate(
-            FinancialProfile profile,
-            BigDecimal monthlyIncome,
-            BigDecimal monthlyFixedExpense,
-            BigDecimal monthlyVariableExpense,
-            BigDecimal totalAsset,
-            BigDecimal totalLiability,
-            BigDecimal cashAsset,
-            BigDecimal investableAmount
-    ) {
-
-        try {
-
-            java.lang.reflect.Field incomeField =
-                    FinancialProfile.class.getDeclaredField("monthlyIncome");
-
-            incomeField.setAccessible(true);
-            incomeField.set(profile, monthlyIncome);
-
-            java.lang.reflect.Field fixedField =
-                    FinancialProfile.class.getDeclaredField("monthlyFixedExpense");
-
-            fixedField.setAccessible(true);
-            fixedField.set(profile, monthlyFixedExpense);
-
-            java.lang.reflect.Field variableField =
-                    FinancialProfile.class.getDeclaredField("monthlyVariableExpense");
-
-            variableField.setAccessible(true);
-            variableField.set(profile, monthlyVariableExpense);
-
-            java.lang.reflect.Field assetField =
-                    FinancialProfile.class.getDeclaredField("totalAsset");
-
-            assetField.setAccessible(true);
-            assetField.set(profile, totalAsset);
-
-            java.lang.reflect.Field liabilityField =
-                    FinancialProfile.class.getDeclaredField("totalLiability");
-
-            liabilityField.setAccessible(true);
-            liabilityField.set(profile, totalLiability);
-
-            java.lang.reflect.Field cashField =
-                    FinancialProfile.class.getDeclaredField("cashAsset");
-
-            cashField.setAccessible(true);
-            cashField.set(profile, cashAsset);
-
-            java.lang.reflect.Field investField =
-                    FinancialProfile.class.getDeclaredField("investableAmount");
-
-            investField.setAccessible(true);
-            investField.set(profile, investableAmount);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

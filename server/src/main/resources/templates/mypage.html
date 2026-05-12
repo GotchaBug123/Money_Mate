@@ -73,8 +73,8 @@
 
             <span class="status-badge"
                   th:text="${member.signupStatus}">
-        ACTIVE
-      </span>
+                ACTIVE
+            </span>
 
         </div>
 
@@ -93,7 +93,6 @@
                     <h2>기본 프로필</h2>
                 </div>
 
-                <!-- 아직 미구현 -->
                 <a href="#"
                    class="small-blue-btn">
                     준비중
@@ -161,10 +160,9 @@
                 맞춤 포트폴리오 분석을 받을 수 있습니다.
             </p>
 
-            <!-- 아직 미구현 -->
-            <a href="#"
+            <a href="/financial/profile"
                class="full-blue-btn">
-                준비중
+                재무 진단 시작
             </a>
 
         </div>
@@ -180,12 +178,19 @@
                 투자 가능 금액
             </h2>
 
-            <p class="money-value">
+            <p class="money-value"
+               th:if="${profile != null}"
+               th:text="${#numbers.formatInteger(profile.investableAmount, 3, 'COMMA')} + '원'">
+                ₩0
+            </p>
+
+            <p class="money-value"
+               th:if="${profile == null}">
                 ₩0
             </p>
 
             <p class="card-desc">
-                아직 입력된 재무 정보가 없습니다.
+                재무 진단 기반 예상 투자 여력입니다.
             </p>
 
             <div class="mini-bars">
@@ -214,7 +219,6 @@
                 <p>투자 성향 설문을 완료해주세요.</p>
             </div>
 
-            <!-- 아직 미구현 -->
             <a href="#"
                class="full-outline-btn">
                 준비중
@@ -238,7 +242,6 @@
                 비밀번호를 주기적으로 변경해주세요.
             </p>
 
-            <!-- 아직 미구현 -->
             <a href="#"
                class="full-outline-btn">
                 준비중
