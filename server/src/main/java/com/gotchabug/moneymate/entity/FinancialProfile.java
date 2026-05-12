@@ -36,6 +36,25 @@ public class FinancialProfile {
         this.member = member;
     }
 
+    public void updateFinancialInfo(
+            BigDecimal monthlyIncome,
+            BigDecimal monthlyFixedExpense,
+            BigDecimal monthlyVariableExpense,
+            BigDecimal totalAsset,
+            BigDecimal totalLiability,
+            BigDecimal cashAsset,
+            BigDecimal investableAmount
+    ) {
+
+        this.monthlyIncome = monthlyIncome;
+        this.monthlyFixedExpense = monthlyFixedExpense;
+        this.monthlyVariableExpense = monthlyVariableExpense;
+        this.totalAsset = totalAsset;
+        this.totalLiability = totalLiability;
+        this.cashAsset = cashAsset;
+        this.investableAmount = investableAmount;
+    }
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
