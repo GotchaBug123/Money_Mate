@@ -214,14 +214,37 @@
                 투자 성향
             </h2>
 
-            <div class="empty-state">
+            <!-- 미진단 -->
+            <div class="empty-state"
+                 th:if="${riskProfile == null}">
+
                 <strong>미진단</strong>
-                <p>투자 성향 설문을 완료해주세요.</p>
+
+                <p>
+                    투자 성향 설문을 완료해주세요.
+                </p>
+
             </div>
 
-            <a href="#"
+            <!-- 진단 완료 -->
+            <div class="empty-state"
+                 th:if="${riskProfile != null}">
+
+                <strong th:text="${riskProfile.riskType}">
+                    위험중립형
+                </strong>
+
+                <p>
+                    투자 성향 분석이 완료되었습니다.
+                </p>
+
+            </div>
+
+            <a href="/risk/test"
                class="full-outline-btn">
-                준비중
+
+                투자 성향 진단하기
+
             </a>
 
         </div>
