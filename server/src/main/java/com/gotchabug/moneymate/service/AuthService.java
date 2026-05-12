@@ -2,8 +2,12 @@ package com.gotchabug.moneymate.service;
 
 import com.gotchabug.moneymate.dto.LoginRequest;
 import com.gotchabug.moneymate.dto.SignupRequest;
-import com.gotchabug.moneymate.entity.*;
-import com.gotchabug.moneymate.repository.*;
+import com.gotchabug.moneymate.entity.FinancialProfile;
+import com.gotchabug.moneymate.entity.Member;
+import com.gotchabug.moneymate.entity.MemberAuth;
+import com.gotchabug.moneymate.repository.FinancialProfileRepository;
+import com.gotchabug.moneymate.repository.MemberAuthRepository;
+import com.gotchabug.moneymate.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +35,12 @@ public class AuthService {
                 .loginId(request.getLoginId())
                 .email(request.getEmail())
                 .name(request.getName())
+                .birthDate(request.getBirthDate())
                 .build();
 
         memberRepository.save(member);
 
+        // TODO: BCrypt 암호화 적용 예정
         MemberAuth auth = MemberAuth.builder()
                 .member(member)
                 .passwordHash(request.getPassword())
@@ -64,7 +70,9 @@ public class AuthService {
         }
 
         auth.loginSuccess();
+
         System.out.println("로그인 성공: " + member.getEmail());
+
         return member;
     }
-    }
+}
