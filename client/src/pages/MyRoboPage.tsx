@@ -1,4 +1,15 @@
-import { TrendingUp, Target, BarChart3, PieChart } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  Edit3,
+  Lock,
+  Lightbulb,
+  TrendingUp,
+  Wallet,
+  ShieldCheck,
+  AlertTriangle,
+} from "lucide-react";
+
+import { RoboSimulationPage } from "./RoboSimulationPage";
 
 interface SurveyAnswers {
   objective?: string;
@@ -10,256 +21,421 @@ interface SurveyAnswers {
 }
 
 interface MyRoboPageProps {
-  onNavigate?: (page: string) => void;
   surveyAnswers?: SurveyAnswers | null;
-  onStartSurvey?: () => void;
 }
 
-// 투자 성향 계산 함수
 function calculateInvestmentStyle(answers: SurveyAnswers): string {
   let score = 0;
   let count = 0;
 
-  // objective 점수
   if (answers.objective) {
-    const objectiveScores: Record<string, number> = {
+    const scores: Record<string, number> = {
       preservation: 1,
       retirement: 2,
       goal: 3,
       growth: 5,
     };
-    score += objectiveScores[answers.objective] || 3;
+
+    score += scores[answers.objective] || 3;
     count++;
   }
 
-  // timeHorizon 점수
   if (answers.timeHorizon) {
-    const timeScores: Record<string, number> = {
+    const scores: Record<string, number> = {
       short: 1,
       "medium-short": 2,
       medium: 3,
       "medium-long": 4,
       long: 5,
     };
-    score += timeScores[answers.timeHorizon] || 3;
+
+    score += scores[answers.timeHorizon] || 3;
     count++;
   }
 
-  // knowledge 점수
   if (answers.knowledge) {
-    const knowledgeScores: Record<string, number> = {
+    const scores: Record<string, number> = {
       beginner: 1,
       intermediate: 3,
       advanced: 4,
       expert: 5,
     };
-    score += knowledgeScores[answers.knowledge] || 3;
+
+    score += scores[answers.knowledge] || 3;
     count++;
   }
 
-  // riskReward 점수 (가장 중요)
   if (answers.riskReward) {
-    const riskScores: Record<string, number> = {
+    const scores: Record<string, number> = {
       conservative: 1,
       "moderate-conservative": 2,
       moderate: 3,
       "moderate-aggressive": 4,
       aggressive: 5,
     };
-    const riskScore = riskScores[answers.riskReward] || 3;
-    score += riskScore * 2; // 가중치 2배
+
+    score += (scores[answers.riskReward] || 3) * 2;
     count += 2;
   }
 
-  // marketReaction 점수
   if (answers.marketReaction) {
-    const reactionScores: Record<string, number> = {
+    const scores: Record<string, number> = {
       "panic-sell": 1,
       "partial-sell": 2,
       hold: 3,
       "buy-dip": 5,
     };
-    score += reactionScores[answers.marketReaction] || 3;
+
+    score += scores[answers.marketReaction] || 3;
     count++;
   }
 
-  // financialSituation 점수
   if (answers.financialSituation) {
-    const financialScores: Record<string, number> = {
+    const scores: Record<string, number> = {
       tight: 1,
       sufficient: 2,
       comfortable: 4,
       abundant: 5,
     };
-    score += financialScores[answers.financialSituation] || 3;
+
+    score += scores[answers.financialSituation] || 3;
     count++;
   }
 
   const average = count > 0 ? score / count : 3;
 
-  // 평균 점수로 투자 성향 결정
   if (average <= 1.5) return "안정형";
   if (average <= 2.5) return "안정추구형";
   if (average <= 3.5) return "위험중립형";
   if (average <= 4.5) return "적극투자형";
+
   return "공격투자형";
 }
 
-export function MyRoboPage({ onNavigate, surveyAnswers, onStartSurvey }: MyRoboPageProps) {
-  // 설문 결과가 있으면 계산, 없으면 기본값
-  const investmentStyle = surveyAnswers ? calculateInvestmentStyle(surveyAnswers) : "안정형";
+export function MyRoboPage({ surveyAnswers }: MyRoboPageProps) {
+  const investmentStyle = surveyAnswers
+    ? calculateInvestmentStyle(surveyAnswers)
+    : "위험중립형";
 
-  // Mock data
-  const roboInfo = {
-    investmentStyle,
-    operationMode: "자동 리밸런싱",
-    assetAllocation: [
-      { category: "국내 주식", percentage: 35 },
-      { category: "해외 주식", percentage: 25 },
-      { category: "채권", percentage: 30 },
-      { category: "현금", percentage: 10 }
-    ],
-    goalAchievement: 78,
-    llmAnalysis: "현재 포트폴리오는 안정적인 구성을 유지하고 있습니다. 채권 비중이 적절하여 시장 변동성에 대한 방어력이 확보되어 있으며, 주식 비중은 장기적인 성장 가능성을 고려한 균형잡힌 수준입니다. 목표 달성 확률 78%는 양호한 수준이며, 현재의 투자 전략을 유지하면서 정기적인 리밸런싱을 통해 안정적인 수익을 기대할 수 있습니다."
-  };
+  const [showSimulation, setShowSimulation] = useState(false);
 
-  // Analysis data
-  const analysisData = {
-    totalReturn: "+12.5%",
-    monthlyReturn: "+2.3%",
-    riskLevel: "중간",
-    sharpeRatio: "1.35"
-  };
+  const [monthlyIncome, setMonthlyIncome] = useState(420);
+  const [fixedExpense, setFixedExpense] = useState(120);
+  const [variableExpense, setVariableExpense] = useState(80);
+
+  const [currentEmergencyFund, setCurrentEmergencyFund] = useState(300);
+  const [targetEmergencyFund, setTargetEmergencyFund] = useState(600);
+
+  const [totalDebt, setTotalDebt] = useState(150);
+  const [monthlyDebtPayment, setMonthlyDebtPayment] = useState(30);
+
+  const report = useMemo(() => {
+    const totalExpense = fixedExpense + variableExpense + monthlyDebtPayment;
+    const baseInvestable = monthlyIncome - totalExpense;
+
+    const spendingRatio =
+      monthlyIncome > 0 ? Math.round((totalExpense / monthlyIncome) * 100) : 0;
+
+    const emergencyChargeRate =
+      targetEmergencyFund > 0
+        ? Math.min(
+            100,
+            Math.round((currentEmergencyFund / targetEmergencyFund) * 100)
+          )
+        : 100;
+
+    const emergencyShortage = Math.max(
+      0,
+      targetEmergencyFund - currentEmergencyFund
+    );
+
+    const monthlyEmergencySave =
+      emergencyChargeRate < 100 ? Math.ceil(emergencyShortage / 3) : 0;
+
+    const finalInvestable = Math.max(
+      0,
+      baseInvestable - monthlyEmergencySave
+    );
+
+    const debtRatio =
+      monthlyIncome > 0
+        ? Math.round((monthlyDebtPayment / monthlyIncome) * 100)
+        : 0;
+
+    const score = Math.max(
+      0,
+      Math.min(
+        100,
+        100 -
+          Math.max(0, spendingRatio - 45) -
+          Math.max(0, debtRatio - 10) * 2 -
+          (emergencyChargeRate < 100 ? 10 : 0)
+      )
+    );
+
+    const savedMoneyPerMonth = finalInvestable > 0 ? finalInvestable : 1;
+
+    const monthsToGoal = Math.max(
+      1,
+      Math.ceil(emergencyShortage / savedMoneyPerMonth)
+    );
+
+    return {
+      totalExpense,
+      baseInvestable,
+      spendingRatio,
+      emergencyChargeRate,
+      emergencyShortage,
+      monthlyEmergencySave,
+      finalInvestable,
+      debtRatio,
+      score,
+      monthsToGoal,
+    };
+  }, [
+    monthlyIncome,
+    fixedExpense,
+    variableExpense,
+    currentEmergencyFund,
+    targetEmergencyFund,
+    monthlyDebtPayment,
+  ]);
+
+  if (showSimulation) {
+    return (
+      <RoboSimulationPage
+        investableAmount={report.finalInvestable}
+        emergencyRate={report.emergencyChargeRate}
+        emergencyShortage={report.emergencyShortage}
+        monthlyEmergencySave={report.monthlyEmergencySave}
+        monthsToGoal={report.monthsToGoal}
+        spendingRatio={report.spendingRatio}
+        debtRatio={report.debtRatio}
+        investmentStyle={investmentStyle}
+        onBack={() => setShowSimulation(false)}
+      />
+    );
+  }
+
+  const moneyInputClass =
+    "w-full appearance-none rounded-xl border border-gray-300 px-4 py-3 pr-16 text-lg font-bold outline-none";
+
+  const renderMoneyInput = (
+    value: number,
+    setter: (value: number) => void,
+    focusColor: string
+  ) => (
+    <div className="relative">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => {
+          const onlyNumber = e.target.value.replace(/[^0-9]/g, "");
+          setter(onlyNumber === "" ? 0 : Number(onlyNumber));
+        }}
+        className={`${moneyInputClass} ${focusColor}`}
+      />
+
+      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+        만원
+      </span>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">로보어드바이저</h1>
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">로보어드바이저</h1>
 
-        {/* 투자 성향 및 운용 모드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
-              <h3 className="text-lg font-bold text-gray-900">투자 성향</h3>
-            </div>
-            <div className="text-3xl font-bold text-blue-600 mb-4">{roboInfo.investmentStyle}</div>
-            <button
-              onClick={() => onStartSurvey?.()}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              투자 성향 재진단
-            </button>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Target className="w-6 h-6 text-green-600" />
-              <h3 className="text-lg font-bold text-gray-900">운용 모드</h3>
-            </div>
-            <div className="text-3xl font-bold text-green-600 mb-4">{roboInfo.operationMode}</div>
-            <button className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-              전략 리스트 보기
-            </button>
-          </div>
+          <p className="text-gray-600 mt-2">
+            사용자의 재무 상태를 기반으로 투자 가능 금액과 ETF 추천을
+            안내합니다.
+          </p>
         </div>
 
-        {/* 자산 배분 현황 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">자산 배분 현황</h3>
-          <div className="space-y-4">
-            {roboInfo.assetAllocation.map((asset, index) => (
-              <div key={index}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-900 font-medium">{asset.category}</span>
-                  <span className="text-gray-900 font-bold">{asset.percentage}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${asset.percentage}%`,
-                      backgroundColor: index === 0 ? "#3B82F6" : index === 1 ? "#10B981" : index === 2 ? "#F59E0B" : "#6B7280"
-                    }}
-                  />
+        <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                <TrendingUp className="w-4 h-4" />
+                재무 컨디션 리포트
+              </div>
+
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                사용자의 현재 재무 상태를 분석합니다
+              </h2>
+
+              <p className="text-gray-600 leading-relaxed">
+                입력된 수입, 지출, 비상금, 부채 데이터를 기반으로 투자 가능
+                금액과 재무 건전성을 계산합니다.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 min-w-full lg:min-w-[520px]">
+              <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200 text-center">
+                <div className="text-sm text-gray-500 mb-2">재무 점수</div>
+                <div className="text-3xl font-bold text-blue-600">
+                  {report.score}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* ETF 목표 달성 확률 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">ETF 목표 달성 확률</h3>
-          <div className="flex items-end gap-4 mb-4">
-            <div className="text-5xl font-bold text-blue-600">{roboInfo.goalAchievement}%</div>
-            <div className="text-gray-600 mb-2">달성 가능</div>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-              className="h-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600"
-              style={{ width: `${roboInfo.goalAchievement}%` }}
-            />
-          </div>
-        </div>
+              <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200 text-center">
+                <div className="text-sm text-gray-500 mb-2">소비 비율</div>
+                <div className="text-3xl font-bold text-purple-600">
+                  {report.spendingRatio}%
+                </div>
+              </div>
 
-        {/* LLM 해설 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">AI 포트폴리오 분석</h3>
-          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-            <p className="text-gray-800 leading-relaxed">{roboInfo.llmAnalysis}</p>
+              <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200 text-center">
+                <div className="text-sm text-gray-500 mb-2">
+                  비상금 충전율
+                </div>
+                <div className="text-3xl font-bold text-green-600">
+                  {report.emergencyChargeRate}%
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* 주요 지표 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="text-sm text-gray-600 mb-2">누적 수익률</div>
-            <div className="text-2xl font-bold text-green-600">{analysisData.totalReturn}</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="text-sm text-gray-600 mb-2">월간 수익률</div>
-            <div className="text-2xl font-bold text-blue-600">{analysisData.monthlyReturn}</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="text-sm text-gray-600 mb-2">위험도</div>
-            <div className="text-2xl font-bold text-gray-900">{analysisData.riskLevel}</div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="text-sm text-gray-600 mb-2">샤프 비율</div>
-            <div className="text-2xl font-bold text-gray-900">{analysisData.sharpeRatio}</div>
-          </div>
-        </div>
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Wallet className="w-6 h-6 text-blue-600" />
+                <h3 className="text-xl font-bold text-gray-900">
+                  수입 및 지출
+                </h3>
+              </div>
 
-        {/* 투자 분석 영역 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <BarChart3 className="w-6 h-6 text-blue-600" />
-            <h3 className="text-lg font-bold text-gray-900">포트폴리오 성과 분석</h3>
-          </div>
+              <Edit3 className="w-5 h-5 text-gray-400" />
+            </div>
 
-          {/* Placeholder for chart */}
-          <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-16 flex flex-col items-center justify-center">
-            <TrendingUp className="w-16 h-16 text-gray-400 mb-4" />
-            <p className="text-gray-600 text-lg font-medium">수익률 차트</p>
-            <p className="text-gray-500 text-sm">시간에 따른 포트폴리오 성과를 표시합니다</p>
-          </div>
-        </div>
+            <div className="space-y-5">
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">월 수입</div>
+                {renderMoneyInput(
+                  monthlyIncome,
+                  setMonthlyIncome,
+                  "focus:border-blue-500"
+                )}
+              </label>
 
-        {/* 자산별 수익률 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <PieChart className="w-6 h-6 text-green-600" />
-            <h3 className="text-lg font-bold text-gray-900">자산별 기여도 분석</h3>
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">고정 지출</div>
+                {renderMoneyInput(
+                  fixedExpense,
+                  setFixedExpense,
+                  "focus:border-blue-500"
+                )}
+              </label>
+
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">변동 지출</div>
+                {renderMoneyInput(
+                  variableExpense,
+                  setVariableExpense,
+                  "focus:border-blue-500"
+                )}
+              </label>
+            </div>
           </div>
 
-          {/* Placeholder for pie chart */}
-          <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-16 flex flex-col items-center justify-center">
-            <PieChart className="w-16 h-16 text-gray-400 mb-4" />
-            <p className="text-gray-600 text-lg font-medium">자산 배분 차트</p>
-            <p className="text-gray-500 text-sm">각 자산의 수익 기여도를 표시합니다</p>
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-6 h-6 text-green-600" />
+                <h3 className="text-xl font-bold text-gray-900">비상금</h3>
+              </div>
+
+              <Edit3 className="w-5 h-5 text-gray-400" />
+            </div>
+
+            <div className="space-y-5">
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">현재 비상금</div>
+                {renderMoneyInput(
+                  currentEmergencyFund,
+                  setCurrentEmergencyFund,
+                  "focus:border-green-500"
+                )}
+              </label>
+
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">목표 비상금</div>
+                {renderMoneyInput(
+                  targetEmergencyFund,
+                  setTargetEmergencyFund,
+                  "focus:border-green-500"
+                )}
+              </label>
+            </div>
           </div>
-        </div>
+
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 text-orange-500" />
+                <h3 className="text-xl font-bold text-gray-900">부채</h3>
+              </div>
+
+              <Lock className="w-5 h-5 text-gray-400" />
+            </div>
+
+            <div className="space-y-5">
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">총 부채</div>
+                {renderMoneyInput(
+                  totalDebt,
+                  setTotalDebt,
+                  "focus:border-orange-500"
+                )}
+              </label>
+
+              <label className="block">
+                <div className="text-sm text-gray-500 mb-2">월 상환액</div>
+                {renderMoneyInput(
+                  monthlyDebtPayment,
+                  setMonthlyDebtPayment,
+                  "focus:border-orange-500"
+                )}
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-yellow-100 flex items-center justify-center shrink-0">
+                <Lightbulb className="w-7 h-7 text-yellow-600" />
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  행동 변화 및 시뮬레이션 연결
+                </h3>
+
+                <p className="text-gray-600 leading-relaxed">
+                  현재 입력값 기준으로 목표 달성까지 약{" "}
+                  <span className="font-bold text-blue-600">
+                    {report.monthsToGoal}개월
+                  </span>
+                  이 필요합니다.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSimulation(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold transition-colors whitespace-nowrap"
+            >
+              행동 변화 시뮬레이션 및 ETF 추천 받기
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );
