@@ -92,32 +92,86 @@ interface SurveyAnswers {
 }
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<Page>("home");
-  const [pendingPage, setPendingPage] = useState<Page | null>(null);
-  const [signupData, setSignupData] = useState<{ email: string; password: string } | null>(null);
-  const [selectedInquiryId, setSelectedInquiryId] = useState<number | undefined>(undefined);
-  const [selectedNoticeId, setSelectedNoticeId] = useState<number | undefined>(undefined);
-  const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers | null>(null);
-  const [surveyReturnPage, setSurveyReturnPage] = useState<Page | null>(null);
 
-  const { isAuthenticated, login, logout } = useAuth();
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState<Page>("home");
+
+  const [
+    pendingPage,
+    setPendingPage,
+  ] = useState<Page | null>(null);
+
+  const [
+    signupData,
+    setSignupData,
+  ] = useState<{
+    email: string;
+    password: string;
+  } | null>(null);
+
+  const [
+    selectedInquiryId,
+    setSelectedInquiryId,
+  ] = useState<number | undefined>(undefined);
+
+  const [
+    selectedNoticeId,
+    setSelectedNoticeId,
+  ] = useState<number | undefined>(undefined);
+
+  const [
+    surveyAnswers,
+    setSurveyAnswers,
+  ] = useState<SurveyAnswers | null>(null);
+
+  const [
+    surveyReturnPage,
+    setSurveyReturnPage,
+  ] = useState<Page | null>(null);
+
+  const {
+    isAuthenticated,
+    login,
+    logout,
+  } = useAuth();
 
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "logout-event") {
+
+    const handleStorageChange = (
+      e: StorageEvent
+    ) => {
+
+      if (
+        e.key === "logout-event"
+      ) {
+
         logout();
+
         setCurrentPage("home");
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener(
+      "storage",
+      handleStorageChange
+    );
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
+
+      window.removeEventListener(
+        "storage",
+        handleStorageChange
+      );
     };
+
   }, [logout]);
 
-  const navigateTo = (page: Page) => {
+  const navigateTo = (
+    page: Page
+  ) => {
+
     const protectedPages: Page[] = [
       "dashboard",
       "my-assets",
@@ -136,376 +190,808 @@ function AppContent() {
       "notification-settings",
     ];
 
-    if (protectedPages.includes(page) && !isAuthenticated) {
+    if (
+      protectedPages.includes(page) &&
+      !isAuthenticated
+    ) {
+
       setPendingPage(page);
+
       setCurrentPage("login");
+
       return;
     }
 
     setCurrentPage(page);
+
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
 
-  const handleLogin = (email: string) => {
+  const handleLogin = (
+    email: string
+  ) => {
+
     login(email);
 
     if (pendingPage) {
-      setCurrentPage(pendingPage);
+
+      setCurrentPage(
+        pendingPage
+      );
+
       setPendingPage(null);
+
       return;
     }
 
     setCurrentPage("home");
   };
 
+  /* =========================
+     로그인
+  ========================= */
+
   if (currentPage === "login") {
+
     return (
       <LoginPage
-        onBack={() => navigateTo("home")}
+        onBack={() =>
+          navigateTo("home")
+        }
         onNavigate={navigateTo}
         onLogin={handleLogin}
       />
     );
   }
 
+  /* =========================
+     회원가입 1단계
+  ========================= */
+
   if (currentPage === "signup-step1") {
+
     return (
       <SignupStep1
-        onBack={() => navigateTo("home")}
+        onBack={() =>
+          navigateTo("home")
+        }
         onNavigate={navigateTo}
         onNext={(data) => {
+
           setSignupData(data);
-          setCurrentPage("signup-step2");
+
+          setCurrentPage(
+            "signup-step2"
+          );
         }}
       />
     );
   }
 
+  /* =========================
+     회원가입 2단계
+  ========================= */
+
   if (currentPage === "signup-step2") {
+
     return (
       <SignupStep2
-        onBack={() => setCurrentPage("signup-step1")}
+        onBack={() =>
+          setCurrentPage(
+            "signup-step1"
+          )
+        }
         onNavigate={navigateTo}
-        signupData={signupData || { email: "", password: "" }}
+        signupData={
+          signupData || {
+            email: "",
+            password: "",
+          }
+        }
       />
     );
   }
+
+  /* =========================
+     아이디 찾기
+  ========================= */
 
   if (currentPage === "find-id") {
+
     return (
       <FindIdPage
-        onBack={() => navigateTo("home")}
+        onBack={() =>
+          navigateTo("home")
+        }
         onNavigate={navigateTo}
       />
     );
   }
+
+  /* =========================
+     비밀번호 찾기
+  ========================= */
 
   if (currentPage === "find-password") {
+
     return (
       <FindPasswordPage
-        onBack={() => navigateTo("home")}
+        onBack={() =>
+          navigateTo("home")
+        }
         onNavigate={navigateTo}
       />
     );
   }
 
+  /* =========================
+     대시보드
+  ========================= */
+
   if (currentPage === "dashboard") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <DashboardPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "account-management") {
+  /* =========================
+     계정관리
+  ========================= */
+
+  if (
+    currentPage ===
+    "account-management"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <AccountManagementPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     설정
+  ========================= */
 
   if (currentPage === "settings") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <SettingsPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     로보어드바이저
+  ========================= */
 
   if (currentPage === "my-robo") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <MyRoboPage
           onNavigate={navigateTo}
-          surveyAnswers={surveyAnswers}
+          surveyAnswers={
+            surveyAnswers
+          }
           onStartSurvey={() => {
-            setSurveyReturnPage("my-robo");
-            setCurrentPage("survey");
+
+            setSurveyReturnPage(
+              "my-robo"
+            );
+
+            setCurrentPage(
+              "survey"
+            );
           }}
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "robo-simulation") {
+  /* =========================
+     로보 시뮬레이션
+  ========================= */
+
+  if (
+    currentPage ===
+    "robo-simulation"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <RoboSimulationPage
-          onBack={() => navigateTo("my-robo")}
+          onBack={() =>
+            navigateTo("my-robo")
+          }
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "asset-simulation") {
+  /* =========================
+     자산 시뮬레이션
+  ========================= */
+
+  if (
+    currentPage ===
+    "asset-simulation"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
-        <AssetSimulationPage
-          onBack={() => navigateTo("my-robo")}
+        <Header
+          onNavigate={navigateTo}
         />
-        <Footer onNavigate={navigateTo} />
+
+        <AssetSimulationPage
+          onBack={() =>
+            navigateTo("my-robo")
+          }
+        />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     분석
+  ========================= */
 
   if (currentPage === "analysis") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <MyRoboPage
           onNavigate={navigateTo}
-          surveyAnswers={surveyAnswers}
+          surveyAnswers={
+            surveyAnswers
+          }
           onStartSurvey={() => {
-            setSurveyReturnPage("my-robo");
-            setCurrentPage("survey");
+
+            setSurveyReturnPage(
+              "my-robo"
+            );
+
+            setCurrentPage(
+              "survey"
+            );
           }}
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     MY 자산
+  ========================= */
 
   if (currentPage === "my-assets") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <MyAssetsPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "asset-summary") {
+  /* =========================
+     맞춤 투자 제안
+  ========================= */
+
+  if (
+    currentPage ===
+    "asset-summary"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <AssetSummaryPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "asset-allocation") {
+  /* =========================
+     자산 분배
+  ========================= */
+
+  if (
+    currentPage ===
+    "asset-allocation"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <AssetAllocationPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     보유 종목
+  ========================= */
 
   if (currentPage === "holdings") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <HoldingsPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     수익률
+  ========================= */
 
   if (currentPage === "returns") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <ReturnsPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     즐겨찾기
+  ========================= */
 
   if (currentPage === "favorites") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <FavoritesPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "notifications") {
+  /* =========================
+     알림
+  ========================= */
+
+  if (
+    currentPage ===
+    "notifications"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <NotificationsPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "notification-settings") {
+  /* =========================
+     알림 설정
+  ========================= */
+
+  if (
+    currentPage ===
+    "notification-settings"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <NotificationSettingsPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     포트폴리오
+  ========================= */
 
   if (currentPage === "portfolio") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <PortfolioPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "investment-info") {
+  /* =========================
+     투자정보
+  ========================= */
+
+  if (
+    currentPage ===
+    "investment-info"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
-        <InvestmentInfoPage onNavigate={navigateTo} />
-        <Footer onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
+        <InvestmentInfoPage
+          onNavigate={navigateTo}
+        />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
+
+  /* =========================
+     고객센터
+  ========================= */
 
   if (currentPage === "support") {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <SupportPage />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "inquiry-list") {
+  /* =========================
+     문의 목록
+  ========================= */
+
+  if (
+    currentPage ===
+    "inquiry-list"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <InquiryListPage
           onNavigate={navigateTo}
           onViewDetail={(id) => {
+
             setSelectedInquiryId(id);
-            setCurrentPage("inquiry-detail");
+
+            setCurrentPage(
+              "inquiry-detail"
+            );
           }}
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "inquiry-detail") {
+  /* =========================
+     문의 상세
+  ========================= */
+
+  if (
+    currentPage ===
+    "inquiry-detail"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <InquiryDetailPage
           onNavigate={navigateTo}
-          inquiryId={selectedInquiryId}
+          inquiryId={
+            selectedInquiryId
+          }
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "customer-inquiry" || currentPage === "customer-inquiry-form") {
+  /* =========================
+     문의 작성
+  ========================= */
+
+  if (
+    currentPage ===
+      "customer-inquiry" ||
+    currentPage ===
+      "customer-inquiry-form"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
-        <CustomerInquiryFormPage onNavigate={navigateTo} />
-        <Footer onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
+        <CustomerInquiryFormPage
+          onNavigate={navigateTo}
+        />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "inquiry-confirmation") {
+  /* =========================
+     문의 완료
+  ========================= */
+
+  if (
+    currentPage ===
+    "inquiry-confirmation"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
-        <InquiryConfirmationPage onNavigate={navigateTo} />
-        <Footer onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
+        <InquiryConfirmationPage
+          onNavigate={navigateTo}
+        />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "notice-list") {
+  /* =========================
+     공지 목록
+  ========================= */
+
+  if (
+    currentPage ===
+    "notice-list"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <NoticeListPage
           onNavigate={navigateTo}
           onViewDetail={(id) => {
+
             setSelectedNoticeId(id);
-            setCurrentPage("notice-detail");
+
+            setCurrentPage(
+              "notice-detail"
+            );
           }}
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
-  if (currentPage === "notice-detail") {
+  /* =========================
+     공지 상세
+  ========================= */
+
+  if (
+    currentPage ===
+    "notice-detail"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <NoticeDetailPage
           onNavigate={navigateTo}
-          noticeId={selectedNoticeId}
+          noticeId={
+            selectedNoticeId
+          }
         />
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
+  /* =========================
+     설문
+  ========================= */
+
   if (currentPage === "survey") {
+
     return (
       <SurveyPage
         onComplete={(answers) => {
-          setSurveyAnswers(answers);
+
+          setSurveyAnswers(
+            answers
+          );
 
           if (surveyReturnPage) {
-            setCurrentPage(surveyReturnPage);
-            setSurveyReturnPage(null);
+
+            setCurrentPage(
+              surveyReturnPage
+            );
+
+            setSurveyReturnPage(
+              null
+            );
+
             return;
           }
 
-          setCurrentPage("survey-result");
+          setCurrentPage(
+            "survey-result"
+          );
         }}
         onBack={() => {
+
           if (surveyReturnPage) {
-            setCurrentPage(surveyReturnPage);
-            setSurveyReturnPage(null);
+
+            setCurrentPage(
+              surveyReturnPage
+            );
+
+            setSurveyReturnPage(
+              null
+            );
+
             return;
           }
 
@@ -515,73 +1001,153 @@ function AppContent() {
     );
   }
 
-  if (currentPage === "survey-result") {
+  /* =========================
+     설문 결과
+  ========================= */
+
+  if (
+    currentPage ===
+    "survey-result"
+  ) {
+
     return (
       <SurveyResultPage
-        answers={surveyAnswers || {}}
+        answers={
+          surveyAnswers || {}
+        }
         onNavigate={navigateTo}
       />
     );
   }
 
-  if (currentPage === "onboarding") {
+  /* =========================
+     온보딩
+  ========================= */
+
+  if (
+    currentPage ===
+    "onboarding"
+  ) {
+
     return (
       <>
-        <Header onNavigate={navigateTo} />
-        <OnboardingPage onNavigate={navigateTo} />
-        <Footer onNavigate={navigateTo} />
+        <Header
+          onNavigate={navigateTo}
+        />
+
+        <OnboardingPage
+          onNavigate={navigateTo}
+        />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
       </>
     );
   }
 
+  /* =========================
+     홈
+  ========================= */
+
   if (currentPage === "home") {
+
     if (isAuthenticated) {
+
       return (
         <>
-          <Header onNavigate={navigateTo} />
+          <Header
+            onNavigate={navigateTo}
+          />
+
           <DashboardPage />
-          <Footer onNavigate={navigateTo} />
+
+          <Footer
+            onNavigate={navigateTo}
+          />
         </>
       );
     }
 
     return (
       <div className="min-h-screen">
-        <Header onNavigate={navigateTo} />
+
+        <Header
+          onNavigate={navigateTo}
+        />
+
         <main>
-          <Hero onNavigate={navigateTo} />
+
+          <Hero
+            onNavigate={navigateTo}
+          />
+
           <Services />
+
           <About />
+
           <Testimonials />
+
         </main>
-        <Footer onNavigate={navigateTo} />
+
+        <Footer
+          onNavigate={navigateTo}
+        />
+
       </div>
     );
   }
 
+  /* =========================
+     기본
+  ========================= */
+
   return (
     <div className="min-h-screen">
-      <Header onNavigate={navigateTo} />
+
+      <Header
+        onNavigate={navigateTo}
+      />
+
       <main>
-        <Hero onNavigate={navigateTo} />
+
+        <Hero
+          onNavigate={navigateTo}
+        />
+
         <Services />
+
         <About />
+
         <Testimonials />
+
         <Support />
+
       </main>
-      <Footer onNavigate={navigateTo} />
+
+      <Footer
+        onNavigate={navigateTo}
+      />
+
     </div>
   );
 }
 
 export default function App() {
+
   return (
     <AuthProvider>
+
       <StockProvider>
+
         <DropdownProvider>
+
           <AppContent />
+
         </DropdownProvider>
+
       </StockProvider>
+
     </AuthProvider>
   );
 }

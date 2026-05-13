@@ -25,6 +25,7 @@ export function SignupStep2({ onBack, onNavigate, signupData }: SignupStep2Props
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [agreeRequired, setAgreeRequired] = useState(false);
+  const [agreeInvestmentNotice, setAgreeInvestmentNotice] = useState(false);
   const [agreeOptional, setAgreeOptional] = useState(false);
   const [error, setError] = useState("");
   const [isIdNumber2Focused, setIsIdNumber2Focused] = useState(false);
@@ -108,8 +109,11 @@ export function SignupStep2({ onBack, onNavigate, signupData }: SignupStep2Props
       setError("필수 약관에 동의해주세요.");
       return;
     }
+    if (!agreeInvestmentNotice) {
+      setError("투자 책임 고지에 동의해주세요.");
+      return;
+    }
 
-    // Save user data
     const users = JSON.parse(localStorage.getItem("users") || '[]');
     const newUser = {
       email: signupData.email,
@@ -118,12 +122,12 @@ export function SignupStep2({ onBack, onNavigate, signupData }: SignupStep2Props
       idNumber: idNumber1 + idNumber2,
       phone: phone,
       marketingAgreed: agreeOptional,
+      investmentNoticeAgreed: agreeInvestmentNotice,
       createdAt: new Date().toISOString()
     };
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
-    // Register the email
     const registeredEmails = JSON.parse(localStorage.getItem("registeredEmails") || '["aa@naver.com"]');
     if (!registeredEmails.includes(signupData.email)) {
       registeredEmails.push(signupData.email);
@@ -134,6 +138,15 @@ export function SignupStep2({ onBack, onNavigate, signupData }: SignupStep2Props
     alert("회원가입이 완료되었습니다!");
     onNavigate("login");
   };
+
+  const canComplete =
+    name &&
+    idNumber1.length === 6 &&
+    idNumber2.length === 1 &&
+    phone.length === 11 &&
+    isVerified &&
+    agreeRequired &&
+    agreeInvestmentNotice;
 
   return (
     <div className="min-h-screen bg-white">
@@ -297,25 +310,43 @@ export function SignupStep2({ onBack, onNavigate, signupData }: SignupStep2Props
 
           {/* Terms */}
           <div className="border border-gray-300 rounded p-4 space-y-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-start gap-2">
               <input
                 type="checkbox"
                 id="agreeRequired"
                 checked={agreeRequired}
                 onChange={(e) => setAgreeRequired(e.target.checked)}
-                className="w-4 h-4"
+                className="w-4 h-4 mt-1"
               />
               <label htmlFor="agreeRequired" className="text-sm text-gray-700">
                 [필수] 이용약관 및 개인정보 처리방침에 동의합니다
               </label>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                id="agreeInvestmentNotice"
+                checked={agreeInvestmentNotice}
+                onChange={(e) => setAgreeInvestmentNotice(e.target.checked)}
+                className="w-4 h-4 mt-1"
+              />
+              <label htmlFor="agreeInvestmentNotice" className="text-sm text-gray-700 leading-relaxed">
+                [필수] 본 서비스는 투자자문이 아닌 정보 제공 목적이며, 최종 투자 결정의 책임은 본인에게 있습니다.
+              </label>
+            </div>
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded text-blue-600 text-sm leading-relaxed">
+              수집된 금융 정보는 성명, 계좌번호 등이 제거된 비식별화 처리를 거쳐 분석에만 활용됩니다.
+            </div>
+
+            <div className="flex items-start gap-2">
               <input
                 type="checkbox"
                 id="agreeOptional"
                 checked={agreeOptional}
                 onChange={(e) => setAgreeOptional(e.target.checked)}
-                className="w-4 h-4"
+                className="w-4 h-4 mt-1"
               />
               <label htmlFor="agreeOptional" className="text-sm text-gray-700">
                 [선택] 마케팅 정보 수신에 동의합니다
@@ -340,10 +371,10 @@ export function SignupStep2({ onBack, onNavigate, signupData }: SignupStep2Props
           {/* Complete Button */}
           <Button
             onClick={handleComplete}
-            disabled={!name || idNumber1.length !== 6 || idNumber2.length !== 1 || phone.length !== 11 || !isVerified || !agreeRequired}
+            disabled={!canComplete}
             className="w-full"
             style={{
-              backgroundColor: name && idNumber1.length === 6 && idNumber2.length === 1 && phone.length === 11 && isVerified && agreeRequired ? "#1D6AE5" : "#9CA3AF",
+              backgroundColor: canComplete ? "#1D6AE5" : "#9CA3AF",
               color: "white",
               padding: "12px",
               fontSize: "16px",

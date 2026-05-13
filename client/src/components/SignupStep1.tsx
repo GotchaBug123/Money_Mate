@@ -46,7 +46,6 @@ export function SignupStep1({ onBack, onNavigate, onNext }: SignupStep1Props) {
       return;
     }
 
-    // Check for duplicate email
     const registeredEmails = JSON.parse(localStorage.getItem("registeredEmails") || '["aa@naver.com"]');
     if (registeredEmails.includes(email)) {
       setError("회원가입이 된 이메일입니다.");
@@ -178,7 +177,6 @@ export function SignupStep1({ onBack, onNavigate, onNext }: SignupStep1Props) {
                   className="w-full"
                   disabled={isVerified}
                 />
-                {/* Email Validation Feedback */}
                 {email && (
                   <div className="mt-1 text-sm">
                     {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? (
@@ -248,7 +246,6 @@ export function SignupStep1({ onBack, onNavigate, onNext }: SignupStep1Props) {
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
-            {/* Password Validation Feedback */}
             <div className="mt-2 space-y-1 text-sm">
               <div className={password.length >= 8 ? "text-green-600" : "text-red-600"}>
                 {password.length >= 8 ? "✓" : "✗"} 8자 이상
@@ -286,6 +283,16 @@ export function SignupStep1({ onBack, onNavigate, onNext }: SignupStep1Props) {
                 {showPasswordConfirm ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+          </div>
+
+          {/* Investment Notice */}
+          <div className="border border-blue-200 bg-blue-50 rounded p-4 space-y-2">
+            <p className="text-sm text-blue-700 font-medium">
+              본 서비스는 투자자문이 아닌 정보 제공 목적이며, 최종 투자 결정의 책임은 본인에게 있습니다.
+            </p>
+            <p className="text-xs text-blue-600">
+              수집된 금융 정보는 성명, 계좌번호 등이 제거된 비식별화 처리를 거쳐 분석에만 활용됩니다.
+            </p>
           </div>
 
           {/* Error Message */}

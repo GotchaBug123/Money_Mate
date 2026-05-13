@@ -291,7 +291,7 @@ export function MyAssetsDropdown({
                 [자산]
               </div>
 
-              {/* 자산 요약 */}
+              {/* 맞춤 투자 제안 */}
               <button
                 type="button"
                 onClick={(event) =>
@@ -314,7 +314,7 @@ export function MyAssetsDropdown({
                   duration-200
                 "
               >
-                자산 요약
+                맞춤 투자 제안
               </button>
 
               {/* 자산 분배 */}
