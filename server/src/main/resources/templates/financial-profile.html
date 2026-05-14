@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 재무정보 입력</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/financial-profile.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a href="/main" class="logo">MoneyMate</a>
+
+        <nav class="nav">
+            <a href="/financial-profile">MY 자산</a>
+            <a href="#">포트폴리오</a>
+            <a href="#">대시보드</a>
+            <a href="#">투자정보</a>
+            <a href="#">고객센터</a>
+        </nav>
+
+        <div class="header-actions">
+            <a href="/mypage" class="mypage-btn">마이페이지</a>
+        </div>
+    </div>
+</header>
+
+<main class="financial-page">
+    <section class="page-hero">
+        <p class="eyebrow">Financial Profile</p>
+        <h1>나의 재무정보 입력</h1>
+        <p>
+            월 수입, 지출, 자산 정보를 입력하면 MoneyMate가 투자 가능 금액을 계산합니다.
+        </p>
+    </section>
+
+    <section class="form-card">
+        <div class="card-header">
+            <h2>기본 재무정보</h2>
+            <p>금액은 원 단위로 입력해주세요.</p>
+        </div>
+
+        <form action="/financial-profile" method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="monthlyIncome">월 수입</label>
+                    <input type="number" id="monthlyIncome" name="monthlyIncome" placeholder="예: 3000000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyFixedExpense">월 고정 지출</label>
+                    <input type="number" id="monthlyFixedExpense" name="monthlyFixedExpense" placeholder="예: 900000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyVariableExpense">월 변동 지출</label>
+                    <input type="number" id="monthlyVariableExpense" name="monthlyVariableExpense" placeholder="예: 700000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalAsset">총 자산</label>
+                    <input type="number" id="totalAsset" name="totalAsset" placeholder="예: 15000000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalLiability">총 부채</label>
+                    <input type="number" id="totalLiability" name="totalLiability" placeholder="예: 3000000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cashAsset">현금성 자산</label>
+                    <input type="number" id="cashAsset" name="cashAsset" placeholder="예: 5000000" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">재무정보 저장하기</button>
+        </form>
+
+        <div id="resultBox" class="result-box hidden">
+            <h3>저장 결과</h3>
+            <p id="resultText"></p>
+        </div>
+    </section>
+</main>
+
+
+</body>
+</html>

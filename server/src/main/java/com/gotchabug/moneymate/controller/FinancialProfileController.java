@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /*
 추가 설명 코드
-사용자의 세션을 확인하여 본인 확인을 마친 뒤,
-재무 정보를 안전하게 저장하거나 꺼내주는 통로
- */
+로그인한 사용자의 재무정보를 저장 및 조회하는 컨트롤러
+*/
 
 @RestController
 @RequestMapping("/api/financial-profile")
@@ -29,40 +27,48 @@ public class FinancialProfileController {
 
     private final FinancialProfileService financialProfileService;
 
+    /*
+    재무정보 저장 및 수정
+     */
     @PostMapping("/me")
     public FinancialProfileResponse saveOrUpdateMyFinancialProfile(
             @Valid @RequestBody FinancialProfileRequest request,
             HttpSession session
     ) {
+
         Member loginUser = getLoginUser(session);
 
         return financialProfileService.saveOrUpdate(loginUser, request);
     }
 
+    /*
+    내 재무정보 조회
+     */
     @GetMapping("/me")
     public FinancialProfileResponse getMyFinancialProfile(
             HttpSession session
     ) {
+
         Member loginUser = getLoginUser(session);
 
         return financialProfileService.getMyFinancialProfile(loginUser);
     }
 
+    /*
+    로그인 세션 확인
+     */
     private Member getLoginUser(HttpSession session) {
+
         Object loginUser = session.getAttribute("loginUser");
 
         if (!(loginUser instanceof Member member)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "로그인이 필요합니다."
+            );
         }
 
         return member;
     }
 
-    @PostMapping("/test/{memberId}")
-    public FinancialProfileResponse saveOrUpdateByMemberIdForTest(
-            @PathVariable Long memberId,
-            @Valid @RequestBody FinancialProfileRequest request
-    ) {
-        return financialProfileService.saveOrUpdateByMemberId(memberId, request);
-    }
 }
