@@ -63,6 +63,6 @@ public class FinancialProfilePageController {
 
         financialProfileService.saveOrUpdate(loginUser, request);
 
-        return "redirect:/my-asset";
+        return "redirect:/diagnosis";
     }
 }
