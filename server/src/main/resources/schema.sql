@@ -4,6 +4,7 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS data_sync_history;
+DROP TABLE IF EXISTS goal_simulation_result;
 DROP TABLE IF EXISTS asset_fundamental;
 DROP TABLE IF EXISTS external_data_source;
 DROP TABLE IF EXISTS conversion_funnel_log;
@@ -65,6 +66,8 @@ CREATE TABLE member_auth
     CONSTRAINT uq_member_auth_member UNIQUE (member_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+
 
 CREATE TABLE financial_profile
 (
@@ -373,6 +376,33 @@ CREATE TABLE investment_goal
     created_at           DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at           DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_investment_goal_member
+        FOREIGN KEY (member_id) REFERENCES member (member_id)
+            ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE goal_simulation_result
+(
+    simulation_result_id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id                   BIGINT   NOT NULL,
+    current_amount              BIGINT   NOT NULL,
+    monthly_investment          BIGINT   NOT NULL,
+    target_amount               BIGINT   NOT NULL,
+    years                       INT      NOT NULL,
+    expected_annual_return      DOUBLE   NOT NULL,
+    annual_volatility           DOUBLE   NOT NULL,
+    success_probability         DOUBLE   NOT NULL,
+    average_final_amount        BIGINT   NOT NULL,
+    optimistic_amount           BIGINT   NOT NULL,
+    median_amount               BIGINT   NOT NULL,
+    pessimistic_amount          BIGINT   NOT NULL,
+    var_amount                  BIGINT   NOT NULL,
+    worst_case_average_amount   BIGINT   NOT NULL,
+    shortage_amount             BIGINT   NOT NULL,
+    what_if_success_probability DOUBLE   NULL,
+    probability_improvement     DOUBLE   NULL,
+    created_at                  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_goal_simulation_result_member
         FOREIGN KEY (member_id) REFERENCES member (member_id)
             ON DELETE CASCADE
 ) ENGINE = InnoDB

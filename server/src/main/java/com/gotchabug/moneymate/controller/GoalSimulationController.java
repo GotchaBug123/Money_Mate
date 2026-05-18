@@ -1,9 +1,9 @@
 package com.gotchabug.moneymate.controller;
 
-import com.gotchabug.moneymate.dto.investment.InvestmentSurveyRequest;
-import com.gotchabug.moneymate.dto.investment.InvestmentSurveyResponse;
+import com.gotchabug.moneymate.dto.simulation.GoalSimulationRequest;
+import com.gotchabug.moneymate.dto.simulation.GoalSimulationResponse;
 import com.gotchabug.moneymate.entity.Member;
-import com.gotchabug.moneymate.service.InvestmentStyleService;
+import com.gotchabug.moneymate.service.GoalSimulationService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +11,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/investment")
-public class InvestmentStyleController {
+@RequestMapping("/simulation")
+public class GoalSimulationController {
 
-    private final InvestmentStyleService investmentStyleService;
+    private final GoalSimulationService goalSimulationService;
 
-    @PostMapping("/survey")
-    public InvestmentSurveyResponse analyze(
-            @Valid @RequestBody InvestmentSurveyRequest request,
+    // 목표 달성 시뮬레이션 실행 API
+    @PostMapping("/goal")
+    public GoalSimulationResponse simulateGoal(
+            @Valid @RequestBody GoalSimulationRequest request,
             HttpSession session
     ) {
 
@@ -28,7 +29,7 @@ public class InvestmentStyleController {
             throw new IllegalArgumentException("로그인이 필요합니다.");
         }
 
-        return investmentStyleService.analyze(
+        return goalSimulationService.simulate(
                 loginUser.getMemberId(),
                 request
         );
