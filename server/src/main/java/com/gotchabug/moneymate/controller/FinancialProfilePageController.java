@@ -37,7 +37,6 @@ public class FinancialProfilePageController {
         } catch (Exception e) {
             model.addAttribute("profile", null);
         }
-
         return "financial-profile";
     }
 
