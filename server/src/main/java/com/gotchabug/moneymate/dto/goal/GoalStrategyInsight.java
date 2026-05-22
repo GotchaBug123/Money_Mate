@@ -22,16 +22,16 @@ public class GoalStrategyInsight {
     private String status;
 
     public boolean isHighImportance() {
-        return "HIGH".equals(importance);
+        return "높음".equals(importance);
     }
 
     public boolean needsUserAction() {
         return actionCode != null
-                && !"MAINTAIN_CURRENT_STRATEGY".equals(actionCode);
+                && !"현재전략유지".equals(actionCode);
     }
 
     public boolean isWarning() {
-        return "WARNING".equals(status)
-                || "DANGER".equals(status);
+        return "주의".equals(status)
+                || "위험".equals(status);
     }
 }

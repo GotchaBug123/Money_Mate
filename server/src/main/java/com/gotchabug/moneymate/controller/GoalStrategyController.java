@@ -28,7 +28,7 @@ public class GoalStrategyController {
         Member loginUser = (Member) session.getAttribute("loginUser");
 
         if (loginUser == null) {
-            throw new IllegalArgumentException("Login is required.");
+            throw new IllegalArgumentException("로그인이 필요합니다.");
         }
 
         return goalStrategyService.analyzeGoalStrategy(

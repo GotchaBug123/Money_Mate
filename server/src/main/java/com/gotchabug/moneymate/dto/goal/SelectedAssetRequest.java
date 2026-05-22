@@ -9,29 +9,42 @@ import lombok.Getter;
 @Getter
 public class SelectedAssetRequest {
 
-    @NotBlank(message = "Asset symbol is required.")
+    @NotBlank(message = "자산 심볼은 필수입니다.")
     private String symbol;
 
-    @NotBlank(message = "Asset name is required.")
+    @NotBlank(message = "자산 이름은 필수입니다.")
     private String assetName;
 
-    @NotBlank(message = "Asset type is required.")
+    @NotBlank(message = "자산 유형은 필수입니다.")
     private String assetType;
 
-    @NotBlank(message = "Market is required.")
+    @NotBlank(message = "시장 정보는 필수입니다.")
     private String market;
 
-    @NotNull(message = "Target weight is required.")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Target weight must be greater than 0.")
-    @DecimalMax(value = "1.0", message = "Target weight must be 1.0 or less.")
+    @NotNull(message = "목표 비중은 필수입니다.")
+    @DecimalMin(
+            value = "0.0",
+            inclusive = false,
+            message = "목표 비중은 0보다 커야 합니다."
+    )
+    @DecimalMax(
+            value = "1.0",
+            message = "목표 비중은 1.0 이하여야 합니다."
+    )
     private Double targetWeight;
 
-    @NotNull(message = "Expected annual return is required.")
-    @DecimalMin(value = "-1.0", message = "Expected annual return must be at least -100%.")
+    @NotNull(message = "예상 연 수익률은 필수입니다.")
+    @DecimalMin(
+            value = "-1.0",
+            message = "예상 연 수익률은 최소 -100% 이상이어야 합니다."
+    )
     private Double expectedAnnualReturn;
 
-    @NotNull(message = "Annual volatility is required.")
-    @DecimalMin(value = "0.0", message = "Annual volatility must be at least 0.")
+    @NotNull(message = "연 변동성은 필수입니다.")
+    @DecimalMin(
+            value = "0.0",
+            message = "연 변동성은 0 이상이어야 합니다."
+    )
     private Double annualVolatility;
 
     private String theme;

@@ -14,36 +14,36 @@ import java.util.List;
 @Getter
 public class GoalStrategyRequest {
 
-    @NotBlank(message = "Goal name is required.")
+    @NotBlank(message = "목표 이름은 필수입니다.")
     private String goalName;
 
-    @NotNull(message = "Current amount is required.")
-    @Min(value = 0, message = "Current amount must be at least 0.")
+    @NotNull(message = "현재 자산은 필수입니다.")
+    @Min(value = 0, message = "현재 자산은 0 이상이어야 합니다.")
     private Long currentAmount;
 
-    @NotNull(message = "Monthly investment is required.")
-    @Min(value = 0, message = "Monthly investment must be at least 0.")
+    @NotNull(message = "월 투자금은 필수입니다.")
+    @Min(value = 0, message = "월 투자금은 0 이상이어야 합니다.")
     private Long monthlyInvestment;
 
-    @NotNull(message = "Target amount is required.")
-    @Min(value = 1000000, message = "Target amount must be at least 1,000,000.")
+    @NotNull(message = "목표 금액은 필수입니다.")
+    @Min(value = 1000000, message = "목표 금액은 최소 100만원 이상이어야 합니다.")
     private Long targetAmount;
 
-    @NotNull(message = "Investment years is required.")
-    @Min(value = 1, message = "Investment years must be at least 1.")
+    @NotNull(message = "투자 기간은 필수입니다.")
+    @Min(value = 1, message = "투자 기간은 최소 1년 이상이어야 합니다.")
     private Integer investmentYears;
 
-    @NotNull(message = "Rebalance cycle is required.")
+    @NotNull(message = "리밸런싱 주기는 필수입니다.")
     private RebalanceCycle rebalanceCycle;
 
     @Valid
-    @NotEmpty(message = "At least one selected asset is required.")
+    @NotEmpty(message = "최소 1개 이상의 자산을 선택해야 합니다.")
     private List<SelectedAssetRequest> selectedAssets;
 
-    @Min(value = 0, message = "Additional monthly investment must be at least 0.")
+    @Min(value = 0, message = "추가 월 투자금은 0 이상이어야 합니다.")
     private Long additionalMonthlyInvestment;
 
-    @Min(value = 0, message = "Additional years must be at least 0.")
+    @Min(value = 0, message = "추가 투자 기간은 0 이상이어야 합니다.")
     private Integer additionalYears;
 
     public int totalInvestmentMonths() {
@@ -97,7 +97,7 @@ public class GoalStrategyRequest {
                 + (safeMonthlyInvestment() * totalInvestmentMonths());
     }
 
-    @AssertTrue(message = "Selected asset target weights must add up to 100%.")
+    @AssertTrue(message = "선택 자산 비중의 합은 100%여야 합니다.")
     public boolean isValidWeightSum() {
 
         if (selectedAssets == null || selectedAssets.isEmpty()) {

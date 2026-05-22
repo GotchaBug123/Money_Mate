@@ -157,7 +157,7 @@ public class GoalStrategyService {
     private Member findMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Login member was not found."));
+                        new IllegalArgumentException("로그인 사용자를 찾을 수 없습니다."));
     }
 
     private SimulationSummary calculateWhatIfSummary(
@@ -462,18 +462,18 @@ public class GoalStrategyService {
     ) {
 
         if (probability >= STATUS_GOOD_THRESHOLD) {
-            return "GOOD";
+            return "양호";
         }
 
         if (probability >= STATUS_NORMAL_THRESHOLD) {
-            return "NORMAL";
+            return "보통";
         }
 
         if (probability >= STATUS_WARNING_THRESHOLD) {
-            return "WARNING";
+            return "주의";
         }
 
-        return "DANGER";
+        return "위험";
     }
 
     private Long calculateRecommendedMonthlyInvestment(
@@ -588,23 +588,19 @@ public class GoalStrategyService {
     ) {
 
         if (summary.successProbability() >= STATUS_GOOD_THRESHOLD) {
-            return "Grade " + strategyGrade
-                    + ": the current goal strategy has a high target success probability.";
+            return strategyGrade + "등급 전략입니다. 현재 목표 달성 가능성이 높은 편입니다.";
         }
 
         if (summary.shortageAmount() > 0) {
-            return "Grade " + strategyGrade
-                    + ": increase monthly investment or adjust the asset mix to reduce the projected shortage.";
+            return strategyGrade + "등급 전략입니다. 목표 금액까지 부족 금액이 예상되므로 월 투자금을 늘리거나 자산 비중을 조정하는 것이 좋습니다.";
         }
 
         if (!request.hasRebalancing()
                 && request.getSelectedAssets().size() > 1) {
-            return "Grade " + strategyGrade
-                    + ": periodic rebalancing may improve consistency across selected assets.";
+            return strategyGrade + "등급 전략입니다. 여러 자산을 선택했기 때문에 주기적인 리밸런싱을 적용하면 전략 안정성을 높일 수 있습니다.";
         }
 
-        return "Grade " + strategyGrade
-                + ": keep monitoring the strategy because the result is sensitive to market paths.";
+        return strategyGrade + "등급 전략입니다. 시장 흐름에 따라 결과가 달라질 수 있으므로 전략을 주기적으로 점검하는 것이 좋습니다.";
     }
 
     private String createAssetSummary(
@@ -639,14 +635,14 @@ public class GoalStrategyService {
 
         insights.add(
                 GoalStrategyInsight.builder()
-                        .insightType("SUCCESS_PROBABILITY")
-                        .title("Goal success probability")
+                        .insightType("목표달성확률")
+                        .title("목표 달성 확률")
                         .value(formatPercent(summary.successProbability()))
-                        .description("Estimated probability that the selected strategy reaches the target amount.")
+                        .description("현재 전략이 목표 금액에 도달할 것으로 예상되는 확률입니다.")
                         .actionCode(summary.successProbability() >= TARGET_SUCCESS_PROBABILITY
-                                ? "MAINTAIN_CURRENT_STRATEGY"
-                                : "REVIEW_GOAL_STRATEGY")
-                        .importance("HIGH")
+                                ? "현재전략유지"
+                                : "전략재검토")
+                        .importance("높음")
                         .status(strategyStatus)
                         .build()
         );
@@ -654,25 +650,25 @@ public class GoalStrategyService {
         if (summary.shortageAmount() > 0) {
             insights.add(
                     GoalStrategyInsight.builder()
-                            .insightType("SHORTAGE_AMOUNT")
-                            .title("Projected shortage")
+                            .insightType("부족금액")
+                            .title("예상 부족 금액")
                             .value(formatMoney(summary.shortageAmount()))
-                            .description("Median simulation result is below the target amount.")
-                            .actionCode("INCREASE_MONTHLY_INVESTMENT")
-                            .importance("HIGH")
-                            .status("WARNING")
+                            .description("중앙 시나리오 기준 목표 금액보다 부족한 금액입니다.")
+                            .actionCode("월투자금증액")
+                            .importance("높음")
+                            .status("주의")
                             .build()
             );
 
             insights.add(
                     GoalStrategyInsight.builder()
-                            .insightType("RECOMMENDED_MONTHLY_INVESTMENT")
-                            .title("Recommended monthly investment")
+                            .insightType("권장월투자금")
+                            .title("권장 월 투자금")
                             .value(formatMoney(recommendedMonthlyInvestment))
-                            .description("Monthly investment estimate needed to close the median projected shortage.")
-                            .actionCode("APPLY_RECOMMENDED_MONTHLY_INVESTMENT")
-                            .importance("MEDIUM")
-                            .status("NORMAL")
+                            .description("목표 달성 가능성을 높이기 위해 필요한 월 투자금 추정치입니다.")
+                            .actionCode("권장투자금적용")
+                            .importance("보통")
+                            .status("보통")
                             .build()
             );
         }
@@ -707,21 +703,21 @@ public class GoalStrategyService {
 
         insights.add(
                 GoalStrategyInsight.builder()
-                        .insightType("REBALANCING_EFFECT")
+                        .insightType("리밸런싱효과")
                         .title(request.hasRebalancing()
-                                ? "Rebalancing effect"
-                                : "Quarterly rebalancing check")
+                                ? "리밸런싱 효과"
+                                : "분기 리밸런싱 비교")
                         .value(formatSignedPercent(rebalancingImprovement))
                         .description(request.hasRebalancing()
-                                ? "Difference versus the same strategy without rebalancing."
-                                : "Estimated difference if quarterly rebalancing is applied.")
+                                ? "리밸런싱을 적용하지 않았을 때와 비교한 목표 달성 확률 차이입니다."
+                                : "분기별 리밸런싱을 적용했을 때 예상되는 목표 달성 확률 차이입니다.")
                         .actionCode(request.hasRebalancing()
-                                ? "MAINTAIN_REBALANCING"
-                                : "APPLY_REBALANCING")
-                        .importance(meaningfulDelta ? "MEDIUM" : "LOW")
+                                ? "리밸런싱유지"
+                                : "리밸런싱적용")
+                        .importance(meaningfulDelta ? "보통" : "낮음")
                         .status(rebalancingImprovement >= 0
-                                ? "GOOD"
-                                : "NORMAL")
+                                ? "양호"
+                                : "보통")
                         .build()
         );
     }
@@ -740,20 +736,20 @@ public class GoalStrategyService {
 
         insights.add(
                 GoalStrategyInsight.builder()
-                        .insightType("WHAT_IF_EFFECT")
-                        .title("What-if effect")
+                        .insightType("추가투자효과")
+                        .title("추가 투자 전략 효과")
                         .value(formatSignedPercent(whatIfImprovement))
                         .description(String.format(
                                 Locale.US,
-                                "Additional monthly investment %s and additional years %d were applied.",
+                                "추가 월 투자금 %s, 추가 투자 기간 %d년을 적용한 결과입니다.",
                                 formatMoney(request.safeAdditionalMonthlyInvestment()),
                                 request.safeAdditionalYears()
                         ))
                         .actionCode(improved
-                                ? "APPLY_WHAT_IF_PLAN"
-                                : "REVIEW_WHAT_IF_ASSUMPTIONS")
-                        .importance(improved ? "MEDIUM" : "LOW")
-                        .status(improved ? "GOOD" : "NORMAL")
+                                ? "추가투자전략적용"
+                                : "추가전략재검토")
+                        .importance(improved ? "보통" : "낮음")
+                        .status(improved ? "양호" : "보통")
                         .build()
         );
     }
@@ -828,7 +824,7 @@ public class GoalStrategyService {
     }
 
     private String formatMoney(long amount) {
-        return String.format(Locale.US, "KRW %,d", amount);
+        return String.format(Locale.US, "%,d원", amount);
     }
 
     private String formatPercent(double value) {

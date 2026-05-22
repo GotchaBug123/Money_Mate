@@ -10,13 +10,14 @@ public interface GoalStrategyResultRepository
         extends JpaRepository<GoalStrategyResult, Long> {
 
     /**
-     * Finds all goal strategy results for a member, newest first.
+     * 회원의 목표 전략 분석 결과 전체 조회
+     * 최신 생성 순 정렬
      */
     List<GoalStrategyResult>
     findByMember_MemberIdOrderByCreatedAtDesc(Long memberId);
 
     /**
-     * Finds the latest goal strategy result for a member.
+     * 회원의 가장 최근 목표 전략 결과 조회
      */
     Optional<GoalStrategyResult>
     findFirstByMember_MemberIdOrderByCreatedAtDesc(Long memberId);
