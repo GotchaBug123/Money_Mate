@@ -1,25 +1,49 @@
 import React from 'react';
-import './App.css'; // 필요에 따라 주석 처리 또는 유지
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import Header from './components/common/Header';
+import Home from './pages/Home';
+import MyPage from './pages/MyPage';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import SignUpComplete from './pages/SignUpComplete';
+import FindId from "./pages/FindId";
+import FindPassword from "./pages/FindPassword";
+import ResetPassword from "./pages/ResetPassword";
+import CustomerService from "./pages/CustomerService";
+import Footer from "./components/common/Footer";
+import InquiryWrite from "./pages/InquiryWrite";
+import InquiryList from "./pages/InquiryList";
+import AssetDetail from "./pages/AssetDetail";
+import MyAsset from "./pages/MyAsset";
 
 function App() {
     return (
-        <div className="app-container">
-            <header>
-                <h1>Money_Mate</h1>
-            </header>
+        <BrowserRouter>
+            <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
+                {/* 공통 상단 헤더 */}
+                <Header/>
 
-            <main>
-                <section className="hero-section">
-                    <h2>내 지갑 속 현실부터 미래의 목표까지,<br/>데이터로 연결하는 나만의 금융 비서</h2>
-                    <p>
-                        단순한 투자 상품 추천이 아닙니다.<br/>
-                        당신의 실제 수입과 지출 데이터를 분석해 현실적인 투자 가능 금액을 찾아내고,<br/>
-                        몬테카를로 시뮬레이션을 통해 목표 달성 확률을 예측합니다.
-                    </p>
-                    <button>내 소비 진단하기</button>
-                </section>
-            </main>
-        </div>
+                {/* 페이지 전환 영역 */}
+                <main style={{minHeight: 'calc(100vh - 60px)'}}>
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/mypage" element={<MyPage/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/signup" element={<SignUp/>}/>
+                        <Route path="/signup-complete" element={<SignUpComplete/>}/>
+                        <Route path="find-id" element={<FindId/>}/>
+                        <Route path="/find-pw" element={<FindPassword/>}/>
+                        <Route path="/reset-pw" element={<ResetPassword/>}/>
+                        <Route path="/customer-service" element={<CustomerService/>}/>
+                        <Route path="/inquiry-write" element={<InquiryWrite/>}/>
+                        <Route path="/inquiry-list" element={<InquiryList/>}/>
+                        <Route path="/asset" element={<MyAsset/>}/>
+                        <Route path="/asset-detail" element={<AssetDetail/>}/>
+                    </Routes>
+                </main>
+                <Footer/>
+            </div>
+        </BrowserRouter>
     );
 }
 
