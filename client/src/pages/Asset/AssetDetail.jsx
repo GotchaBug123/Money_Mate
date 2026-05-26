@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
-import {useModal} from '../hooks/useModal'
+import {useModal} from '../../hooks/useModal'
 
 function AssetDetail() {
     // 모달 표시 여부를 관리하는 상태

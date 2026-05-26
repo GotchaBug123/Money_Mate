@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
-import '../styles/customerInquiryManage.css';
+import './customerInquiryManage.css';
 
 function CustomerInquiryManagePage({
-    inquiries,
-    onAnswerInquiry,
-    onDeleteInquiry,
-}) {
+                                       inquiries,
+                                       onAnswerInquiry,
+                                       onDeleteInquiry,
+                                   }) {
     const [mode, setMode] = useState('list');
     const [answerForm, setAnswerForm] = useState({
         inquiryNo: '',
@@ -31,7 +31,7 @@ function CustomerInquiryManagePage({
     };
 
     const handleAnswerChange = (event) => {
-        const { value } = event.target;
+        const {value} = event.target;
 
         setAnswerForm((prevForm) => ({
             ...prevForm,

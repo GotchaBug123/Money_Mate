@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import '../styles/investmentManage.css';
+import React, {useState} from 'react';
 
+import './investmentManage.css';
 
 const investmentMembers = [
     {
@@ -231,11 +231,11 @@ function InvestmentManagePage() {
 
                                             {statistics.map((item, index) => {
                                                 const points = [
-                                                    { x: 60, y: 220 },
-                                                    { x: 180, y: 150 },
-                                                    { x: 300, y: 175 },
-                                                    { x: 420, y: 195 },
-                                                    { x: 540, y: 230 },
+                                                    {x: 60, y: 220},
+                                                    {x: 180, y: 150},
+                                                    {x: 300, y: 175},
+                                                    {x: 420, y: 195},
+                                                    {x: 540, y: 230},
                                                 ];
 
                                                 return (

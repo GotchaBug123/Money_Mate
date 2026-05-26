@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import logo from '../assets/moneymate_logo.png';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import logo from '../../assets/moneymate_logo.png';
 import MemberManagePage from './MemberManagePage';
 import InvestmentManagePage from './InvestmentManagePage';
 import CommunityManagePage from './CommunityManagePage';
 import CustomerInquiryManagePage from './CustomerInquiryManagePage';
 
-import '../styles/admin.css';
+import './admin.css';
 
 function AdminPage({
-    onLogout,
-    posts: externalPosts,
-    onUpdatePost,
-    onDeletePost,
-}) {
+                       onLogout,
+                       posts: externalPosts,
+                       onUpdatePost,
+                       onDeletePost,
+                   }) {
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState('dashboard');
 
@@ -236,7 +236,7 @@ function AdminPage({
         <div className="admin-page">
             <header className="admin-header">
                 <div className="admin-brand" onClick={() => setActiveMenu('dashboard')}>
-                    <img src={logo} alt="머니메이트 로고" />
+                    <img src={logo} alt="머니메이트 로고"/>
                     <h1>관리자 화면</h1>
                 </div>
 
@@ -304,7 +304,7 @@ function AdminPage({
             )}
 
             {activeMenu === 'investmentManage' && (
-                <InvestmentManagePage />
+                <InvestmentManagePage/>
             )}
 
             {activeMenu === 'communityManage' && (

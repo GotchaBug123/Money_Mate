@@ -1,34 +1,40 @@
 import React from 'react';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
+
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+
 import Home from './pages/Home/Home';
-import MyPage from './pages/MyPage';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import SignUpComplete from './pages/SignUpComplete';
-import FindId from './pages/FindId';
-import FindPassword from './pages/FindPassword';
-import ResetPassword from './pages/ResetPassword';
-import CustomerService from './pages/CustomerService';
-import InquiryWrite from './pages/InquiryWrite';
-import InquiryList from './pages/InquiryList';
-import AssetDetail from './pages/AssetDetail';
-import MyAsset from './pages/MyAsset';
-import AdminPage from './pages/AdminPage';
 
-import FinancialInput from './pages/Diagnosis/FinancialDiagnosis/FinancialInput.jsx';
-import FinancialResult from './pages/Diagnosis/FinancialDiagnosis/FinancialResult.jsx';
-import InvestmentQuestions from './pages/Diagnosis/InvestmentDiagnosis/InvestmentQuestions.jsx';
-import InvestmentResult from './pages/Diagnosis/InvestmentDiagnosis/InvestmentResult.jsx';
+import MyPage from './pages/Members/MyPage';
+import Login from './pages/Members/Login';
+import SignUp from './pages/Members/SignUp';
+import SignUpComplete from './pages/Members/SignUpComplete';
+import FindId from './pages/Members/FindId';
+import FindPassword from './pages/Members/FindPassword';
+import ResetPassword from './pages/Members/ResetPassword';
 
-import PortfolioMain from './pages/Portfolio/PortfolioMain/PortfolioMain.jsx';
-import PortfolioAuto from './pages/Portfolio/PortfolioAuto/PortfolioAuto.jsx';
-import PortfolioResult from './pages/Portfolio/PortfolioResult/PortfolioResult.jsx';
-import PortfolioDirect from './pages/Portfolio/PortfolioDirect/PortfolioDirect.jsx';
+import CustomerService from './pages/Service/CustomerService';
+import InquiryWrite from './pages/Service/InquiryWrite';
+import InquiryList from './pages/Service/InquiryList';
 
-import Rebalancing from './pages/Rebalancing/Rebalancing.jsx';
-import InvestmentInformation from './pages/InvestmentInformation/InvestmentInformation.jsx';
+import AssetDetail from './pages/Asset/AssetDetail';
+import MyAsset from './pages/Asset/MyAsset';
+
+import AdminPage from './pages/Admin/AdminPage';
+
+import FinancialInput from './pages/Diagnosis/FinancialDiagnosis/FinancialInput';
+import FinancialResult from './pages/Diagnosis/FinancialDiagnosis/FinancialResult';
+import InvestmentQuestions from './pages/Diagnosis/InvestmentDiagnosis/InvestmentQuestions';
+import InvestmentResult from './pages/Diagnosis/InvestmentDiagnosis/InvestmentResult';
+
+import PortfolioMain from './pages/Portfolio/PortfolioMain/PortfolioMain';
+import PortfolioAuto from './pages/Portfolio/PortfolioAuto/PortfolioAuto';
+import PortfolioResult from './pages/Portfolio/PortfolioResult/PortfolioResult';
+import PortfolioDirect from './pages/Portfolio/PortfolioDirect/PortfolioDirect';
+
+import Rebalancing from './pages/Rebalancing/Rebalancing';
+import InvestmentInformation from './pages/InvestmentInformation/InvestmentInformation';
 
 import './App.css';
 
@@ -55,16 +61,16 @@ function App() {
                         <Route path="/inquiry-list" element={<InquiryList/>}/>
                         <Route path="/asset" element={<MyAsset/>}/>
                         <Route path="/asset-detail" element={<AssetDetail/>}/>
-                        <Route path="/financial/input" element={<FinancialInput />} />
-                        <Route path="/financial/result" element={<FinancialResult />} />
-                        <Route path="/investment/questions" element={<InvestmentQuestions />} />
-                        <Route path="/investment/result" element={<InvestmentResult />} />
-                        <Route path="/portfolio" element={<PortfolioMain />} />
-                        <Route path="/portfolio/auto" element={<PortfolioAuto />} />
-                        <Route path="/portfolio/result" element={<PortfolioResult />} />
-                        <Route path="/portfolio/direct" element={<PortfolioDirect />} />
-                        <Route path="/rebalancing" element={<Rebalancing />} />
-                        <Route path="/investment-information" element={<InvestmentInformation />} />
+                        <Route path="/financial/input" element={<FinancialInput/>}/>
+                        <Route path="/financial/result" element={<FinancialResult/>}/>
+                        <Route path="/investment/questions" element={<InvestmentQuestions/>}/>
+                        <Route path="/investment/result" element={<InvestmentResult/>}/>
+                        <Route path="/portfolio" element={<PortfolioMain/>}/>
+                        <Route path="/portfolio/auto" element={<PortfolioAuto/>}/>
+                        <Route path="/portfolio/result" element={<PortfolioResult/>}/>
+                        <Route path="/portfolio/direct" element={<PortfolioDirect/>}/>
+                        <Route path="/rebalancing" element={<Rebalancing/>}/>
+                        <Route path="/investment-information" element={<InvestmentInformation/>}/>
                         <Route path="/admin" element={<AdminPage/>}/>
                     </Routes>
                 </main>

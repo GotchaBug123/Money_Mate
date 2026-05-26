@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
-import '../styles/communityManage.css';
+import './communityManage.css';
 
-function CommunityManagePage({ posts, onUpdatePost, onDeletePost }) {
+function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
     const [mode, setMode] = useState('list');
     const [selectedPost, setSelectedPost] = useState(null);
     const [searchInput, setSearchInput] = useState('');
@@ -54,7 +54,7 @@ function CommunityManagePage({ posts, onUpdatePost, onDeletePost }) {
     };
 
     const handleEditChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
 
         setEditForm((prevForm) => ({
             ...prevForm,

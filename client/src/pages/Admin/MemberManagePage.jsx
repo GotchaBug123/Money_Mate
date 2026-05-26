@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import '../styles/memberManage.css';
+import React, {useState} from 'react';
+import './memberManage.css';
 
-function MemberManagePage({ members, onDeleteMember, onUpdateMember }) {
+function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [selectedMember, setSelectedMember] = useState(null);
@@ -35,7 +35,7 @@ function MemberManagePage({ members, onDeleteMember, onUpdateMember }) {
 
     const handleOpenEditModal = (member) => {
         setSelectedMember(member);
-        setEditForm({ ...member });
+        setEditForm({...member});
     };
 
     const handleCloseEditModal = () => {
@@ -43,7 +43,7 @@ function MemberManagePage({ members, onDeleteMember, onUpdateMember }) {
     };
 
     const handleEditChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
 
         setEditForm((prevForm) => ({
             ...prevForm,
