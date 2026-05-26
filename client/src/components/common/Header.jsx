@@ -43,7 +43,7 @@ function Header() {
                         <Link to="/asset">MY자산</Link>
                         <Link to="/portfolio">포트폴리오</Link>
                         <Link to="/rebalancing">리밸런싱</Link>
-                        <Link to="/info">투자정보</Link>
+                        <Link to="/investment-information">투자정보</Link>
                         <Link to="/community">커뮤니티</Link>
                     </nav>
                 </div>

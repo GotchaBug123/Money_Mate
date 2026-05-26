@@ -1,0 +1,252 @@
+.pageWrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+/* 자동 생성 버튼 */
+.autoGenBtn {
+    align-self: flex-start;
+    padding: 12px 28px;
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.autoGenBtn:hover {
+    background: #1B5ED9;
+    color: #fff;
+}
+
+/* 섹션 */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.sectionDesc {
+    font-size: 13px;
+    color: #999;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* 카드 가로 줄 */
+.cardRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* 포트폴리오 카드 공통 */
+.card {
+    width: 300px;
+    background: #fff;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+    transform: translateY(-2px);
+}
+
+.cardTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cardName {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.cardDate {
+    font-size: 11px;
+    color: #ccc;
+    margin: 0;
+}
+
+/* 자동생성 카드 수익 지표 */
+.cardStats {
+    display: flex;
+    gap: 0;
+    background: #f8f9fb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.statBox {
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+    border-right: 1px solid #efefef;
+}
+
+.statBox:last-child {
+    border-right: none;
+}
+
+.statLabel {
+    font-size: 10px;
+    color: #aaa;
+    margin: 0 0 4px;
+}
+
+.statValue {
+    font-size: 13px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.pos { color: #1A7A45 !important; }
+
+/* 종목 칩 */
+.cardStocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.stockChip {
+    background: #f0f4ff;
+    color: #1B5ED9;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+
+.stockChip strong {
+    margin-left: 3px;
+    color: #1B5ED9;
+}
+
+/* 하단 기간 + 목표 */
+.cardBottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 10px;
+}
+
+.cardPeriod {
+    font-size: 11px;
+    color: #bbb;
+}
+
+.cardGoal {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1B5ED9;
+}
+
+/* 빈 카드 */
+.emptyCard {
+    width: 300px;
+    height: 150px;
+    background: #f8f9fb;
+    border: 2px dashed #ddd;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.emptyText {
+    font-size: 13px;
+    color: #bbb;
+    margin: 0;
+}
+
+.emptyBtn {
+    font-size: 12px;
+    color: #1B5ED9;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+/* + 생성하기 카드 */
+.addCard {
+    width: 300px;
+    height: 170px;
+    background: #f8f9fb;
+    border: 2px dashed #ddd;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.addCard:hover {
+    border-color: #1B5ED9;
+    background: #E8F0FE;
+}
+
+.addIcon {
+    font-size: 30px;
+    color: #ccc;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.addCard:hover .addIcon {
+    color: #1B5ED9;
+}
+
+.addText {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ccc;
+    transition: color 0.2s;
+}
+
+.addCard:hover .addText {
+    color: #1B5ED9;
+}
+
+.loadingText {
+    font-size: 13px;
+    color: #aaa;
+    padding: 20px 0;
+}

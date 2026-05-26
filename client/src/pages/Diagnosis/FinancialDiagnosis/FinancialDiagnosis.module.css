@@ -1,0 +1,318 @@
+/* ─── 공통 래퍼 ─── */
+.pageWrapper {
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    background: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 40px;
+}
+
+/* ─── 폼 컨테이너 ─── */
+.formContainer {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─── 각 필드 행 ─── */
+.fieldRow {
+    display: flex;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 1px solid #ebebeb;
+    gap: 32px;
+}
+
+.fieldLabel {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    width: 110px;
+    flex-shrink: 0;
+}
+
+.inputWrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.textInput {
+    width: 100%;
+    padding: 14px 60px 14px 18px;
+    font-size: 15px;
+    color: #111;
+    background: #f5f5f5;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    box-sizing: border-box;
+}
+
+.textInput::placeholder {
+    color: #bbb;
+    font-size: 14px;
+}
+
+.textInput:focus {
+    border-color: #1B5ED9;
+    background: #fff;
+}
+
+.inputFilled {
+    border-color: #1B5ED9;
+    background: #fff;
+}
+
+.inputUnit {
+    position: absolute;
+    right: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1B5ED9;
+    pointer-events: none;
+}
+
+/* ─── 버튼 영역 ─── */
+.submitRow {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.submitBtn {
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    padding: 14px 60px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 2px 10px rgba(27, 94, 217, 0.25);
+    letter-spacing: -0.01em;
+}
+
+.submitBtn:hover {
+    background: #1249B3;
+    transform: translateY(-1px);
+}
+
+.submitBtnDisabled {
+    background: #c5cdd8;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ════════════════════════════════
+   RESULT 페이지
+════════════════════════════════ */
+.resultLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 64px);
+}
+
+.eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1B5ED9;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+}
+
+.resultLeft {
+    padding: 56px 52px;
+    background: #fff;
+    border-right: 1px solid #e8ecf2;
+    display: flex;
+    flex-direction: column;
+}
+
+.resultTitle {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0d1b2a;
+    letter-spacing: -0.03em;
+    margin: 0 0 28px;
+}
+
+.scoreCard {
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 20px;
+}
+
+.scoreNumRow {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.scoreNum {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+.scoreMax {
+    font-size: 20px;
+    font-weight: 600;
+    opacity: 0.7;
+}
+
+.scoreLabelBadge {
+    display: inline-block;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 99px;
+    margin-bottom: 20px;
+}
+
+.gaugeTrack {
+    width: 100%;
+    height: 10px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.gaugeFill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s ease;
+}
+
+.scoreComment {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.investCard {
+    background: #f7f8fa;
+    border: 1px solid #e8ecf2;
+    border-radius: 14px;
+    padding: 24px 28px;
+}
+
+.investCardLabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.investCardValue {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+}
+
+.investCardDesc {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.resultRight {
+    padding: 56px 52px;
+    background: #f4f6f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.summaryCard {
+    background: #fff;
+    border: 1px solid #e8ecf2;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    flex: 1;
+}
+
+.summaryHeader {
+    padding: 20px 28px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #f0f2f5;
+    background: #fafbfc;
+}
+
+.summaryList {
+    padding: 8px 0;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 28px;
+    border-bottom: 1px solid #f5f6f8;
+}
+
+.summaryRow:last-child {
+    border-bottom: none;
+}
+
+.summaryKey {
+    font-size: 13px;
+    color: #888;
+}
+
+.summaryVal {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+}
+
+.resultActions {
+    display: flex;
+    gap: 12px;
+}
+
+.secondaryBtn {
+    background: #fff;
+    color: #555;
+    border: 1.5px solid #dde1e8;
+    padding: 14px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: border-color 0.15s, color 0.15s;
+    flex: 1;
+}
+
+.secondaryBtn:hover {
+    border-color: #1B5ED9;
+    color: #1B5ED9;
+}
+
+.resultActions .submitBtn {
+    flex: 2;
+    width: auto;
+    padding: 14px 28px;
+    border-radius: 10px;
+}

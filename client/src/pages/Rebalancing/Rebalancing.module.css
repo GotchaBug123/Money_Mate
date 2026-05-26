@@ -1,0 +1,117 @@
+.pageWrapper { padding: 32px; }
+
+/* ── 2열 레이아웃 ── */
+.layout { display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: flex-start; }
+
+/* ── 왼쪽 폼 ── */
+.formSection { display: flex; flex-direction: column; gap: 20px; }
+
+.inputGroup { display: flex; flex-direction: column; gap: 8px; }
+
+.inputLabel { font-size: 13px; font-weight: 500; color: #555; }
+
+.amountRow { display: flex; gap: 8px; }
+
+.currencySelect { padding: 9px 10px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; background: #fff; cursor: pointer; min-width: 72px; outline: none; }
+
+.textInput { flex: 1; padding: 9px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+.textInput:focus { border-color: #185FA5; }
+
+.dateRow { display: flex; gap: 8px; align-items: center; }
+
+.dateInput { flex: 1; padding: 9px 8px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 12px; outline: none; transition: border-color 0.2s; }
+.dateInput:focus { border-color: #185FA5; }
+
+.dateSep { font-size: 14px; color: #aaa; }
+
+.stockHeader { display: flex; justify-content: space-between; align-items: center; }
+.stockCount { font-size: 12px; color: #888; }
+
+.stockItem { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f8f9fb; border-radius: 10px; margin-top: 4px; }
+.stockItemLeft { display: flex; align-items: center; gap: 10px; }
+.stockItemName { font-size: 13px; font-weight: 600; color: #1a1a2e; margin: 0 0 2px; }
+.stockItemTicker { font-size: 11px; color: #aaa; margin: 0; }
+.stockItemRight { display: flex; align-items: center; gap: 6px; }
+
+.logoBadge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.logoImg { width: 28px; height: 28px; border-radius: 50%; object-fit: contain; background: #f8f9fb; border: 1px solid #f0f0f0; flex-shrink: 0; }
+
+.weightInput { width: 50px; padding: 5px 8px; border: 1.5px solid #e0e0e0; border-radius: 6px; font-size: 13px; font-weight: 700; text-align: center; outline: none; }
+.weightInput:focus { border-color: #185FA5; }
+.weightPct { font-size: 13px; color: #555; }
+.removeBtn { background: none; border: none; color: #ccc; font-size: 13px; cursor: pointer; transition: color 0.15s; padding: 2px; }
+.removeBtn:hover { color: #a32d2d; }
+
+.weightFooter { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8f9fb; border-radius: 8px; gap: 10px; margin-top: 4px; }
+.weightTotal { font-size: 12px; font-weight: 600; }
+.weightOk { color: #0f6e56; }
+.weightError { color: #a32d2d; }
+.autoWeightBtn { padding: 4px 12px; background: #fff; border: 1.5px solid #185FA5; border-radius: 6px; font-size: 11px; font-weight: 700; color: #185FA5; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.autoWeightBtn:hover { background: #185FA5; color: #fff; }
+
+.addStockBtn { margin-top: 4px; padding: 10px; background: #fafafa; border: 1.5px dashed #ddd; border-radius: 8px; font-size: 13px; font-weight: 600; color: #1B5ED9; cursor: pointer; transition: all 0.2s; }
+.addStockBtn:hover { background: #E8F0FE; border-color: #1B5ED9; }
+
+.rebalanceBtn { padding: 13px; background: #185FA5; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.rebalanceBtn:hover:not(:disabled) { background: #0C447C; }
+.rebalanceBtn:disabled { background: #aaa; cursor: not-allowed; }
+
+/* ── 오른쪽 결과 ── */
+.resultSection { display: flex; flex-direction: column; gap: 16px; }
+
+.chartCard { background: #f8f9fb; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; min-height: 280px; align-items: center; justify-content: center; }
+
+.chartTop { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.chartLabel { font-size: 13px; color: #888; }
+.chartLegend { display: flex; gap: 16px; font-size: 11px; }
+.legendBlue { color: #185FA5; font-weight: 600; }
+.legendGray { color: #aaa; }
+.chartSvg { width: 100%; }
+
+.chartPlaceholder { font-size: 13px; color: #ccc; text-align: center; white-space: pre-line; line-height: 2; }
+
+.loadingBox { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.spinner { width: 36px; height: 36px; border: 3px solid #e0e0e0; border-top-color: #185FA5; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loadingText { font-size: 13px; color: #aaa; }
+
+.achieveCard { background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+.achieveLabel { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+.achieveRow { display: flex; align-items: center; gap: 14px; }
+.achieveTrack { flex: 1; height: 10px; background: #e8e8e8; border-radius: 5px; overflow: hidden; }
+.achieveFill { height: 100%; background: #0f6e56; border-radius: 5px; transition: width 0.6s ease; }
+.achieveVal { font-size: 16px; font-weight: 700; color: #0f6e56; min-width: 44px; text-align: right; }
+
+/* 5개 지표 한 줄 */
+.statsGrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+
+.statItem { background: #f8f9fb; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.statLabel { font-size: 11px; color: #aaa; margin: 0; }
+.statVal { font-size: 17px; font-weight: 700; color: #1a1a2e; margin: 0; }
+.statUnit { font-size: 11px; font-weight: 500; color: #aaa; margin-left: 2px; }
+.pos { color: #0f6e56 !important; }
+.neg { color: #a32d2d !important; }
+
+/* 검색 모달 */
+.modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.searchModal { background: #fff; border-radius: 16px; padding: 24px; width: 500px; max-width: 90vw; display: flex; flex-direction: column; gap: 16px; }
+.searchModalHeader { display: flex; justify-content: space-between; align-items: center; }
+.searchModalTitle { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0; }
+.searchModalClose { border: none; background: none; font-size: 18px; color: #bbb; cursor: pointer; transition: color 0.15s; }
+.searchModalClose:hover { color: #333; }
+.searchRow { display: flex; gap: 8px; }
+.searchInput { flex: 1; padding: 9px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+.searchInput:focus { border-color: #185FA5; }
+.searchBtn { padding: 9px 16px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.searchResults { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+.searchMsg { font-size: 12px; color: #bbb; text-align: center; padding: 24px 0; margin: 0; }
+.resultItem { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #fff; border: 1.5px solid #f0f0f0; border-radius: 10px; }
+.resultLeft { display: flex; align-items: center; gap: 10px; }
+.resultName { font-size: 13px; font-weight: 700; color: #1a1a2e; margin: 0 0 2px; }
+.resultInfo { font-size: 11px; color: #aaa; margin: 0; }
+.resultRight { display: flex; align-items: center; gap: 8px; }
+.resultPos { font-size: 12px; color: #0f6e56; font-weight: 700; }
+.resultNeg { font-size: 12px; color: #a32d2d; font-weight: 700; }
+.addBtn { padding: 5px 12px; background: #185FA5; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+.addBtn:hover:not(:disabled) { background: #0C447C; }
+.addBtnDone { background: #e0e0e0 !important; color: #999 !important; cursor: not-allowed !important; }

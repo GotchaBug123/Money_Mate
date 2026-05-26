@@ -1,0 +1,391 @@
+/* ─── 전체 컨테이너 ─── */
+.homeContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 32px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f4f6f9;
+    min-height: 100vh;
+}
+
+/* ─── 히어로 섹션 ─── */
+.heroSection {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    background: white;
+    border-radius: 16px;
+    padding: 48px 48px 48px 52px;
+    border: 1px solid #e8ecf2;
+    overflow: hidden;
+}
+
+.heroLeft {
+    flex: 1;
+    min-width: 0;
+}
+
+.heroEyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1B5ED9;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.heroTitle {
+    font-size: 36px;
+    font-weight: 800;
+    color: #0d1b2a;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+}
+
+.heroSub {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.85;
+    margin-bottom: 32px;
+    max-width: 420px;
+}
+
+.heroRight {
+    flex: 0 0 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.heroSvg {
+    width: 100%;
+    height: auto;
+}
+
+/* ─── 무료 진단 버튼 ─── */
+.primaryButton {
+    background-color: #1B5ED9;
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    letter-spacing: -0.01em;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(27, 94, 217, 0.25);
+}
+
+.primaryButton:hover {
+    background-color: #1249B3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(27, 94, 217, 0.3);
+}
+
+.primaryButton:active {
+    transform: translateY(0);
+}
+
+/* ─── 시장 2단 그리드 ─── */
+.gridRow {
+    display: flex;
+    gap: 16px;
+}
+
+.marketCard {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e8ecf2;
+    border-radius: 12px;
+    padding: 18px 20px 14px;
+}
+
+.marketCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.marketTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: -0.01em;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.badgeLive {
+    background: #FFF0EE;
+    color: #C0392B;
+}
+
+.badgeReal {
+    background: #EDFAF4;
+    color: #1A7A45;
+}
+
+.marketRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.marketRow:last-of-type {
+    border-bottom: none;
+}
+
+.marketName {
+    font-size: 13px;
+    color: #555;
+}
+
+.marketRight {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+}
+
+.marketValue {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    letter-spacing: -0.02em;
+}
+
+.changeUp {
+    font-size: 11px;
+    color: #C0392B;
+    font-weight: 500;
+}
+
+.changeDown {
+    font-size: 11px;
+    color: #1A7A45;
+    font-weight: 500;
+}
+
+.sparkline {
+    width: 100%;
+    height: 38px;
+    margin-top: 10px;
+    display: block;
+}
+
+/* ─── 섹션 공통 ─── */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sectionLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ─── 상품 소개 3단 그리드 ─── */
+.productGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.productCard {
+    background: #fff;
+    border: 1px solid #e8ecf2;
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.productCard:hover {
+    border-color: #1B5ED9;
+    box-shadow: 0 2px 12px rgba(27, 94, 217, 0.1);
+}
+
+.productIcon {
+    font-size: 26px;
+    margin-bottom: 10px;
+    line-height: 1;
+}
+
+.productTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 5px;
+}
+
+.productDesc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.productStat {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1B5ED9;
+}
+
+/* ─── 성향 그래프 카드 ─── */
+.chartCard {
+    background: #fff;
+    border: 1px solid #e8ecf2;
+    border-radius: 12px;
+    padding: 20px 24px;
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.chartTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    letter-spacing: -0.01em;
+}
+
+.chartSub {
+    font-size: 12px;
+    color: #888;
+    margin-top: 3px;
+}
+
+.legend {
+    display: flex;
+    gap: 12px;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+.legendDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dotProfit {
+    background: #1B5ED9;
+}
+
+.dotLoss {
+    background: #C0392B;
+}
+
+.histogram {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 140px;
+    padding-bottom: 24px;
+    position: relative;
+}
+
+.histBar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    position: relative;
+}
+
+.bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: opacity 0.15s;
+}
+
+.bar:hover {
+    opacity: 0.75;
+}
+
+.barProfit {
+    background: #1B5ED9;
+}
+
+.barLoss {
+    background: #E05555;
+}
+
+.barLabel {
+    position: absolute;
+    bottom: -20px;
+    font-size: 9px;
+    color: #888;
+    white-space: nowrap;
+}
+
+/* ─── 푸터 ─── */
+.footer {
+    background: #2c3140;
+    color: #ccc;
+    border-radius: 12px;
+    padding: 24px 28px 18px;
+    margin-top: 4px;
+}
+
+.footerGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.footerColTitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.footerLink {
+    display: block;
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.footerLink:hover {
+    color: #fff;
+}
+
+.footerBottom {
+    border-top: 1px solid #3e4355;
+    padding-top: 14px;
+    font-size: 11px;
+    color: #666;
+}
