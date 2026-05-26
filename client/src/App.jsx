@@ -1,20 +1,21 @@
 import React from 'react';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Header from './components/common/Header';
+import Footer from './components/common/Footer';
 import Home from './pages/Home/Home';
 import MyPage from './pages/MyPage';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import SignUpComplete from './pages/SignUpComplete';
-import FindId from "./pages/FindId";
-import FindPassword from "./pages/FindPassword";
-import ResetPassword from "./pages/ResetPassword";
-import CustomerService from "./pages/CustomerService";
-import Footer from "./components/common/Footer";
-import InquiryWrite from "./pages/InquiryWrite";
-import InquiryList from "./pages/InquiryList";
-import AssetDetail from "./pages/AssetDetail";
-import MyAsset from "./pages/MyAsset";
+import FindId from './pages/FindId';
+import FindPassword from './pages/FindPassword';
+import ResetPassword from './pages/ResetPassword';
+import CustomerService from './pages/CustomerService';
+import InquiryWrite from './pages/InquiryWrite';
+import InquiryList from './pages/InquiryList';
+import AssetDetail from './pages/AssetDetail';
+import MyAsset from './pages/MyAsset';
+import AdminPage from './pages/AdminPage';
 
 import FinancialInput from './pages/Diagnosis/FinancialDiagnosis/FinancialInput.jsx';
 import FinancialResult from './pages/Diagnosis/FinancialDiagnosis/FinancialResult.jsx';
@@ -64,6 +65,7 @@ function App() {
                         <Route path="/portfolio/direct" element={<PortfolioDirect />} />
                         <Route path="/rebalancing" element={<Rebalancing />} />
                         <Route path="/investment-information" element={<InvestmentInformation />} />
+                        <Route path="/admin" element={<AdminPage/>}/>
                     </Routes>
                 </main>
                 <Footer/>

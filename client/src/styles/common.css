@@ -1,0 +1,93 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #111111;
+    background: #ffffff;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.error-message {
+    margin: 0 !important;
+    color: #ff4d4f !important;
+    font-size: 14px;
+}
+
+/* 공통 모달 */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 17, 17, 0.42);
+}
+
+.modal-header {
+    margin-bottom: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #111111;
+    font-size: 32px;
+    font-weight: 900;
+}
+
+.modal-close-button {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #5728f5;
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+/* 관리자 페이지 공통 콘텐츠 */
+
+.admin-content-main {
+    max-width: 1440px;
+    min-height: 720px;
+    margin: 0 auto;
+    padding: 56px 32px 100px;
+}
+
+.admin-page-label {
+    display: inline-block;
+    margin-bottom: 32px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    color: #111111;
+    background: #e1e1e1;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+/* 공통 Footer */
+
+.admin-footer {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: #222222;
+    font-size: 24px;
+    font-weight: 800;
+}
