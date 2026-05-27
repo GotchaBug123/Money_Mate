@@ -4,6 +4,11 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS data_sync_history;
+DROP TABLE IF EXISTS community_post_like;
+DROP TABLE IF EXISTS community_comment;
+DROP TABLE IF EXISTS community_attachment;
+DROP TABLE IF EXISTS community_post;
+DROP TABLE IF EXISTS community_theme;
 DROP TABLE IF EXISTS goal_strategy_result;
 DROP TABLE IF EXISTS asset_fundamental;
 DROP TABLE IF EXISTS external_data_source;
@@ -51,6 +56,103 @@ CREATE TABLE member
     updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE community_theme
+(
+    theme_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    theme_name    VARCHAR(50)  NOT NULL,
+    description   VARCHAR(255) NULL,
+    display_order INT          NOT NULL,
+    active_yn     VARCHAR(1)   NOT NULL DEFAULT 'Y',
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_community_theme_name UNIQUE (theme_name),
+    CONSTRAINT ck_community_theme_active_yn CHECK (active_yn IN ('Y', 'N'))
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE community_post
+(
+    post_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id    BIGINT       NOT NULL,
+    theme_id     BIGINT       NULL,
+    category     VARCHAR(30)  NOT NULL,
+    title        VARCHAR(150) NOT NULL,
+    content      LONGTEXT     NOT NULL,
+    stock_symbol VARCHAR(30)  NULL,
+    stock_name   VARCHAR(100) NULL,
+    view_count   BIGINT       NOT NULL DEFAULT 0,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_post_member
+        FOREIGN KEY (member_id) REFERENCES member (member_id)
+            ON DELETE CASCADE,
+    CONSTRAINT fk_community_post_theme
+        FOREIGN KEY (theme_id) REFERENCES community_theme (theme_id)
+            ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_community_post_member ON community_post (member_id);
+CREATE INDEX idx_community_post_theme ON community_post (theme_id);
+CREATE INDEX idx_community_post_category ON community_post (category);
+CREATE INDEX idx_community_post_created_at ON community_post (created_at);
+CREATE INDEX idx_community_post_view_count ON community_post (view_count);
+
+CREATE TABLE community_attachment
+(
+    attachment_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id         BIGINT       NOT NULL,
+    attachment_url  VARCHAR(500) NOT NULL,
+    attachment_name VARCHAR(255) NOT NULL,
+    created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_attachment_post
+        FOREIGN KEY (post_id) REFERENCES community_post (post_id)
+            ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE community_comment
+(
+    comment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id    BIGINT   NOT NULL,
+    member_id  BIGINT   NOT NULL,
+    content    LONGTEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_comment_post
+        FOREIGN KEY (post_id) REFERENCES community_post (post_id)
+            ON DELETE CASCADE,
+    CONSTRAINT fk_community_comment_member
+        FOREIGN KEY (member_id) REFERENCES member (member_id)
+            ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_community_comment_post ON community_comment (post_id);
+CREATE INDEX idx_community_comment_member ON community_comment (member_id);
+CREATE INDEX idx_community_comment_created_at ON community_comment (created_at);
+
+CREATE TABLE community_post_like
+(
+    post_like_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id      BIGINT   NOT NULL,
+    member_id    BIGINT   NOT NULL,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_post_like_post
+        FOREIGN KEY (post_id) REFERENCES community_post (post_id)
+            ON DELETE CASCADE,
+    CONSTRAINT fk_community_post_like_member
+        FOREIGN KEY (member_id) REFERENCES member (member_id)
+            ON DELETE CASCADE,
+    CONSTRAINT uq_community_post_like_member UNIQUE (post_id, member_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_community_post_like_post ON community_post_like (post_id);
+CREATE INDEX idx_community_post_like_member ON community_post_like (member_id);
 
 CREATE TABLE member_auth
 (

@@ -97,37 +97,7 @@ public class GoalStrategyResult extends BaseTimeEntity {
     @Column(name = "shortage_amount", nullable = false)
     private Long shortageAmount;
 
-    @Column(name = "recommended_monthly_investment")
-    private Long recommendedMonthlyInvestment;
-
-    @Column(name = "strategy_grade", length = 10)
-    private String strategyGrade;
-
-    @Lob
-    @Column(name = "strategy_comment")
-    private String strategyComment;
-
-    @Column(name = "what_if_success_probability")
-    private Double whatIfSuccessProbability;
-
-    @Column(name = "probability_improvement")
-    private Double probabilityImprovement;
-
     public boolean achievedTarget() {
         return medianAmount >= targetAmount;
-    }
-
-    public boolean needsStrategyAdjustment() {
-        return successProbability < 70.0;
-    }
-
-    public boolean hasShortageAmount() {
-        return shortageAmount != null
-                && shortageAmount > 0;
-    }
-
-    public boolean hasWhatIfImprovement() {
-        return probabilityImprovement != null
-                && probabilityImprovement > 0;
     }
 }

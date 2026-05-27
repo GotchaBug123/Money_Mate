@@ -2,11 +2,11 @@ package com.gotchabug.moneymate.enums;
 
 public enum RebalanceCycle {
 
-    NONE("None", 0),
-    MONTHLY("Monthly", 1),
-    QUARTERLY("Quarterly", 3),
-    HALF_YEARLY("Half-yearly", 6),
-    YEARLY("Yearly", 12);
+    NONE("리밸런싱 없음", 0),
+    MONTHLY("매월", 1),
+    QUARTERLY("분기별", 3),
+    HALF_YEARLY("반기별", 6),
+    YEARLY("매년", 12);
 
     private final String label;
     private final int intervalMonths;

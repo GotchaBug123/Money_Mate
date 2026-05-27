@@ -1,6 +1,5 @@
 package com.gotchabug.moneymate.dto.goal;
 
-import com.gotchabug.moneymate.enums.RebalanceCycle;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,59 +9,51 @@ import java.util.List;
 @Builder
 public class GoalStrategyResponse {
 
-    private Long goalStrategyResultId;
-
-    private String goalName;
-
     private Double successProbability;
 
-    private String strategyGrade;
+    private Long finalAmount;
 
-    private String strategyStatus;
+    private Double annualizedReturn;
 
-    private Long averageFinalAmount;
+    private Double maxDrawdown;
 
-    private Long optimisticAmount;
+    private Double bestAnnualReturn;
 
-    private Long medianAmount;
+    private Double worstAnnualReturn;
 
-    private Long pessimisticAmount;
+    private List<ChartPoint> chartData;
 
-    private Long worstCaseAverageAmount;
+    private List<AssetSummary> selectedAssets;
 
-    private Long varAmount;
+    @Getter
+    @Builder
+    public static class ChartPoint {
 
-    private Long shortageAmount;
+        private Integer month;
 
-    private Long recommendedMonthlyInvestment;
+        private Long optimisticAmount;
 
-    private RebalanceCycle rebalanceCycle;
+        private Long medianAmount;
 
-    private boolean rebalancingApplied;
+        private Long pessimisticAmount;
 
-    private Double rebalancingProbabilityImprovement;
-
-    private String selectedAssetSummary;
-
-    private Double whatIfSuccessProbability;
-
-    private Double probabilityImprovement;
-
-    private String strategyComment;
-
-    private List<GoalStrategyInsight> insights;
-
-    public boolean hasWhatIfResult() {
-        return whatIfSuccessProbability != null;
+        private Long targetAmount;
     }
 
-    public boolean hasImprovement() {
-        return probabilityImprovement != null
-                && probabilityImprovement > 0;
-    }
+    @Getter
+    @Builder
+    public static class AssetSummary {
 
-    public boolean hasShortageAmount() {
-        return shortageAmount != null
-                && shortageAmount > 0;
+        private String symbol;
+
+        private String assetName;
+
+        private String assetType;
+
+        private String market;
+
+        private Double targetWeight;
+
+        private String theme;
     }
 }

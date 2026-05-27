@@ -9,10 +9,10 @@ import lombok.Getter;
 @Getter
 public class SelectedAssetRequest {
 
-    @NotBlank(message = "자산 심볼은 필수입니다.")
+    @NotBlank(message = "종목 코드는 필수입니다.")
     private String symbol;
 
-    @NotBlank(message = "자산 이름은 필수입니다.")
+    @NotBlank(message = "종목명은 필수입니다.")
     private String assetName;
 
     @NotBlank(message = "자산 유형은 필수입니다.")
@@ -29,14 +29,14 @@ public class SelectedAssetRequest {
     )
     @DecimalMax(
             value = "1.0",
-            message = "목표 비중은 1.0 이하여야 합니다."
+            message = "목표 비중은 100% 이하여야 합니다."
     )
     private Double targetWeight;
 
     @NotNull(message = "예상 연 수익률은 필수입니다.")
     @DecimalMin(
             value = "-1.0",
-            message = "예상 연 수익률은 최소 -100% 이상이어야 합니다."
+            message = "예상 연 수익률은 -100% 이상이어야 합니다."
     )
     private Double expectedAnnualReturn;
 
