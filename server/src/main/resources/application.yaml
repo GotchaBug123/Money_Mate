@@ -2,6 +2,8 @@ spring:
   application:
     name: Moneymate
 
+
+
   datasource:
     url: jdbc:mysql://localhost:3307/moneymate_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
     username: moneymate_user

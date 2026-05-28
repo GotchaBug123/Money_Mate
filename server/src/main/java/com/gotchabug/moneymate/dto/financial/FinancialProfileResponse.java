@@ -7,12 +7,6 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/*
-DB에 저장된 복잡한 재무 데이터를 사용자에게 보여주기 좋게 딱 필요한
-항목만 정리 및 포장
- */
-
-
 @Getter
 @Builder
 public class FinancialProfileResponse {
@@ -30,6 +24,8 @@ public class FinancialProfileResponse {
 
     private BigDecimal investableAmount;
 
+    private String diagnosisGrade;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -44,6 +40,7 @@ public class FinancialProfileResponse {
                 .totalLiability(profile.getTotalLiability())
                 .cashAsset(profile.getCashAsset())
                 .investableAmount(profile.getInvestableAmount())
+                .diagnosisGrade(profile.getDiagnosisGrade())
                 .createdAt(profile.getCreatedAt())
                 .updatedAt(profile.getUpdatedAt())
                 .build();

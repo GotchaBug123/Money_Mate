@@ -50,4 +50,21 @@ public class HomeController {
 
         return "home";
     }
+    @GetMapping("/home")
+    public String homePage(HttpSession session, Model model) {
+        Member loginUser = (Member) session.getAttribute("loginUser");
+
+        FinancialProfile profile = null;
+
+        if (loginUser != null) {
+            profile = financialProfileRepository
+                    .findByMember_MemberId(loginUser.getMemberId())
+                    .orElse(null);
+        }
+
+        model.addAttribute("loginUser", loginUser);
+        model.addAttribute("profile", profile);
+
+        return "home";
+    }
 }

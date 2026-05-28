@@ -1,11 +1,14 @@
 package com.gotchabug.moneymate.dto.risk;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class RiskSurveyResponse {
 
@@ -13,8 +16,9 @@ public class RiskSurveyResponse {
     private String resultType;
     private String description;
 
-    private int riskAvoidancePercent;
-    private int financialInterestPercent;
+    private BigDecimal riskAvoidancePercent;
+    private BigDecimal financialInterestPercent;
+
     private String riskAvoidanceLabel;
     private String financialInterestLabel;
 

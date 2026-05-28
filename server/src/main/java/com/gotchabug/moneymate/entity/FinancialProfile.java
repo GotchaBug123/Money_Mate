@@ -45,6 +45,9 @@ public class FinancialProfile {
     @Column(name = "investable_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal investableAmount = BigDecimal.ZERO;
 
+    @Column(name = "diagnosis_grade", length = 20)
+    private String diagnosisGrade;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -90,6 +93,13 @@ public class FinancialProfile {
         this.investableAmount = this.monthlyIncome
                 .subtract(this.monthlyFixedExpense)
                 .subtract(this.monthlyVariableExpense);
+    }
+
+    /*
+    재무 진단 등급 저장
+     */
+    public void updateDiagnosisGrade(String diagnosisGrade) {
+        this.diagnosisGrade = diagnosisGrade;
     }
 
     /*

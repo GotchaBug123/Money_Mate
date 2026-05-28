@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 내 재무 정보</title>
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/my-asset-financial.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+
+        <a href="/main" class="logo">MoneyMate</a>
+
+        <nav class="nav">
+            <div class="nav-dropdown">
+                <a href="/my-asset" class="nav-link active">MY 자산</a>
+
+                <div class="dropdown-menu">
+                    <a href="/my-asset/financial">내 재무 정보</a>
+                    <a href="/my-investment">내 투자 정보</a>
+                </div>
+            </div>
+
+            <a href="#">포트폴리오</a>
+            <a href="#">대시보드</a>
+            <a href="#">투자정보</a>
+            <a href="#">고객센터</a>
+        </nav>
+
+        <a href="/mypage" class="mypage-btn">마이페이지</a>
+
+    </div>
+</header>
+
+<main class="finance-page">
+
+    <!-- 상단 HERO -->
+    <section class="finance-hero">
+
+        <div class="hero-left">
+            <p class="eyebrow">MY FINANCIAL INFO</p>
+
+            <h1>
+                내 재무 정보를<br>
+                한눈에 확인하세요
+            </h1>
+
+            <p>
+                수입 · 지출 · 자산 · 투자 여력을
+                통합 분석합니다.
+            </p>
+        </div>
+
+        <div class="score-card">
+            <span>재무 상태</span>
+
+            <strong th:text="${profile != null && profile.diagnosisGrade != null ? profile.diagnosisGrade : '미진단'}">
+                미진단
+            </strong>
+
+            <p th:text="${profile != null && profile.diagnosisGrade != null ? '재무 진단 완료' : 'MoneyMate AI 재무 분석'}">
+                MoneyMate AI 재무 분석
+            </p>
+        </div>
+    </section>
+
+    <!-- 요약 카드 -->
+    <section class="summary-grid">
+
+        <div class="summary-card blue">
+            <p>월 수입</p>
+
+            <h2 th:text="${profile != null ? #numbers.formatInteger(profile.monthlyIncome, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </h2>
+
+            <span>매월 들어오는 총 수입</span>
+        </div>
+
+        <div class="summary-card red">
+            <p>월 지출</p>
+
+            <h2 th:text="${profile != null ? #numbers.formatInteger(profile.monthlyFixedExpense + profile.monthlyVariableExpense, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </h2>
+
+            <span>고정 + 변동 지출</span>
+        </div>
+
+        <div class="summary-card dark">
+            <p>투자 가능 금액</p>
+
+            <h2 th:text="${profile != null ? #numbers.formatInteger(profile.investableAmount, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </h2>
+
+            <span>예상 투자 여력</span>
+        </div>
+
+    </section>
+
+    <!-- 자산 정보 -->
+    <section class="detail-grid">
+
+        <div class="detail-card">
+            <span>총 자산</span>
+
+            <strong th:text="${profile != null ? #numbers.formatInteger(profile.totalAsset, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </strong>
+        </div>
+
+        <div class="detail-card">
+            <span>총 부채</span>
+
+            <strong th:text="${profile != null ? #numbers.formatInteger(profile.totalLiability, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </strong>
+        </div>
+
+        <div class="detail-card">
+            <span>순자산</span>
+
+            <strong th:text="${profile != null ? #numbers.formatInteger(profile.totalAsset - profile.totalLiability, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </strong>
+        </div>
+
+        <div class="detail-card">
+            <span>보유 현금</span>
+
+            <strong th:text="${profile != null ? #numbers.formatInteger(profile.cashAsset, 3, 'COMMA') + '원' : '0원'}">
+                0원
+            </strong>
+        </div>
+
+    </section>
+
+    <!-- 차트 -->
+    <!-- 차트 -->
+    <section class="chart-section">
+        <div class="chart-card premium-chart">
+
+            <div class="premium-chart-header">
+                <div>
+                    <p>MONTHLY CASH FLOW</p>
+                    <h2 id="chartMonthTitle">월별 재무 흐름</h2>
+                </div>
+
+                <div class="month-control">
+                    <button type="button" onclick="prevMonth()">‹</button>
+                    <strong id="currentMonthText">2026.05</strong>
+                    <button type="button" onclick="nextMonth()">›</button>
+                </div>
+            </div>
+
+            <div class="premium-chart-summary">
+                <div class="summary-mini income">
+                    <span>월 수입</span>
+                    <strong id="incomeText">0원</strong>
+                </div>
+
+                <div class="summary-mini expense">
+                    <span>월 지출</span>
+                    <strong id="expenseText">0원</strong>
+                </div>
+
+                <div class="summary-mini invest">
+                    <span>투자 여력</span>
+                    <strong id="investText">0원</strong>
+                </div>
+            </div>
+
+            <div class="premium-graph-box">
+                <svg class="premium-line-chart" viewBox="0 0 720 300" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="incomeArea" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#155eef" stop-opacity="0.35"/>
+                            <stop offset="100%" stop-color="#155eef" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <line x1="50" y1="40" x2="680" y2="40" class="chart-grid"/>
+                    <line x1="50" y1="100" x2="680" y2="100" class="chart-grid"/>
+                    <line x1="50" y1="160" x2="680" y2="160" class="chart-grid"/>
+                    <line x1="50" y1="220" x2="680" y2="220" class="chart-grid"/>
+
+                    <path id="incomeAreaPath" class="income-area-path"></path>
+                    <path id="incomeLinePath" class="income-line-path"></path>
+                    <path id="expenseLinePath" class="expense-line-path"></path>
+                    <path id="investLinePath" class="invest-line-path"></path>
+
+                    <g id="chartDots"></g>
+                </svg>
+
+                <div class="chart-labels" id="chartLabels"></div>
+            </div>
+
+            <div class="premium-legend">
+                <span><i class="legend-dot income-dot"></i>수입</span>
+                <span><i class="legend-dot expense-dot"></i>지출</span>
+                <span><i class="legend-dot invest-dot"></i>투자 여력</span>
+            </div>
+
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        const monthlyFinancialData = [
+            {
+                month: "2026.01",
+                income: 2800000,
+                expense: 1700000,
+                invest: 1100000
+            },
+            {
+                month: "2026.02",
+                income: 3000000,
+                expense: 1850000,
+                invest: 1150000
+            },
+            {
+                month: "2026.03",
+                income: 3200000,
+                expense: 2000000,
+                invest: 1200000
+            },
+            {
+                month: "2026.04",
+                income: 3100000,
+                expense: 1950000,
+                invest: 1150000
+            },
+            {
+                month: "2026.05",
+                income: /*[[${profile != null ? profile.monthlyIncome : 0}]]*/ 0,
+                expense: /*[[${profile != null ? profile.monthlyFixedExpense + profile.monthlyVariableExpense : 0}]]*/ 0,
+                invest: /*[[${profile != null ? profile.investableAmount : 0}]]*/ 0
+            }
+        ];
+
+        let currentIndex = monthlyFinancialData.length - 1;
+
+        function formatWon(value) {
+            return Number(value).toLocaleString("ko-KR") + "원";
+        }
+
+        function getVisibleData() {
+            return monthlyFinancialData.slice(
+                Math.max(0, currentIndex - 4),
+                currentIndex + 1
+            );
+        }
+
+        function makePoints(values, maxValue) {
+            return values.map((value, index) => {
+                const x = 70 + index * 145;
+                const y = 240 - (value / maxValue) * 180;
+                return { x, y };
+            });
+        }
+
+        function makePath(points) {
+            return "M " + points.map(point => `${point.x},${point.y}`).join(" L ");
+        }
+
+        function renderChart() {
+            const visibleData = getVisibleData();
+            const selected = monthlyFinancialData[currentIndex];
+
+            const incomeValues = visibleData.map(data => data.income);
+            const expenseValues = visibleData.map(data => data.expense);
+            const investValues = visibleData.map(data => data.invest);
+
+            const maxValue = Math.max(
+                ...incomeValues,
+                ...expenseValues,
+                ...investValues,
+                1
+            );
+
+            const incomePoints = makePoints(incomeValues, maxValue);
+            const expensePoints = makePoints(expenseValues, maxValue);
+            const investPoints = makePoints(investValues, maxValue);
+
+            const incomePath = makePath(incomePoints);
+            const expensePath = makePath(expensePoints);
+            const investPath = makePath(investPoints);
+
+            document.getElementById("incomeLinePath").setAttribute("d", incomePath);
+            document.getElementById("expenseLinePath").setAttribute("d", expensePath);
+            document.getElementById("investLinePath").setAttribute("d", investPath);
+
+            const first = incomePoints[0];
+            const last = incomePoints[incomePoints.length - 1];
+            const areaPath = `${incomePath} L ${last.x},260 L ${first.x},260 Z`;
+
+            document.getElementById("incomeAreaPath").setAttribute("d", areaPath);
+
+            let dots = "";
+
+            incomePoints.forEach(point => {
+                dots += `<circle cx="${point.x}" cy="${point.y}" r="6" class="income-circle"></circle>`;
+            });
+
+            expensePoints.forEach(point => {
+                dots += `<circle cx="${point.x}" cy="${point.y}" r="6" class="expense-circle"></circle>`;
+            });
+
+            investPoints.forEach(point => {
+                dots += `<circle cx="${point.x}" cy="${point.y}" r="6" class="invest-circle"></circle>`;
+            });
+
+            document.getElementById("chartDots").innerHTML = dots;
+
+            document.getElementById("chartLabels").innerHTML = visibleData.map(data => {
+                return `<span>${data.month.substring(5)}월</span>`;
+            }).join("");
+
+            document.getElementById("currentMonthText").innerText = selected.month;
+            document.getElementById("chartMonthTitle").innerText =
+                selected.month.replace(".", "년 ") + "월 재무 흐름";
+
+            document.getElementById("incomeText").innerText = formatWon(selected.income);
+            document.getElementById("expenseText").innerText = formatWon(selected.expense);
+            document.getElementById("investText").innerText = formatWon(selected.invest);
+        }
+
+        function prevMonth() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderChart();
+            }
+        }
+
+        function nextMonth() {
+            if (currentIndex < monthlyFinancialData.length - 1) {
+                currentIndex++;
+                renderChart();
+            }
+        }
+
+        renderChart();
+    </script>
+    <!-- 하단 분석 -->
+    <section class="analysis-section">
+
+        <div class="analysis-card">
+
+            <h2>재무 분석 요약</h2>
+
+            <div class="analysis-row">
+                <span>지출 비율</span>
+
+                <strong th:text="${profile != null && profile.monthlyIncome > 0 ? #numbers.formatDecimal(((profile.monthlyFixedExpense + profile.monthlyVariableExpense) * 100.0 / profile.monthlyIncome), 1, 1) + '%' : '0%'}">
+                    0%
+                </strong>
+            </div>
+
+            <div class="analysis-row">
+                <span>저축 가능 비율</span>
+
+                <strong th:text="${profile != null && profile.monthlyIncome > 0 ? #numbers.formatDecimal((profile.investableAmount * 100.0 / profile.monthlyIncome), 1, 1) + '%' : '0%'}">
+                    0%
+                </strong>
+            </div>
+
+            <div class="progress-box">
+
+                <div class="progress-label">
+                    <span>투자 여력</span>
+
+                    <b th:text="${profile != null ? #numbers.formatInteger(profile.investableAmount, 3, 'COMMA') + '원' : '0원'}">
+                        0원
+                    </b>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="guide-card">
+
+            <h2>추천 행동</h2>
+
+            <p>
+                현재 재무 상태를 기반으로
+                투자성향 분석 및 맞춤 포트폴리오를
+                추천받아보세요.
+            </p>
+
+            <a href="/risk-survey">
+                투자성향 분석하기
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

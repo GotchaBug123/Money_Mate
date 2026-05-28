@@ -11,29 +11,35 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class MyAssetPageController {
+public class MyAssetController {
 
     private final FinancialProfileService financialProfileService;
 
     @GetMapping("/my-asset")
-    public String myAssetPage(HttpSession session, Model model) {
+    public String myAssetMain() {
+        return "my-asset";
+    }
+
+    @GetMapping("/my-asset/financial")
+    public String myAssetFinancialPage(HttpSession session, Model model) {
+
         Object loginUserObj = session.getAttribute("loginUser");
 
         if (!(loginUserObj instanceof Member loginUser)) {
             return "redirect:/login";
         }
 
+        FinancialProfileResponse profile =
+                financialProfileService.getMyFinancialProfile(loginUser);
+
         model.addAttribute("member", loginUser);
+        model.addAttribute("profile", profile);
 
-        try {
-            FinancialProfileResponse profile =
-                    financialProfileService.getMyFinancialProfile(loginUser);
+        return "my-asset-financial";
+    }
 
-            model.addAttribute("profile", profile);
-        } catch (Exception e) {
-            model.addAttribute("profile", null);
-        }
-
-        return "my-asset";
+    @GetMapping("/my-investment")
+    public String myInvestmentPage() {
+        return "my-investment";
     }
 }

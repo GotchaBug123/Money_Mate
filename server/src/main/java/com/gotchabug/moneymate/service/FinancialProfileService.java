@@ -29,6 +29,7 @@ public class FinancialProfileService {
                 .findByMember_MemberId(loginUser.getMemberId())
                 .orElseGet(() -> FinancialProfile.create(loginUser));
 
+
         profile.updateFinancialInfo(
                 request.getMonthlyIncome(),
                 request.getMonthlyFixedExpense(),

@@ -9,6 +9,8 @@ import com.gotchabug.moneymate.repository.RiskAnswerSheetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -38,8 +40,8 @@ public class RiskSurveyService {
         String resultType = calculateResultType(totalScore);
         String description = getDescription(resultType);
 
-        int riskAvoidancePercent = calculateRiskAvoidancePercent(request);
-        int financialInterestPercent = calculateFinancialInterestPercent(request);
+        BigDecimal riskAvoidancePercent = calculateRiskAvoidancePercent(request);
+        BigDecimal financialInterestPercent = calculateFinancialInterestPercent(request);
 
         List<InvestmentRecommendationCard> recommendations =
                 createRecommendationCards(
@@ -100,7 +102,7 @@ public class RiskSurveyService {
         };
     }
 
-    private int calculateRiskAvoidancePercent(RiskSurveyRequest request) {
+    private BigDecimal calculateRiskAvoidancePercent(RiskSurveyRequest request) {
         int rawScore =
                 reverseScore(request.getInvestmentRatio())
                         + reverseScore(request.getFundSource())
@@ -109,10 +111,13 @@ public class RiskSurveyService {
                         + reverseScore(request.getLossReaction())
                         + reverseScore(request.getInvestmentStyle());
 
-        return (int) Math.round((rawScore - 6) / 24.0 * 100);
+        return BigDecimal.valueOf(rawScore - 6)
+                .divide(BigDecimal.valueOf(24), 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
-    private int calculateFinancialInterestPercent(RiskSurveyRequest request) {
+    private BigDecimal calculateFinancialInterestPercent(RiskSurveyRequest request) {
         int themeCount = request.getPreferredThemes() == null
                 ? 0
                 : Math.min(request.getPreferredThemes().size(), 5);
@@ -123,16 +128,19 @@ public class RiskSurveyService {
                         + request.getPreferredProduct()
                         + themeCount;
 
-        return (int) Math.round((rawScore - 3) / 17.0 * 100);
+        return BigDecimal.valueOf(rawScore - 3)
+                .divide(BigDecimal.valueOf(17), 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     private int reverseScore(int value) {
         return 6 - value;
     }
 
-    private String levelLabel(int percent) {
-        if (percent >= 70) return "높음";
-        if (percent >= 40) return "보통";
+    private String levelLabel(BigDecimal percent) {
+        if (percent.compareTo(BigDecimal.valueOf(70)) >= 0) return "높음";
+        if (percent.compareTo(BigDecimal.valueOf(40)) >= 0) return "보통";
         return "낮음";
     }
 
@@ -140,18 +148,18 @@ public class RiskSurveyService {
             Member member,
             RiskSurveyRequest request,
             String resultType,
-            int riskAvoidancePercent,
-            int financialInterestPercent
+            BigDecimal riskAvoidancePercent,
+            BigDecimal financialInterestPercent
     ) {
         int koreaStockScore = 40;
         int usStockScore = 40;
         int koreaEtfScore = 40;
         int usEtfScore = 40;
 
-        if (riskAvoidancePercent < 40) {
+        if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(40)) < 0) {
             koreaStockScore += 20;
             usStockScore += 20;
-        } else if (riskAvoidancePercent >= 70) {
+        } else if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(70)) >= 0) {
             koreaEtfScore += 20;
             usEtfScore += 20;
         } else {
@@ -161,11 +169,11 @@ public class RiskSurveyService {
             usEtfScore += 10;
         }
 
-        if (financialInterestPercent >= 70) {
+        if (financialInterestPercent.compareTo(BigDecimal.valueOf(70)) >= 0) {
             koreaStockScore += 12;
             usStockScore += 15;
             usEtfScore += 8;
-        } else if (financialInterestPercent < 40) {
+        } else if (financialInterestPercent.compareTo(BigDecimal.valueOf(40)) < 0) {
             koreaEtfScore += 12;
             usEtfScore += 12;
         } else {
@@ -248,8 +256,8 @@ public class RiskSurveyService {
             String categoryName,
             int matchingScore,
             String resultType,
-            int riskAvoidancePercent,
-            int financialInterestPercent
+            BigDecimal riskAvoidancePercent,
+            BigDecimal financialInterestPercent
     ) {
         double operationLevel = Math.round((matchingScore / 10.0) * 10) / 10.0;
 
@@ -284,18 +292,19 @@ public class RiskSurveyService {
     private String createEasyReason(
             Member member,
             String categoryName,
-            int riskAvoidancePercent,
-            int financialInterestPercent
+            BigDecimal riskAvoidancePercent,
+            BigDecimal financialInterestPercent
     ) {
         String name = member.getName();
 
         if (categoryName.equals("한국주식")) {
-            if (riskAvoidancePercent < 40 && financialInterestPercent >= 60) {
+            if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(40)) < 0
+                    && financialInterestPercent.compareTo(BigDecimal.valueOf(60)) >= 0) {
                 return name + "님은 손실 위험을 어느 정도 감수할 수 있고 금융상품에 대한 관심도도 높은 편입니다. "
                         + "그래서 익숙한 국내 기업에 투자하는 한국주식 포트폴리오가 잘 맞습니다.";
             }
 
-            if (riskAvoidancePercent >= 70) {
+            if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(70)) >= 0) {
                 return name + "님은 안정성을 중요하게 보는 편입니다. "
                         + "한국주식은 변동성이 있을 수 있으므로 관심 있는 테마 중심으로 소액부터 접근하는 것이 좋습니다.";
             }
@@ -305,12 +314,13 @@ public class RiskSurveyService {
         }
 
         if (categoryName.equals("미국주식")) {
-            if (riskAvoidancePercent < 40 && financialInterestPercent >= 60) {
+            if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(40)) < 0
+                    && financialInterestPercent.compareTo(BigDecimal.valueOf(60)) >= 0) {
                 return name + "님은 성장 가능성이 큰 자산에 관심이 있고 변동성도 감수할 수 있는 편입니다. "
                         + "미국주식은 AI, 반도체, 빅테크 기업에 투자할 수 있어 잘 어울립니다.";
             }
 
-            if (riskAvoidancePercent >= 70) {
+            if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(70)) >= 0) {
                 return name + "님은 위험을 피하려는 성향이 강한 편입니다. "
                         + "미국주식은 변동성이 있을 수 있으니 ETF와 함께 분산해서 접근하는 것이 좋습니다.";
             }
@@ -320,7 +330,7 @@ public class RiskSurveyService {
         }
 
         if (categoryName.equals("국내ETF")) {
-            if (riskAvoidancePercent >= 60) {
+            if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(60)) >= 0) {
                 return name + "님은 안정성을 중요하게 생각하는 편입니다. "
                         + "국내ETF는 여러 종목에 나누어 투자할 수 있어 개별 주식보다 부담을 줄일 수 있습니다.";
             }
@@ -329,7 +339,7 @@ public class RiskSurveyService {
                     + "국내ETF는 테마와 시장에 분산 투자할 수 있어 적합합니다.";
         }
 
-        if (riskAvoidancePercent >= 60) {
+        if (riskAvoidancePercent.compareTo(BigDecimal.valueOf(60)) >= 0) {
             return name + "님은 안정적인 분산투자를 선호할 가능성이 높습니다. "
                     + "미국ETF는 S&P500, 나스닥 같은 대표 지수에 나누어 투자할 수 있어 장기투자에 적합합니다.";
         }
@@ -338,9 +348,9 @@ public class RiskSurveyService {
                 + "미국ETF는 미국 대표 기업들에 분산 투자하면서 성장성과 안정성을 함께 기대할 수 있습니다.";
     }
 
-    private String[] createEasyTags(
-            int riskAvoidancePercent,
-            int financialInterestPercent,
+    private List<String> createEasyTags(
+            BigDecimal riskAvoidancePercent,
+            BigDecimal financialInterestPercent,
             String categoryName
     ) {
         List<String> tags = new ArrayList<>();
@@ -360,7 +370,7 @@ public class RiskSurveyService {
             tags.add("#국내시장");
         }
 
-        return tags.toArray(new String[0]);
+        return tags;
     }
 
     private String convertAgeGroup(int value) {
