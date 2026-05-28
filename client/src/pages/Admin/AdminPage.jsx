@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import logo from '../../assets/moneymate_logo.png';
+import Header from '../../components/common/Header';
 import MemberManagePage from './MemberManagePage';
 import InvestmentManagePage from './InvestmentManagePage';
 import CommunityManagePage from './CommunityManagePage';
@@ -142,6 +142,9 @@ function AdminPage({
     const postCount = posts.length;
 
     const handleLogout = () => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('role');
+
         if (onLogout) {
             onLogout();
             return;
@@ -234,34 +237,21 @@ function AdminPage({
 
     return (
         <div className="admin-page">
-            <header className="admin-header">
-                <div className="admin-brand" onClick={() => setActiveMenu('dashboard')}>
-                    <img src={logo} alt="머니메이트 로고"/>
-                    <h1>관리자 화면</h1>
-                </div>
-
-                <nav className="admin-nav">
-                    <button type="button" onClick={() => setActiveMenu('memberManage')}>
-                        회원정보관리
-                    </button>
-
-                    <button type="button" onClick={() => setActiveMenu('investmentManage')}>
-                        투자정보관리
-                    </button>
-
-                    <button type="button" onClick={() => setActiveMenu('communityManage')}>
-                        커뮤니티관리
-                    </button>
-
-                    <button type="button" onClick={() => setActiveMenu('customerInquiryManage')}>
-                        고객문의관리
-                    </button>
-                </nav>
-
-                <button className="logout-button" type="button" onClick={handleLogout}>
-                    로그아웃
-                </button>
-            </header>
+            <Header
+                logoTo="/admin"
+                menuItems={[
+                    {label: '회원정보관리', onClick: () => setActiveMenu('memberManage')},
+                    {label: '투자정보관리', onClick: () => setActiveMenu('investmentManage')},
+                    {label: '커뮤니티관리', onClick: () => setActiveMenu('communityManage')},
+                    {label: '고객문의관리', onClick: () => setActiveMenu('customerInquiryManage')},
+                ]}
+                rightButtons={[
+                    {
+                        label: '로그아웃',
+                        onClick: handleLogout,
+                    },
+                ]}
+            />
 
             {activeMenu === 'dashboard' && (
                 <main className="admin-main">
@@ -322,10 +312,6 @@ function AdminPage({
                     onDeleteInquiry={handleDeleteInquiry}
                 />
             )}
-
-            <footer className="admin-footer">
-                Footer 영역
-            </footer>
         </div>
     );
 }

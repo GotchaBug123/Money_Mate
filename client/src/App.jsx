@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
 
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
@@ -38,44 +38,52 @@ import InvestmentInformation from './pages/InvestmentInformation/InvestmentInfor
 
 import './App.css';
 
+function AppContent() {
+    const location = useLocation();
+    const isAdminPage = location.pathname.startsWith('/admin');
+
+    return (
+        <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
+            {!isAdminPage && <Header/>}
+
+            <main style={{minHeight: 'calc(100vh - 60px)'}}>
+                <Routes>
+                    <Route path="/" element={<Home/>}/>
+                    <Route path="/mypage" element={<MyPage/>}/>
+                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/signup" element={<SignUp/>}/>
+                    <Route path="/signup-complete" element={<SignUpComplete/>}/>
+                    <Route path="/find-id" element={<FindId/>}/>
+                    <Route path="/find-pw" element={<FindPassword/>}/>
+                    <Route path="/reset-pw" element={<ResetPassword/>}/>
+                    <Route path="/customer-service" element={<CustomerService/>}/>
+                    <Route path="/inquiry-write" element={<InquiryWrite/>}/>
+                    <Route path="/inquiry-list" element={<InquiryList/>}/>
+                    <Route path="/asset" element={<MyAsset/>}/>
+                    <Route path="/asset-detail" element={<AssetDetail/>}/>
+                    <Route path="/financial/input" element={<FinancialInput/>}/>
+                    <Route path="/financial/result" element={<FinancialResult/>}/>
+                    <Route path="/investment/questions" element={<InvestmentQuestions/>}/>
+                    <Route path="/investment/result" element={<InvestmentResult/>}/>
+                    <Route path="/portfolio" element={<PortfolioMain/>}/>
+                    <Route path="/portfolio/auto" element={<PortfolioAuto/>}/>
+                    <Route path="/portfolio/result" element={<PortfolioResult/>}/>
+                    <Route path="/portfolio/direct" element={<PortfolioDirect/>}/>
+                    <Route path="/rebalancing" element={<Rebalancing/>}/>
+                    <Route path="/investment-information" element={<InvestmentInformation/>}/>
+                    <Route path="/admin" element={<AdminPage/>}/>
+                </Routes>
+            </main>
+
+            {!isAdminPage && <Footer/>}
+        </div>
+    );
+}
+
 function App() {
     return (
         <BrowserRouter>
-            <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
-                {/* 공통 상단 헤더 */}
-                <Header/>
-
-                {/* 페이지 전환 영역 */}
-                <main style={{minHeight: 'calc(100vh - 60px)'}}>
-                    <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/mypage" element={<MyPage/>}/>
-                        <Route path="/login" element={<Login/>}/>
-                        <Route path="/signup" element={<SignUp/>}/>
-                        <Route path="/signup-complete" element={<SignUpComplete/>}/>
-                        <Route path="/find-id" element={<FindId/>}/>
-                        <Route path="/find-pw" element={<FindPassword/>}/>
-                        <Route path="/reset-pw" element={<ResetPassword/>}/>
-                        <Route path="/customer-service" element={<CustomerService/>}/>
-                        <Route path="/inquiry-write" element={<InquiryWrite/>}/>
-                        <Route path="/inquiry-list" element={<InquiryList/>}/>
-                        <Route path="/asset" element={<MyAsset/>}/>
-                        <Route path="/asset-detail" element={<AssetDetail/>}/>
-                        <Route path="/financial/input" element={<FinancialInput/>}/>
-                        <Route path="/financial/result" element={<FinancialResult/>}/>
-                        <Route path="/investment/questions" element={<InvestmentQuestions/>}/>
-                        <Route path="/investment/result" element={<InvestmentResult/>}/>
-                        <Route path="/portfolio" element={<PortfolioMain/>}/>
-                        <Route path="/portfolio/auto" element={<PortfolioAuto/>}/>
-                        <Route path="/portfolio/result" element={<PortfolioResult/>}/>
-                        <Route path="/portfolio/direct" element={<PortfolioDirect/>}/>
-                        <Route path="/rebalancing" element={<Rebalancing/>}/>
-                        <Route path="/investment-information" element={<InvestmentInformation/>}/>
-                        <Route path="/admin" element={<AdminPage/>}/>
-                    </Routes>
-                </main>
-                <Footer/>
-            </div>
+            <AppContent/>
         </BrowserRouter>
     );
 }
