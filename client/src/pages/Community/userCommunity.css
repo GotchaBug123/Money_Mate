@@ -5,43 +5,6 @@
     background: #f7f8fb;
 }
 
-.user-community-header {
-    height: 82px;
-    padding: 0 42px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #ffffff;
-    border-bottom: 1px solid #eeeeee;
-}
-
-.user-community-header h1 {
-    margin: 0;
-    color: #5728f5;
-    font-size: 30px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-.user-community-header nav {
-    display: flex;
-    gap: 14px;
-}
-
-.user-community-header button {
-    min-width: 86px;
-    height: 42px;
-    border: 1px solid #eeeeee;
-    border-radius: 12px;
-    background: #ffffff;
-    font-weight: 900;
-}
-
-.user-community-header button.active {
-    color: #ffffff;
-    background: #5728f5;
-}
-
 .user-community-main {
     max-width: 1320px;
     min-height: 760px;
@@ -66,6 +29,7 @@
     color: #333333;
     font-size: 14px;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .community-page-toolbar button:first-child {
@@ -100,33 +64,51 @@
     background: #5728f5;
     font-size: 18px;
     font-weight: 900;
+    cursor: pointer;
 }
 
-/* Real Stock Logo */
+/* Stock Badge */
 
-.stock-logo-img,
-.stock-logo-fallback {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
+.stock-logo-box {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    max-width: 54px;
+    flex: 0 0 54px;
     border-radius: 50%;
-}
-
-.stock-logo-img {
-    padding: 6px;
-    object-fit: contain;
-    background: #ffffff;
     border: 1px solid #eeeeee;
-}
-
-.stock-logo-fallback {
+    background: #f4f1ff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
-    background: #5728f5;
-    font-size: 16px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.stock-logo-img {
+    display: none;
+}
+
+.stock-logo-box .stock-logo-fallback {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    max-width: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #5728f5;
+    font-size: 17px;
     font-weight: 900;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: -1px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 /* Home */
@@ -203,13 +185,14 @@
     margin-bottom: 14px;
     padding: 14px;
     display: grid;
-    grid-template-columns: 28px 44px 1fr;
+    grid-template-columns: 28px 54px 1fr;
     align-items: center;
     gap: 14px;
     border: 0;
     border-radius: 18px;
     background: #f7f8fb;
     text-align: left;
+    cursor: pointer;
 }
 
 .popular-post-item > strong {
@@ -250,6 +233,7 @@
     border-radius: 18px;
     background: #f7f8fb;
     text-align: left;
+    cursor: pointer;
 }
 
 .popular-community-list button > strong {
@@ -294,6 +278,7 @@
     background: #ffffff;
     color: #333333;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .community-theme-chips button:hover {
@@ -338,6 +323,7 @@
     background: #f1efff;
     font-size: 13px;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .theme-post-preview {
@@ -345,9 +331,13 @@
     padding: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 18px;
     border-radius: 18px;
     background: #f7f8fb;
+}
+
+.theme-post-preview > div {
+    min-width: 0;
 }
 
 .theme-post-preview strong {
@@ -358,7 +348,7 @@
     font-weight: 900;
 }
 
-.theme-post-preview span {
+.theme-post-preview > div > span {
     display: block;
     color: #777777;
     font-size: 13px;
@@ -408,6 +398,7 @@
     border-radius: 12px;
     background: #ffffff;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .community-theme-select button.active {
@@ -445,6 +436,7 @@
     color: #ffffff;
     background: #5728f5;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .community-post-card {
@@ -509,6 +501,7 @@
     background: #5728f5;
     font-size: 14px;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .community-post-actions button.liked {
@@ -580,6 +573,7 @@
     color: #ffffff;
     background: #5728f5;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .my-posts-table-head,
@@ -614,6 +608,7 @@
     border-radius: 10px;
     background: #dddddd;
     font-weight: 900;
+    cursor: pointer;
 }
 
 /* Modal */
@@ -662,6 +657,7 @@
     background: #5728f5 !important;
     font-size: 26px;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .user-post-modal h2 {
@@ -723,6 +719,7 @@
     border-radius: 12px;
     background: #dddddd;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .user-post-modal button[type='submit'] {
@@ -754,6 +751,7 @@
     background: #5728f5;
     font-size: 26px;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .comment-post-content {
@@ -852,6 +850,7 @@
     color: #ffffff;
     background: #5728f5;
     font-weight: 900;
+    cursor: pointer;
 }
 
 .comment-write-form button:disabled,
@@ -983,17 +982,6 @@
     background: #4520d6;
 }
 
-.user-community-footer {
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    background: #222222;
-    font-size: 24px;
-    font-weight: 800;
-}
-
 @media (max-width: 1100px) {
     .community-theme-grid {
         grid-template-columns: 1fr;
@@ -1010,18 +998,6 @@
 }
 
 @media (max-width: 800px) {
-    .user-community-header {
-        height: auto;
-        padding: 22px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 18px;
-    }
-
-    .user-community-header nav {
-        flex-wrap: wrap;
-    }
-
     .community-page-toolbar {
         flex-direction: column;
     }

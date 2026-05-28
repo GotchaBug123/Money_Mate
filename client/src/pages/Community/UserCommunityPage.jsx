@@ -1,97 +1,139 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
-import samsungLogo from '../assets/logos/samsung.png';
-import skhynixLogo from '../assets/logos/skhynix.png';
-import tigerLogo from '../assets/logos/tiger.png';
-import kodexLogo from '../assets/logos/kodex.png';
-import naverLogo from '../assets/logos/naver.png';
-import kakaoLogo from '../assets/logos/kakao.png';
-import hyundaiLogo from '../assets/logos/hyundai.png';
-import appleLogo from '../assets/logos/apple.png';
-import microsoftLogo from '../assets/logos/microsoft.png';
-import teslaLogo from '../assets/logos/tesla.png';
-import nvidiaLogo from '../assets/logos/nvidia.png';
-import googleLogo from '../assets/logos/google.png';
-
-import '../styles/userCommunity.css';
+import './userCommunity.css';
 
 const themes = ['반도체', 'ETF', '배당주', '성장주'];
 const interestStocks = ['삼성전자', 'SK하이닉스', 'TIGER 미국S&P500'];
 
+const defaultPosts = [
+    {
+        postNo: '1',
+        title: '삼성전자 장기투자 어떻게 생각하시나요?',
+        writerId: 'user01',
+        writerName: '이회원',
+        createdAt: '2026-05-20',
+        content: '삼성전자를 장기적으로 담아가려고 하는데 다른 분들은 어떻게 생각하시나요?',
+        attachmentName: 'samsung-analysis.pdf',
+        attachmentUrl: '',
+        theme: '반도체',
+        stockName: '삼성전자',
+        likes: 18,
+        likedUserIds: [],
+        comments: [
+            {
+                commentNo: '1',
+                writerName: '김회원',
+                content: '저도 장기 관점이면 괜찮다고 봅니다.',
+                createdAt: '2026-05-20',
+                replies: [],
+            },
+        ],
+    },
+    {
+        postNo: '2',
+        title: 'ETF 중심 포트폴리오 공유합니다',
+        writerId: 'etf100',
+        writerName: '정ETF',
+        createdAt: '2026-05-21',
+        content: '저는 국내 주식보다 ETF 비중을 높게 가져가고 있습니다.',
+        attachmentName: '',
+        attachmentUrl: '',
+        theme: 'ETF',
+        stockName: 'TIGER 미국S&P500',
+        likes: 24,
+        likedUserIds: [],
+        comments: [],
+    },
+    {
+        postNo: '3',
+        title: '요즘 반도체 주식 흐름 괜찮나요?',
+        writerId: 'stock77',
+        writerName: '한주식',
+        createdAt: '2026-05-22',
+        content: '반도체 관련 종목들이 다시 올라오는 것 같아서 의견을 듣고 싶습니다.',
+        attachmentName: 'semiconductor.png',
+        attachmentUrl: '',
+        theme: '반도체',
+        stockName: 'SK하이닉스',
+        likes: 31,
+        likedUserIds: [],
+        comments: [],
+    },
+];
+
 const stockProfiles = {
     삼성전자: {
-        logo: samsungLogo,
         name: '삼성전자',
+        shortName: '삼',
         description: '국내 대표 반도체·전자 기업',
     },
     SK하이닉스: {
-        logo: skhynixLogo,
         name: 'SK하이닉스',
+        shortName: 'SK',
         description: '메모리 반도체 대표 기업',
     },
     'TIGER 미국S&P500': {
-        logo: tigerLogo,
         name: 'TIGER 미국S&P500',
+        shortName: 'T',
         description: '미국 대표 지수 ETF',
     },
     KODEX: {
-        logo: kodexLogo,
         name: 'KODEX',
+        shortName: 'K',
         description: '국내 ETF 브랜드',
     },
     NAVER: {
-        logo: naverLogo,
         name: 'NAVER',
+        shortName: 'N',
         description: '국내 대표 플랫폼 기업',
     },
     카카오: {
-        logo: kakaoLogo,
         name: '카카오',
+        shortName: '카',
         description: '국내 대표 플랫폼 기업',
     },
     현대차: {
-        logo: hyundaiLogo,
         name: '현대차',
+        shortName: '현',
         description: '국내 대표 자동차 기업',
     },
     애플: {
-        logo: appleLogo,
         name: '애플',
+        shortName: 'A',
         description: '글로벌 대표 기술 기업',
     },
     마이크로소프트: {
-        logo: microsoftLogo,
         name: '마이크로소프트',
+        shortName: 'M',
         description: '글로벌 소프트웨어 기업',
     },
     테슬라: {
-        logo: teslaLogo,
         name: '테슬라',
+        shortName: 'T',
         description: '전기차·AI 성장주',
     },
     엔비디아: {
-        logo: nvidiaLogo,
         name: '엔비디아',
+        shortName: 'N',
         description: 'AI 반도체 대표 기업',
     },
     구글: {
-        logo: googleLogo,
         name: '구글',
+        shortName: 'G',
         description: '글로벌 플랫폼 기업',
     },
 };
 
 function UserCommunityPage({
-    posts,
-    currentUser,
-    onGoHome,
-    onGoLogin,
+    posts: externalPosts,
+    currentUser: externalCurrentUser,
     onCreatePost,
     onUpdatePost,
     onLikePost,
     onAddComment,
     onAddReply,
 }) {
+    const [internalPosts, setInternalPosts] = useState(defaultPosts);
     const [view, setView] = useState('home');
     const [selectedTheme, setSelectedTheme] = useState('반도체');
     const [searchInput, setSearchInput] = useState('');
@@ -102,6 +144,17 @@ function UserCommunityPage({
     const [commentInput, setCommentInput] = useState('');
     const [replyingCommentNo, setReplyingCommentNo] = useState(null);
     const [replyInput, setReplyInput] = useState('');
+
+    const posts = externalPosts || internalPosts;
+
+    const currentUser = externalCurrentUser || (
+        localStorage.getItem('isLoggedIn') === 'true'
+            ? {
+                userId: localStorage.getItem('role') === 'admin' ? 'admin' : 'test',
+                name: localStorage.getItem('role') === 'admin' ? '관리자' : '테스트회원',
+            }
+            : null
+    );
 
     const [writeForm, setWriteForm] = useState({
         title: '',
@@ -130,8 +183,8 @@ function UserCommunityPage({
 
     const getStockProfile = (stockName) => {
         return stockProfiles[stockName] || {
-            logo: null,
             name: stockName,
+            shortName: String(stockName).slice(0, 1),
             description: '투자 종목 커뮤니티',
         };
     };
@@ -139,30 +192,22 @@ function UserCommunityPage({
     const renderStockLogo = (stockName) => {
         const profile = getStockProfile(stockName);
 
-        if (!profile.logo) {
-            return (
-                <span className="stock-logo-fallback">
-                    {stockName.slice(0, 1)}
-                </span>
-            );
-        }
-
         return (
-            <img
-                className="stock-logo-img"
-                src={profile.logo}
-                alt={`${profile.name} 로고`}
-            />
+            <span className="stock-logo-box">
+                <span className="stock-logo-fallback">
+                    {profile.shortName}
+                </span>
+            </span>
         );
     };
 
     const filteredPosts = posts.filter((post) => {
         const matchesSearch =
             !searchKeyword ||
-            post.title.toLowerCase().includes(searchKeyword) ||
-            post.content.toLowerCase().includes(searchKeyword) ||
-            post.writerName.toLowerCase().includes(searchKeyword) ||
-            post.stockName.toLowerCase().includes(searchKeyword);
+            String(post.title).toLowerCase().includes(searchKeyword) ||
+            String(post.content).toLowerCase().includes(searchKeyword) ||
+            String(post.writerName).toLowerCase().includes(searchKeyword) ||
+            String(post.stockName).toLowerCase().includes(searchKeyword);
 
         const matchesTheme = view !== 'board' || post.theme === selectedTheme;
 
@@ -206,6 +251,14 @@ function UserCommunityPage({
         ? posts.find((post) => post.postNo === selectedCommentPost.postNo)
         : null;
 
+    const updateInternalPost = (updatedPost) => {
+        setInternalPosts((prevPosts) =>
+            prevPosts.map((post) =>
+                post.postNo === updatedPost.postNo ? updatedPost : post
+            )
+        );
+    };
+
     const goCommunityHome = () => {
         setView('home');
         setSearchInput('');
@@ -246,7 +299,7 @@ function UserCommunityPage({
     };
 
     const handleWriteChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
 
         setWriteForm((prevForm) => ({
             ...prevForm,
@@ -272,11 +325,22 @@ function UserCommunityPage({
             return;
         }
 
-        onCreatePost({
+        const newPost = {
             ...writeForm,
+            postNo: String(posts.length + 1),
             writerId: currentUser.userId,
             writerName: currentUser.name,
-        });
+            createdAt: new Date().toISOString().slice(0, 10),
+            likes: 0,
+            likedUserIds: [],
+            comments: [],
+        };
+
+        if (onCreatePost) {
+            onCreatePost(newPost);
+        } else {
+            setInternalPosts((prevPosts) => [newPost, ...prevPosts]);
+        }
 
         setIsWriteModalOpen(false);
         setView('board');
@@ -284,7 +348,7 @@ function UserCommunityPage({
     };
 
     const openEditModal = (post) => {
-        setEditingPost({ ...post });
+        setEditingPost({...post});
     };
 
     const closeEditModal = () => {
@@ -292,7 +356,7 @@ function UserCommunityPage({
     };
 
     const handleEditChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
 
         setEditingPost((prevPost) => ({
             ...prevPost,
@@ -313,7 +377,12 @@ function UserCommunityPage({
     const handleEditSubmit = (event) => {
         event.preventDefault();
 
-        onUpdatePost(editingPost);
+        if (onUpdatePost) {
+            onUpdatePost(editingPost);
+        } else {
+            updateInternalPost(editingPost);
+        }
+
         setEditingPost(null);
         setView('board');
         setSelectedTheme(editingPost.theme);
@@ -330,7 +399,16 @@ function UserCommunityPage({
             return;
         }
 
-        onLikePost(post.postNo, currentUser.userId);
+        if (onLikePost) {
+            onLikePost(post.postNo, currentUser.userId);
+            return;
+        }
+
+        updateInternalPost({
+            ...post,
+            likes: post.likes + 1,
+            likedUserIds: [...(post.likedUserIds || []), currentUser.userId],
+        });
     };
 
     const openCommentModal = (post) => {
@@ -360,7 +438,24 @@ function UserCommunityPage({
             return;
         }
 
-        onAddComment(latestSelectedCommentPost.postNo, commentInput.trim());
+        if (onAddComment) {
+            onAddComment(latestSelectedCommentPost.postNo, commentInput.trim());
+        } else {
+            updateInternalPost({
+                ...latestSelectedCommentPost,
+                comments: [
+                    ...(latestSelectedCommentPost.comments || []),
+                    {
+                        commentNo: String((latestSelectedCommentPost.comments || []).length + 1),
+                        writerName: currentUser.name,
+                        content: commentInput.trim(),
+                        createdAt: new Date().toISOString().slice(0, 10),
+                        replies: [],
+                    },
+                ],
+            });
+        }
+
         setCommentInput('');
     };
 
@@ -389,7 +484,32 @@ function UserCommunityPage({
             return;
         }
 
-        onAddReply(latestSelectedCommentPost.postNo, commentNo, replyInput.trim());
+        if (onAddReply) {
+            onAddReply(latestSelectedCommentPost.postNo, commentNo, replyInput.trim());
+        } else {
+            updateInternalPost({
+                ...latestSelectedCommentPost,
+                comments: (latestSelectedCommentPost.comments || []).map((comment) => {
+                    if (comment.commentNo !== commentNo) {
+                        return comment;
+                    }
+
+                    return {
+                        ...comment,
+                        replies: [
+                            ...(comment.replies || []),
+                            {
+                                replyNo: String((comment.replies || []).length + 1),
+                                writerName: currentUser.name,
+                                content: replyInput.trim(),
+                                createdAt: new Date().toISOString().slice(0, 10),
+                            },
+                        ],
+                    };
+                }),
+            });
+        }
+
         setReplyingCommentNo(null);
         setReplyInput('');
     };
@@ -414,23 +534,6 @@ function UserCommunityPage({
 
     return (
         <div className="user-community-page">
-            <header className="user-community-header">
-                <h1 onClick={onGoHome}>Money_Mate</h1>
-
-                <nav>
-                    <button>MY자산</button>
-                    <button>포트폴리오</button>
-                    <button>리밸런싱</button>
-                    <button>투자정보</button>
-                    <button className="active" type="button" onClick={goCommunityHome}>
-                        커뮤니티
-                    </button>
-                    <button type="button" onClick={onGoLogin}>
-                        로그인
-                    </button>
-                </nav>
-            </header>
-
             <main className="user-community-main">
                 {showCommunityToolbar && (
                     <div className="community-page-toolbar">
@@ -735,8 +838,6 @@ function UserCommunityPage({
                 )}
             </main>
 
-            <footer className="user-community-footer">Footer 영역</footer>
-
             {isWriteModalOpen && (
                 <div className="user-modal-backdrop">
                     <section className="user-post-modal">
@@ -794,7 +895,7 @@ function UserCommunityPage({
 
                             <label>
                                 첨부파일
-                                <input type="file" onChange={handleWriteFileChange} />
+                                <input type="file" onChange={handleWriteFileChange}/>
                                 <span>{writeForm.attachmentName || '첨부파일 없음'}</span>
                             </label>
 
@@ -868,7 +969,7 @@ function UserCommunityPage({
 
                             <label>
                                 첨부파일
-                                <input type="file" onChange={handleEditFileChange} />
+                                <input type="file" onChange={handleEditFileChange}/>
                                 <span>{editingPost.attachmentName || '첨부파일 없음'}</span>
                             </label>
 

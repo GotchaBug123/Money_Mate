@@ -35,6 +35,7 @@ import PortfolioDirect from './pages/Portfolio/PortfolioDirect/PortfolioDirect';
 
 import Rebalancing from './pages/Rebalancing/Rebalancing';
 import InvestmentInformation from './pages/InvestmentInformation/InvestmentInformation';
+import UserCommunityPage from './pages/Community/UserCommunityPage';
 
 import './App.css';
 
@@ -71,6 +72,7 @@ function AppContent() {
                     <Route path="/portfolio/direct" element={<PortfolioDirect/>}/>
                     <Route path="/rebalancing" element={<Rebalancing/>}/>
                     <Route path="/investment-information" element={<InvestmentInformation/>}/>
+                    <Route path="/community" element={<UserCommunityPage/>}/>
                     <Route path="/admin" element={<AdminPage/>}/>
                 </Routes>
             </main>
