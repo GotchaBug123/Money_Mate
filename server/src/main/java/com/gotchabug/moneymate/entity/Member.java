@@ -57,4 +57,11 @@ public class Member {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void updateAdminInfo(String name, String email, String role, String signupStatus) {
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.signupStatus = signupStatus;
+    }
 }

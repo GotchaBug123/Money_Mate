@@ -60,8 +60,15 @@ public class AuthController {
 
         try {
             Member member = authService.login(request);
+
             session.setAttribute("loginUser", member);
-            return "redirect:/main";
+
+            if ("ADMIN".equals(member.getRole())) {
+                return "redirect:/admin";
+            }
+
+            return "redirect:/home";
+
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "login";

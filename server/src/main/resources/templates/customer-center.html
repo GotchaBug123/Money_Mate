@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 고객센터</title>
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/customer-center.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a href="/main" class="logo">MoneyMate</a>
+
+        <nav class="nav">
+            <div class="nav-dropdown">
+                <span class="nav-link disabled-link">MY 자산</span>
+                <div class="dropdown-menu">
+                    <a href="/my-asset/financial">내 재무 정보</a>
+                    <a href="/my-investment">내 투자 정보</a>
+                </div>
+            </div>
+
+            <a href="#">포트폴리오</a>
+            <a href="#">대시보드</a>
+            <a href="/stock-search">투자정보</a>
+            <a href="/customer-center" class="active">고객센터</a>
+        </nav>
+
+        <div class="header-actions">
+            <a href="/mypage" class="mypage-btn">마이페이지</a>
+        </div>
+    </div>
+</header>
+
+<main class="customer-page">
+
+    <section class="customer-hero">
+        <p>MoneyMate 고객센터</p>
+        <h1>무엇을 도와드릴까요?</h1>
+
+        <div class="search-box">
+            <input type="text" placeholder="궁금한 내용을 검색해보세요. 예) 수익률, 포트폴리오, 투자성향">
+            <button type="button">검색</button>
+        </div>
+    </section>
+
+    <section class="quick-menu">
+        <a href="#faq" class="quick-card">
+            <strong>자주 묻는 질문</strong>
+            <span>투자, 수익률, 계정 관련 도움말</span>
+        </a>
+
+        <a href="#inquiry" class="quick-card">
+            <strong>1:1 문의하기</strong>
+            <span>상담이 필요한 내용을 남겨주세요</span>
+        </a>
+
+        <a href="#my-inquiries" class="quick-card">
+            <strong>내 문의 내역</strong>
+            <span>접수 상태와 답변 확인</span>
+        </a>
+    </section>
+
+    <section class="content-grid">
+
+        <div class="faq-area" id="faq">
+            <div class="section-header">
+                <div>
+                    <p>FAQ</p>
+                    <h2>자주 묻는 질문</h2>
+                </div>
+            </div>
+
+            <div class="category-tabs">
+                <button type="button" th:each="category : ${categories}" th:text="${category}">
+                    투자
+                </button>
+            </div>
+
+            <div class="faq-list">
+                <details class="faq-item" th:each="faq : ${faqs}">
+                    <summary>
+                        <span class="faq-category" th:text="${faq.category}">투자</span>
+                        <strong th:text="${faq.question}">
+                            로보어드바이저 추천 포트폴리오는 어떻게 만들어지나요?
+                        </strong>
+                    </summary>
+
+                    <p th:text="${faq.answer}">
+                        회원님의 투자성향과 재무정보를 기반으로 추천합니다.
+                    </p>
+                </details>
+
+                <div class="empty-box" th:if="${#lists.isEmpty(faqs)}">
+                    등록된 FAQ가 없습니다.
+                </div>
+            </div>
+        </div>
+
+        <aside class="notice-area">
+            <div class="notice-card">
+                <h3>운영 안내</h3>
+                <p>
+                    문의 답변은 평일 기준 1~2영업일 이내 제공됩니다.
+                    투자 판단의 최종 책임은 투자자 본인에게 있습니다.
+                </p>
+            </div>
+
+            <div class="notice-card blue">
+                <h3>상담 가능 시간</h3>
+                <p>
+                    평일 09:00 ~ 18:00<br>
+                    점심시간 12:00 ~ 13:00<br>
+                    주말 및 공휴일 휴무
+                </p>
+            </div>
+        </aside>
+
+    </section>
+
+    <section class="inquiry-section" id="inquiry">
+
+        <div class="section-header">
+            <div>
+                <p>CONTACT</p>
+                <h2>1:1 문의하기</h2>
+            </div>
+        </div>
+
+        <div class="success-message" th:if="${param.success}">
+            문의가 정상적으로 접수되었습니다.
+        </div>
+
+        <form class="inquiry-form"
+              th:action="@{/customer-center/inquiry}"
+              th:object="${inquiryRequest}"
+              method="post">
+
+            <div class="form-row">
+                <label>문의 유형</label>
+                <select th:field="*{category}">
+                    <option value="">문의 유형을 선택하세요</option>
+                    <option value="투자">투자</option>
+                    <option value="수익률">수익률</option>
+                    <option value="포트폴리오">포트폴리오</option>
+                    <option value="계정">계정</option>
+                    <option value="데이터">데이터</option>
+                    <option value="문의">기타 문의</option>
+                </select>
+                <p class="error" th:errors="*{category}"></p>
+            </div>
+
+            <div class="form-row">
+                <label>제목</label>
+                <input type="text"
+                       th:field="*{title}"
+                       placeholder="문의 제목을 입력하세요">
+                <p class="error" th:errors="*{title}"></p>
+            </div>
+
+            <div class="form-row">
+                <label>문의 내용</label>
+                <textarea th:field="*{content}"
+                          placeholder="문의 내용을 자세히 입력해주세요"></textarea>
+                <p class="error" th:errors="*{content}"></p>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                문의 접수하기
+            </button>
+
+        </form>
+
+    </section>
+
+    <section class="my-inquiry-section" id="my-inquiries">
+
+        <div class="section-header">
+            <div>
+                <p>MY INQUIRY</p>
+                <h2>내 문의 내역</h2>
+            </div>
+        </div>
+
+        <div class="inquiry-list">
+
+            <div class="inquiry-item" th:each="inquiry : ${inquiries}">
+
+                <div class="inquiry-top">
+                    <span class="badge" th:text="${inquiry.status}">WAITING</span>
+                    <small th:text="${#temporals.format(inquiry.createdAt, 'yyyy.MM.dd HH:mm')}">
+                        2026.05.28 17:30
+                    </small>
+                </div>
+
+                <h3 th:text="${inquiry.title}">
+                    문의 제목
+                </h3>
+
+                <p class="inquiry-content" th:text="${inquiry.content}">
+                    문의 내용입니다.
+                </p>
+
+                <div class="answer-box" th:if="${inquiry.answer != null}">
+                    <strong>답변</strong>
+                    <p th:text="${inquiry.answer}">
+                        답변 내용
+                    </p>
+                </div>
+
+                <div class="answer-waiting" th:if="${inquiry.answer == null}">
+                    답변 대기 중입니다.
+                </div>
+
+            </div>
+
+            <div class="empty-box" th:if="${#lists.isEmpty(inquiries)}">
+                아직 등록한 문의가 없습니다.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>MoneyMate © 2026 All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>

@@ -37,9 +37,4 @@ public class MyAssetController {
 
         return "my-asset-financial";
     }
-
-    @GetMapping("/my-investment")
-    public String myInvestmentPage() {
-        return "my-investment";
-    }
 }

@@ -52,19 +52,21 @@ public class AuthService {
     @Transactional
     public Member login(LoginRequest request) {
 
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 없음"));
+        Member member = memberRepository.findByLoginId(request.getLoginId())
+                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
 
         MemberAuth auth = memberAuthRepository.findByMember_MemberId(member.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("인증 정보 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("인증 정보가 없습니다."));
 
         if (!auth.getPasswordHash().equals(request.getPassword())) {
             auth.loginFail();
-            throw new IllegalArgumentException("비밀번호 틀림");
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         auth.loginSuccess();
-        System.out.println("로그인 성공: " + member.getEmail());
+
+        System.out.println("로그인 성공: " + member.getLoginId());
+
         return member;
     }
-    }
+}
