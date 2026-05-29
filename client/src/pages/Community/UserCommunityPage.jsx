@@ -550,33 +550,68 @@ function UserCommunityPage({
                     </div>
                 )}
 
-                <form className="user-community-search" onSubmit={handleSearchSubmit}>
-                    <input
-                        type="text"
-                        value={searchInput}
-                        onChange={(event) => setSearchInput(event.target.value)}
-                        placeholder="종목명 / 제목 / 작성자 검색"
-                    />
-                    <button type="submit">검색</button>
-                </form>
+                <section className="community-top-area">
+                    <form className="user-community-search" onSubmit={handleSearchSubmit}>
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value)}
+                            placeholder="종목명 / 제목 / 작성자 검색"
+                        />
+                        <button type="submit">검색</button>
+                    </form>
+
+                    <div className="community-quick-actions">
+                        <button type="button" onClick={() => requireLogin('myPosts')}>
+                            내 게시글
+                        </button>
+                        <button type="button" onClick={openWriteModal}>
+                            글쓰기
+                        </button>
+                    </div>
+                </section>
 
                 {view === 'home' && (
                     <>
                         <section className="community-hero-section">
                             <div>
                                 <span>Money_Mate 커뮤니티</span>
-                                <h2>관심 종목을 기준으로 투자 이야기를 나눠보세요</h2>
+                                <h2>투자 이야기를 나누고 종목별 의견을 확인해보세요</h2>
                                 <p>
-                                    종목별 게시글, 인기 커뮤니티, 댓글 반응을 한눈에 확인할 수 있어요.
+                                    관심 종목, 인기 게시글, 테마별 커뮤니티를 한 화면에서 빠르게 확인할 수 있어요.
                                 </p>
+
+                                <div className="community-hero-buttons">
+                                    <button type="button" onClick={() => goBoardByTheme('반도체')}>
+                                        게시글 둘러보기
+                                    </button>
+                                    <button type="button" onClick={openWriteModal}>
+                                        게시글 작성
+                                    </button>
+                                </div>
                             </div>
+                        </section>
+
+                        <section className="community-theme-chips">
+                            {themes.map((theme) => (
+                                <button
+                                    type="button"
+                                    key={theme}
+                                    onClick={() => goBoardByTheme(theme)}
+                                >
+                                    {theme}
+                                </button>
+                            ))}
                         </section>
 
                         <section className="community-rank-section">
                             <article className="popular-post-panel">
                                 <div className="section-title-row">
-                                    <h2>인기 글</h2>
-                                    <span>좋아요 + 댓글 기준</span>
+                                    <div>
+                                        <span>Popular Posts</span>
+                                        <h2>인기 글</h2>
+                                    </div>
+                                    <small>좋아요 + 댓글 기준</small>
                                 </div>
 
                                 {popularPosts.map((post, index) => (
@@ -602,8 +637,11 @@ function UserCommunityPage({
 
                             <article className="popular-community-panel">
                                 <div className="section-title-row">
-                                    <h2>인기 커뮤니티</h2>
-                                    <span>활동 많은 테마</span>
+                                    <div>
+                                        <span>Hot Themes</span>
+                                        <h2>인기 커뮤니티</h2>
+                                    </div>
+                                    <small>활동 많은 테마</small>
                                 </div>
 
                                 <div className="popular-community-list">
@@ -624,18 +662,6 @@ function UserCommunityPage({
                             </article>
                         </section>
 
-                        <section className="community-theme-chips">
-                            {themes.map((theme) => (
-                                <button
-                                    type="button"
-                                    key={theme}
-                                    onClick={() => goBoardByTheme(theme)}
-                                >
-                                    {theme}
-                                </button>
-                            ))}
-                        </section>
-
                         <section className="community-theme-grid">
                             {themes.slice(0, 3).map((theme) => {
                                 const themePosts = posts
@@ -645,22 +671,36 @@ function UserCommunityPage({
                                 return (
                                     <article className="community-theme-card" key={theme}>
                                         <div className="theme-card-header">
-                                            <h3>{theme}</h3>
+                                            <div>
+                                                <span>Theme</span>
+                                                <h3>{theme}</h3>
+                                            </div>
                                             <button type="button" onClick={() => goBoardByTheme(theme)}>
                                                 더보기
                                             </button>
                                         </div>
 
-                                        {themePosts.map((post) => (
-                                            <div className="theme-post-preview" key={post.postNo}>
-                                                {renderStockLogo(post.stockName)}
+                                        {themePosts.length > 0 ? (
+                                            themePosts.map((post) => (
+                                                <button
+                                                    type="button"
+                                                    className="theme-post-preview"
+                                                    key={post.postNo}
+                                                    onClick={() => goBoardByTheme(post.theme)}
+                                                >
+                                                    {renderStockLogo(post.stockName)}
 
-                                                <div>
-                                                    <strong>{post.stockName}</strong>
-                                                    <span>{post.title}</span>
-                                                </div>
+                                                    <div>
+                                                        <strong>{post.stockName}</strong>
+                                                        <span>{post.title}</span>
+                                                    </div>
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <div className="theme-empty-preview">
+                                                아직 게시글이 없습니다.
                                             </div>
-                                        ))}
+                                        )}
                                     </article>
                                 );
                             })}
@@ -718,7 +758,10 @@ function UserCommunityPage({
 
                         <section className="community-board">
                             <div className="community-board-top">
-                                <h2>{selectedTheme} 게시글</h2>
+                                <div>
+                                    <span>Community Board</span>
+                                    <h2>{selectedTheme} 게시글</h2>
+                                </div>
 
                                 <div>
                                     <button type="button" onClick={() => requireLogin('myPosts')}>
@@ -744,6 +787,8 @@ function UserCommunityPage({
                                                     <strong>{post.stockName}</strong>
                                                     <small>{profile.description}</small>
                                                 </div>
+
+                                                <span className="post-theme-badge">{post.theme}</span>
                                             </div>
 
                                             <div className="post-card-body">
@@ -809,7 +854,10 @@ function UserCommunityPage({
                 {view === 'myPosts' && (
                     <section className="my-posts-section">
                         <div className="my-posts-header">
-                            <h2>내 게시글</h2>
+                            <div>
+                                <span>My Posts</span>
+                                <h2>내 게시글</h2>
+                            </div>
                             <button type="button" onClick={goBackToBoard}>
                                 돌아가기
                             </button>
@@ -823,16 +871,22 @@ function UserCommunityPage({
                                 <span>관리</span>
                             </div>
 
-                            {myPosts.map((post) => (
-                                <div className="my-posts-row" key={post.postNo}>
-                                    <span>{post.postNo}</span>
-                                    <span>{post.title}</span>
-                                    <span>{post.content}</span>
-                                    <button type="button" onClick={() => openEditModal(post)}>
-                                        수정하기
-                                    </button>
+                            {myPosts.length > 0 ? (
+                                myPosts.map((post) => (
+                                    <div className="my-posts-row" key={post.postNo}>
+                                        <span>{post.postNo}</span>
+                                        <span>{post.title}</span>
+                                        <span>{post.content}</span>
+                                        <button type="button" onClick={() => openEditModal(post)}>
+                                            수정하기
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="empty-user-community">
+                                    작성한 게시글이 없습니다.
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </section>
                 )}
