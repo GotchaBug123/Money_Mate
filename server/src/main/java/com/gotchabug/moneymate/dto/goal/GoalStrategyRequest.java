@@ -15,16 +15,16 @@ public class GoalStrategyRequest {
 
     private String goalName;
 
-    @Min(value = 0, message = "현재 보유금은 0원 이상이어야 합니다.")
+    @Min(value = 0, message = "현재 보유 금액은 0원 이상이어야 합니다.")
     private Long currentAmount;
 
-    // 화면의 "투자 금액" 입력값은 월 투자금으로 처리합니다.
+    // 리밸런싱 화면의 "투자 금액" 입력값은 월 투자금으로 처리합니다.
     @NotNull(message = "월 투자금은 필수입니다.")
     @Min(value = 0, message = "월 투자금은 0원 이상이어야 합니다.")
     private Long monthlyInvestment;
 
     @NotNull(message = "목표 금액은 필수입니다.")
-    @Min(value = 1000000, message = "목표 금액은 최소 100만 원 이상이어야 합니다.")
+    @Min(value = 1000000, message = "목표 금액은 최소 100만원 이상이어야 합니다.")
     private Long targetAmount;
 
     @NotNull(message = "투자 기간은 필수입니다.")
@@ -56,7 +56,7 @@ public class GoalStrategyRequest {
 
     public String safeGoalName() {
         if (goalName == null || goalName.trim().isEmpty()) {
-            return "리밸런싱 전략";
+            return "포트폴리오 리밸런싱 분석";
         }
 
         return goalName.trim();
