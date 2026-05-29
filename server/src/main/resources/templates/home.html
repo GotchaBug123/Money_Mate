@@ -10,7 +10,7 @@
 
 <header class="header">
   <div class="header-inner">
-    <a href="/main" class="logo">MoneyMate</a>
+    <div class="logo">MoneyMate</div>
 
     <nav class="nav">
       <div class="nav-dropdown">
@@ -23,20 +23,23 @@
       </div>
 
       <a href="#">포트폴리오</a>
-      <a href="#">대시보드</a>
-      <a href="/stock-search">투자정보</a>
-      <a href="/customer-center">고객센터</a>
+      <a href="/rebalancing">리밸런싱</a>
+      <a href="#">투자정보</a>
+      <a href="/community">커뮤니티</a>
     </nav>
 
     <div class="header-buttons">
 
+      <!-- 로그인 안된 상태 -->
       <div th:if="${loginUser == null}">
         <a href="/login" class="login-btn">로그인</a>
         <a href="/signup" class="join-btn">회원가입</a>
       </div>
 
+      <!-- 로그인 된 상태 -->
       <div th:if="${loginUser != null}">
-        <span class="welcome-text" th:text="|${session.loginUser.name}님 환영합니다 👋|"></span>
+        <span class="welcome-text" th:text="|${session.loginUser.name}님 환영합니다 👋|">
+        </span>
         <a href="/mypage" class="mypage-btn">마이페이지</a>
         <a href="/logout" class="login-btn">로그아웃</a>
       </div>

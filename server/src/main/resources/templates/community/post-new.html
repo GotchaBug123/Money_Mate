@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 게시글 작성</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .page { max-width: 860px; margin: 0 auto; padding: 34px 20px 70px; background: #f8fafc; min-height: calc(100vh - 78px); }
+        .panel { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 22px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; margin: 12px 0 6px; font-weight: 700; }
+        input, select, textarea { width: 100%; border: 1px solid #d0d5dd; border-radius: 6px; padding: 10px; background: #ffffff; }
+        textarea { min-height: 180px; resize: vertical; }
+        .btn { border: 1px solid #d0d5dd; border-radius: 8px; background: #ffffff; padding: 11px 18px; font-weight: 700; cursor: pointer; }
+        .btn.primary { border-color: #155eef; background: #155eef; color: #ffffff; }
+        @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="/" class="logo">MoneyMate</a>
+        <nav class="nav">
+            <a href="/my-asset">MY 자산</a><a href="#">포트폴리오</a><a href="/rebalancing">리밸런싱</a><a href="#">투자정보</a><a href="/community">커뮤니티</a>
+        </nav>
+        <div class="header-buttons">
+            <a th:if="${!loggedIn}" href="/login" class="login-btn">로그인</a>
+            <a th:if="${loggedIn}" href="/mypage" class="login-btn">마이페이지</a>
+            <a th:if="${loggedIn}" href="/logout" class="login-btn">로그아웃</a>
+        </div>
+    </div>
+</header>
+
+<main class="page">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div>
+            <h1>게시글 작성</h1>
+            <p style="color:#667085;">첨부파일은 Multipart 업로드로 저장됩니다.</p>
+        </div>
+        <a class="btn" href="/community">목록</a>
+    </div>
+    <section class="panel">
+        <form id="postForm">
+            <div class="grid">
+                <div>
+                    <label for="themeId">테마</label>
+                    <select id="themeId" name="themeId"><option value="">테마 선택 없음</option></select>
+                </div>
+                <div>
+                    <label for="category">카테고리</label>
+                    <input id="category" name="category" type="text" value="정보공유" required>
+                </div>
+                <div>
+                    <label for="stockSymbol">종목코드</label>
+                    <input id="stockSymbol" name="stockSymbol" type="text" placeholder="AAPL">
+                </div>
+                <div>
+                    <label for="stockName">종목명</label>
+                    <input id="stockName" name="stockName" type="text" placeholder="Apple">
+                </div>
+            </div>
+            <label for="title">게시글 제목</label>
+            <input id="title" name="title" type="text" required>
+            <label for="content">내용</label>
+            <textarea id="content" name="content" required></textarea>
+            <label for="files">첨부파일</label>
+            <input id="files" name="files" type="file" multiple>
+            <div style="display:flex; gap:10px; margin-top:18px;">
+                <button class="btn primary" type="submit">올리기</button>
+                <a class="btn" href="/community">취소</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<footer class="footer"><p>© 2026 MoneyMate. All rights reserved.</p></footer>
+
+<script th:inline="javascript">
+    const loggedIn = /*[[${loggedIn}]]*/ false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadThemes();
+        document.getElementById('postForm').addEventListener('submit', createPost);
+    });
+
+    async function loadThemes() {
+        const response = await fetch('/community/themes', {credentials: 'same-origin'});
+        const themes = await response.json();
+        document.getElementById('themeId').innerHTML = '<option value="">테마 선택 없음</option>' + themes
+            .map(theme => `<option value="${theme.themeId}">${escapeHtml(theme.themeName)}</option>`)
+            .join('');
+    }
+
+    async function createPost(event) {
+        event.preventDefault();
+        if (!loggedIn) return alert('로그인 후 게시글을 작성할 수 있습니다.');
+        const form = event.target;
+        const formData = new FormData();
+        appendIfPresent(formData, 'themeId', form.themeId.value);
+        formData.append('category', form.category.value);
+        formData.append('title', form.title.value);
+        formData.append('content', form.content.value);
+        appendIfPresent(formData, 'stockSymbol', form.stockSymbol.value);
+        appendIfPresent(formData, 'stockName', form.stockName.value);
+        Array.from(form.files.files).forEach(file => formData.append('files', file));
+
+        const response = await fetch('/community/posts', {method: 'POST', body: formData, credentials: 'same-origin'});
+        const body = await response.json().catch(() => null);
+        if (!response.ok) return alert(body?.message || body?.error || '게시글 작성에 실패했습니다.');
+        location.href = `/community/posts/${body.postId}/view`;
+    }
+
+    function appendIfPresent(formData, key, value) { if (value && value.trim()) formData.append(key, value.trim()); }
+    function escapeHtml(value) { return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+</script>
+</body>
+</html>
