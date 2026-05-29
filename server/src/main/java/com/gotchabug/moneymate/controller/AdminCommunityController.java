@@ -25,7 +25,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/admin")
+@RequestMapping("/admin/community")
 public class AdminCommunityController {
 
     private final CommunityService communityService;
