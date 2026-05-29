@@ -1,9 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styles from './Rebalancing.module.css';
 
-// ✅ 백엔드 API 연결 시 아래 import로 교체
-// import { searchStocks, LOGO_MAP } from '../../data/stockData';
-
 const LOGO_MAP = {
     '005930':'samsung.com','000660':'skhynix.com','NVDA':'nvidia.com',
     'AAPL':'apple.com','360750':'tigeretf.com','005380':'hyundai.com',
@@ -27,7 +24,7 @@ const STOCK_LIST = [
 ];
 
 const searchStocks = (query) => {
-    if (!query || !query.trim()) return [];
+    if (!query.trim()) return [];
     const q = query.toLowerCase();
     return STOCK_LIST.filter(s =>
         s.name.toLowerCase().includes(q) || s.ticker.toLowerCase().includes(q)
@@ -67,15 +64,16 @@ const MOCK_RESULT = (investAmount) => ({
 const Rebalancing = () => {
     const resultRef = useRef(null);
 
-    const [currency,     setCurrency]     = useState('만원');
-    const [investAmount, setInvestAmount] = useState('');
-    const [startDate,    setStartDate]    = useState('');
-    const [endDate,      setEndDate]      = useState('');
-    const [goalAmount,   setGoalAmount]   = useState('');
-    const [stocks,       setStocks]       = useState([]);
-    const [result,       setResult]       = useState(null);
-    const [loading,      setLoading]      = useState(false);
-
+    const [currency,      setCurrency]      = useState('원화');
+    const [investAmount,  setInvestAmount]  = useState('');
+    const [addPeriod,     setAddPeriod]     = useState('없음');
+    const [addAmount,     setAddAmount]     = useState('');
+    const [startDate,     setStartDate]     = useState('');
+    const [endDate,       setEndDate]       = useState('');
+    const [goalAmount,    setGoalAmount]    = useState('');
+    const [stocks,        setStocks]        = useState([]);
+    const [result,        setResult]        = useState(null);
+    const [loading,       setLoading]       = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [searchQuery,     setSearchQuery]     = useState('');
     const [searchResults,   setSearchResults]   = useState([]);
@@ -86,11 +84,9 @@ const Rebalancing = () => {
     };
 
     const handleAdd = (stock) => {
-        if (stocks.find(s => s.ticker === stock.ticker)) {
-            alert('이미 추가된 종목입니다.'); return;
-        }
+        if (stocks.find(s => s.ticker === stock.ticker)) { alert('이미 추가된 종목입니다.'); return; }
         const newStocks = [...stocks, { ...stock, weight: 0 }];
-        const eq  = Math.floor(100 / newStocks.length);
+        const eq = Math.floor(100 / newStocks.length);
         const rem = 100 - eq * newStocks.length;
         setStocks(newStocks.map((s,i) => ({ ...s, weight: i===0 ? eq+rem : eq })));
     };
@@ -98,7 +94,7 @@ const Rebalancing = () => {
     const handleRemove = (ticker) => {
         const newStocks = stocks.filter(s => s.ticker !== ticker);
         if (!newStocks.length) { setStocks([]); return; }
-        const eq  = Math.floor(100 / newStocks.length);
+        const eq = Math.floor(100 / newStocks.length);
         const rem = 100 - eq * newStocks.length;
         setStocks(newStocks.map((s,i) => ({ ...s, weight: i===0 ? eq+rem : eq })));
     };
@@ -110,7 +106,7 @@ const Rebalancing = () => {
 
     const handleAutoWeight = () => {
         if (!stocks.length) return;
-        const eq  = Math.floor(100 / stocks.length);
+        const eq = Math.floor(100 / stocks.length);
         const rem = 100 - eq * stocks.length;
         setStocks(stocks.map((s,i) => ({ ...s, weight: i===0 ? eq+rem : eq })));
     };
@@ -121,14 +117,11 @@ const Rebalancing = () => {
         }
         if (!stocks.length) { alert('최소 1개 이상의 종목을 추가해주세요.'); return; }
         if (totalWeight !== 100) { alert(`비중 합계가 ${totalWeight}%입니다. 100%가 되어야 합니다.`); return; }
-
         setLoading(true);
         try {
             await new Promise(res => setTimeout(res, 1000));
             setResult(MOCK_RESULT(investAmount));
-            setTimeout(() => {
-                resultRef.current?.scrollIntoView({ behavior:'smooth', block:'start' });
-            }, 100);
+            setTimeout(() => resultRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
         } catch {
             alert('리밸런싱 확인 중 오류가 발생했습니다.');
         } finally {
@@ -138,23 +131,53 @@ const Rebalancing = () => {
 
     return (
         <div className={styles.pageWrapper}>
-            <div className={styles.layout}>
+            <div className={styles.pageHeader}>
+                <div className={styles.pageHeaderIcon}>🔄</div>
+                <div>
+                    <p className={styles.pageHeaderTitle}>리밸런싱 시뮬레이션</p>
+                    <p className={styles.pageHeaderDesc}>투자 정보를 입력하고 리밸런싱 결과를 확인해보세요.</p>
+                </div>
+            </div>
 
+            <div className={styles.layout}>
                 {/* ── 왼쪽: 입력 폼 ── */}
                 <div className={styles.formSection}>
 
+                    {/* 투자 금액 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.inputLabel}>투자 금액</label>
-                        <div className={styles.amountRow}>
-                            <select className={styles.currencySelect} value={currency} onChange={e=>setCurrency(e.target.value)}>
-                                <option value="만원">만원</option>
-                                <option value="달러">달러</option>
+                        <div className={styles.fieldRow}>
+                            <select className={styles.sel} value={currency} onChange={e=>setCurrency(e.target.value)}>
+                                <option>원화</option>
+                                <option>달러</option>
                             </select>
-                            <input className={styles.textInput} type="number" placeholder="투자 금액 입력"
+                            <input className={styles.textInput} type="number" placeholder="금액 입력"
                                    value={investAmount} onChange={e=>setInvestAmount(e.target.value)} />
                         </div>
                     </div>
 
+                    {/* 추가 납입금액 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>추가 납입금액</label>
+                        <div className={styles.fieldRow}>
+                            <select className={styles.sel} value={addPeriod} onChange={e=>{setAddPeriod(e.target.value); if(e.target.value==='없음') setAddAmount('');}}>
+                                <option>없음</option>
+                                <option>매달</option>
+                                <option>매분기</option>
+                                <option>매년</option>
+                            </select>
+                            <input
+                                className={addPeriod==='없음' ? styles.disabledInput : styles.textInput}
+                                type="number"
+                                placeholder="금액 입력"
+                                value={addAmount}
+                                onChange={e=>setAddAmount(e.target.value)}
+                                disabled={addPeriod==='없음'}
+                            />
+                        </div>
+                    </div>
+
+                    {/* 투자 목표 기간 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.inputLabel}>투자 목표 기간</label>
                         <div className={styles.dateRow}>
@@ -164,18 +187,19 @@ const Rebalancing = () => {
                         </div>
                     </div>
 
+                    {/* 목표 금액 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.inputLabel}>목표 금액</label>
                         <input className={styles.textInput} type="number" placeholder="목표 금액 입력"
                                value={goalAmount} onChange={e=>setGoalAmount(e.target.value)} />
                     </div>
 
+                    {/* 주식 종목 */}
                     <div className={styles.inputGroup}>
                         <div className={styles.stockHeader}>
                             <label className={styles.inputLabel}>주식 종목</label>
                             <span className={styles.stockCount}>{stocks.length}개</span>
                         </div>
-
                         {stocks.map(st => (
                             <div key={st.ticker} className={styles.stockItem}>
                                 <div className={styles.stockItemLeft}>
@@ -193,20 +217,16 @@ const Rebalancing = () => {
                                 </div>
                             </div>
                         ))}
-
                         {stocks.length > 0 && (
                             <div className={styles.weightFooter}>
                                 <span className={`${styles.weightTotal} ${totalWeight!==100 ? styles.weightError : styles.weightOk}`}>
                                     비중 합계: {totalWeight}% {totalWeight===100 ? '✓' : `(${100-totalWeight > 0 ? '+' : ''}${100-totalWeight}% 남음)`}
                                 </span>
                                 {totalWeight !== 100 && (
-                                    <button className={styles.autoWeightBtn} onClick={handleAutoWeight}>
-                                        균등 배분
-                                    </button>
+                                    <button className={styles.autoWeightBtn} onClick={handleAutoWeight}>균등 배분</button>
                                 )}
                             </div>
                         )}
-
                         <button className={styles.addStockBtn} onClick={() => {
                             setSearchQuery(''); setSearchResults([]); setShowSearchModal(true);
                         }}>
@@ -215,26 +235,28 @@ const Rebalancing = () => {
                     </div>
 
                     <button className={styles.rebalanceBtn} onClick={handleRebalance} disabled={loading}>
-                        {loading ? '계산 중...' : '리밸런싱 확인'}
+                        {loading ? '계산 중...' : '⚖ 리밸런싱 확인'}
                     </button>
                 </div>
 
                 {/* ── 오른쪽: 결과 ── */}
                 <div className={styles.resultSection} ref={resultRef}>
-                    <div className={styles.chartCard}>
-                        {!result && !loading && (
-                            <p className={styles.chartPlaceholder}>
-                                투자 정보를 입력하고{'\n'}리밸런싱 확인을 눌러주세요
-                            </p>
-                        )}
-                        {loading && (
-                            <div className={styles.loadingBox}>
-                                <div className={styles.spinner} />
-                                <p className={styles.loadingText}>리밸런싱을 계산하고 있습니다...</p>
-                            </div>
-                        )}
-                        {result && !loading && (
-                            <>
+                    {!result && !loading && (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIllust}>📊</div>
+                            <p className={styles.emptyTitle}>투자 정보를 입력하고<br/>리밸런싱 확인을 눌러주세요</p>
+                            <p className={styles.emptyDesc}>리밸런싱 결과가 여기에 표시됩니다.</p>
+                        </div>
+                    )}
+                    {loading && (
+                        <div className={styles.emptyState}>
+                            <div className={styles.spinner} />
+                            <p className={styles.loadingText}>리밸런싱을 계산하고 있습니다...</p>
+                        </div>
+                    )}
+                    {result && !loading && (
+                        <>
+                            <div className={styles.chartCard}>
                                 <div className={styles.chartTop}>
                                     <span className={styles.chartLabel}>포트폴리오 성장 시뮬레이션</span>
                                     <div className={styles.chartLegend}>
@@ -248,12 +270,7 @@ const Rebalancing = () => {
                                     <polyline points="0,160 75,155 150,158 225,148 300,145 375,140 450,132 525,125 600,118"
                                               fill="none" stroke="#e0e0e0" strokeWidth="1.5" strokeDasharray="6,4"/>
                                 </svg>
-                            </>
-                        )}
-                    </div>
-
-                    {result && !loading && (
-                        <>
+                            </div>
                             <div className={styles.achieveCard}>
                                 <span className={styles.achieveLabel}>달성 확률</span>
                                 <div className={styles.achieveRow}>
@@ -306,9 +323,7 @@ const Rebalancing = () => {
                         </div>
                         <div className={styles.searchResults}>
                             {searchResults.length === 0 ? (
-                                <p className={styles.searchMsg}>
-                                    {searchQuery ? '검색 결과가 없습니다' : '종목명이나 티커를 입력하세요'}
-                                </p>
+                                <p className={styles.searchMsg}>{searchQuery ? '검색 결과가 없습니다' : '종목명이나 티커를 입력하세요'}</p>
                             ) : searchResults.map(st => {
                                 const inList = stocks.find(s => s.ticker === st.ticker);
                                 return (

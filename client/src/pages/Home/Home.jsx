@@ -230,30 +230,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* 푸터 */}
-            <footer className={styles.footer}>
-                <div className={styles.footerGrid}>
-                    <div>
-                        <div className={styles.footerColTitle}>MoneyMate</div>
-                        <span className={styles.footerLink}>회사 소개</span>
-                        <span className={styles.footerLink}>이용약관</span>
-                        <span className={styles.footerLink}>개인정보처리방침</span>
-                    </div>
-                    <div>
-                        <div className={styles.footerColTitle}>서비스</div>
-                        <span className={styles.footerLink}>로보어드바이저</span>
-                        <span className={styles.footerLink}>포트폴리오 분석</span>
-                        <span className={styles.footerLink}>투자 리포트</span>
-                    </div>
-                    <div>
-                        <div className={styles.footerColTitle}>고객지원</div>
-                        <span className={styles.footerLink}>FAQ</span>
-                        <span className={styles.footerLink}>1:1 문의</span>
-                        <span className={styles.footerLink}>공지사항</span>
-                    </div>
-                </div>
-                <div className={styles.footerBottom}>© 2026 MoneyMate Inc. · 금융투자업 인가번호 제2024-서울-XXXX호</div>
-            </footer>
+
         </div>
     );
 };
