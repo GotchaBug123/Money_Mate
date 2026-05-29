@@ -66,6 +66,9 @@
             </p>
         </div>
     </section>
+    <a href="/my-asset/financial/edit" class="financial-edit-btn">
+        재무정보 수정하기
+    </a>
 
     <!-- 요약 카드 -->
     <section class="summary-grid">
@@ -395,7 +398,38 @@
                 투자성향 분석 및 맞춤 포트폴리오를
                 추천받아보세요.
             </p>
+            <section class="result-summary-grid">
 
+                <div class="result-card risk-card">
+                    <p>투자성향 분석 결과</p>
+
+                    <h2 th:text="${riskResult != null ? riskResult.resultType : '미분석'}">
+                        미분석
+                    </h2>
+
+                    <span th:text="${riskResult != null ? riskResult.totalScore + '점' : '분석 전입니다'}">
+            분석 전입니다
+        </span>
+                </div>
+
+                <div class="result-card finance-card">
+                    <p>재무진단 결과</p>
+
+                    <h2 th:text="${profile != null && profile.diagnosisGrade != null ? profile.diagnosisGrade : '미진단'}">
+                        미진단
+                    </h2>
+
+                    <span th:text="${diagnosisScore != null ? diagnosisScore + '점' : '진단 전입니다'}">
+            진단 전입니다
+        </span>
+                </div>
+
+            </section>
+
+            <div class="investment-actions">
+                <a href="/risk-survey" class="primary-btn">투자성향 분석하기</a>
+                <a href="/my-asset/financial/edit" class="outline-btn">재무정보 수정하기</a>
+            </div>
             <a href="/risk-survey">
                 투자성향 분석하기
             </a>
