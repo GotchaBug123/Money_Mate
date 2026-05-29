@@ -16,6 +16,7 @@ public class CommunityPostListResponse {
     private String themeName;
     private String title;
     private String contentPreview;
+    private Long authorId;
     private String authorName;
     private String stockSymbol;
     private String stockName;
@@ -24,6 +25,7 @@ public class CommunityPostListResponse {
     private Integer attachmentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean edited;
 
     public static CommunityPostListResponse from(
             CommunityPost post,
@@ -36,6 +38,7 @@ public class CommunityPostListResponse {
                 .themeName(post.getTheme() == null ? null : post.getTheme().getThemeName())
                 .title(post.getTitle())
                 .contentPreview(createPreview(post.getContent()))
+                .authorId(post.getMember() == null ? null : post.getMember().getMemberId())
                 .authorName(post.getAuthorName())
                 .stockSymbol(post.getStockSymbol())
                 .stockName(post.getStockName())
@@ -46,6 +49,7 @@ public class CommunityPostListResponse {
                         : post.getAttachments().size())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .edited(isEdited(post.getCreatedAt(), post.getUpdatedAt()))
                 .build();
     }
 
@@ -65,5 +69,14 @@ public class CommunityPostListResponse {
         }
 
         return normalizedContent.substring(0, 120) + "...";
+    }
+
+    private static boolean isEdited(
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
+        return createdAt != null
+                && updatedAt != null
+                && updatedAt.isAfter(createdAt);
     }
 }

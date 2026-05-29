@@ -2,6 +2,9 @@ package com.gotchabug.moneymate.repository;
 
 import com.gotchabug.moneymate.entity.CommunityPostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -18,5 +21,14 @@ public interface CommunityPostLikeRepository
     Optional<CommunityPostLike> findByPost_PostIdAndMember_MemberId(
             Long postId,
             Long memberId
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            DELETE FROM CommunityPostLike l
+            WHERE l.post.postId = :postId
+            """)
+    void deleteByPostId(
+            @Param("postId") Long postId
     );
 }

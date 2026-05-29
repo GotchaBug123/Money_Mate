@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -54,6 +55,20 @@ public interface CommunityPostRepository
             WHERE p.postId = :postId
             """)
     Optional<CommunityPost> findDetailByPostId(
+            @Param("postId") Long postId
+    );
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(
+            value = """
+                    UPDATE community_post
+                    SET view_count = COALESCE(view_count, 0) + 1,
+                        updated_at = updated_at
+                    WHERE post_id = :postId
+                    """,
+            nativeQuery = true
+    )
+    int increaseViewCount(
             @Param("postId") Long postId
     );
 

@@ -148,8 +148,8 @@ public class CommunityService {
             Long postId,
             Long currentMemberId
     ) {
+        communityPostRepository.increaseViewCount(postId);
         CommunityPost post = findPost(postId);
-        post.increaseViewCount();
 
         return toDetailResponse(post, currentMemberId);
     }
@@ -162,6 +162,12 @@ public class CommunityService {
         validatePostWriter(post, memberId);
 
         return toDetailResponse(post, memberId);
+    }
+
+    public CommunityPostResponse getPostForAdmin(Long postId) {
+        CommunityPost post = findPost(postId);
+
+        return toDetailResponse(post, null);
     }
 
     @Transactional
@@ -235,6 +241,7 @@ public class CommunityService {
                 request.getAttachments(),
                 files
         ));
+        communityPostRepository.flush();
 
         return toDetailResponse(post, memberId);
     }
@@ -247,6 +254,47 @@ public class CommunityService {
         CommunityPost post = findPost(postId);
         validatePostWriter(post, memberId);
 
+        deletePostWithRelations(post);
+    }
+
+    @Transactional
+    public CommunityPostResponse updatePostByAdmin(
+            Long postId,
+            CommunityPostUpdateRequest request,
+            List<MultipartFile> files
+    ) {
+        CommunityPost post = findPost(postId);
+        CommunityTheme theme = findThemeOrNull(request.getThemeId());
+
+        post.update(
+                theme,
+                normalizeRequired(request.getCategory(), "category"),
+                normalizeRequired(request.getTitle(), "title"),
+                normalizeRequired(request.getContent(), "content"),
+                normalize(request.getStockSymbol()),
+                normalize(request.getStockName())
+        );
+        post.replaceAttachments(createAttachments(
+                request.getAttachments(),
+                files
+        ));
+        communityPostRepository.flush();
+
+        return toDetailResponse(post, null);
+    }
+
+    @Transactional
+    public void deletePostByAdmin(Long postId) {
+        CommunityPost post = findPost(postId);
+
+        deletePostWithRelations(post);
+    }
+
+    private void deletePostWithRelations(CommunityPost post) {
+        Long postId = post.getPostId();
+
+        communityPostLikeRepository.deleteByPostId(postId);
+        communityCommentRepository.deleteByPostId(postId);
         communityPostRepository.delete(post);
     }
 
@@ -313,6 +361,7 @@ public class CommunityService {
                 request.getContent(),
                 "content"
         ));
+        communityCommentRepository.flush();
 
         return CommunityCommentResponse.from(comment, memberId);
     }

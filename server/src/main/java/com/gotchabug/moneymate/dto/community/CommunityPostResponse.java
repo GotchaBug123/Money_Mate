@@ -30,6 +30,7 @@ public class CommunityPostResponse {
     private List<CommunityCommentResponse> comments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean edited;
 
     public static CommunityPostResponse from(
             CommunityPost post,
@@ -59,6 +60,7 @@ public class CommunityPostResponse {
                 .comments(comments)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .edited(isEdited(post.getCreatedAt(), post.getUpdatedAt()))
                 .build();
     }
 
@@ -67,6 +69,15 @@ public class CommunityPostResponse {
             Long currentMemberId
     ) {
         return from(post, currentMemberId, 0L, false, List.of());
+    }
+
+    private static boolean isEdited(
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
+        return createdAt != null
+                && updatedAt != null
+                && updatedAt.isAfter(createdAt);
     }
 
     @Getter
