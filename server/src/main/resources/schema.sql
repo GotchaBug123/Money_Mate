@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS investment_goal;
 DROP TABLE IF EXISTS asset_indicator;
 DROP TABLE IF EXISTS asset_price;
 DROP TABLE IF EXISTS asset;
+DROP TABLE IF EXISTS asset_master;
 DROP TABLE IF EXISTS investment_style;
 DROP TABLE IF EXISTS risk_answer;
 DROP TABLE IF EXISTS risk_answer_sheet;
@@ -360,6 +361,25 @@ CREATE TABLE external_data_source
     CONSTRAINT ck_external_data_source_active_yn CHECK (active_yn IN ('Y', 'N'))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE asset_master
+(
+    asset_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    symbol       VARCHAR(20)  NOT NULL,
+    yahoo_symbol VARCHAR(30)  NOT NULL,
+    asset_name   VARCHAR(120) NOT NULL,
+    market       VARCHAR(20)  NOT NULL,
+    asset_type   VARCHAR(20)  NOT NULL,
+    country      VARCHAR(10)  NOT NULL DEFAULT 'KR',
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_asset_master_symbol UNIQUE (symbol),
+    CONSTRAINT uq_asset_master_yahoo_symbol UNIQUE (yahoo_symbol)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_asset_master_asset_name ON asset_master (asset_name);
+CREATE INDEX idx_asset_master_market ON asset_master (market);
+CREATE INDEX idx_asset_master_country ON asset_master (country);
 
 CREATE TABLE asset
 (
