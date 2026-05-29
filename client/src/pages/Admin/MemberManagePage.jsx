@@ -29,7 +29,8 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
         return (
             member.memberNo.toLowerCase().includes(searchKeyword) ||
             member.userId.toLowerCase().includes(searchKeyword) ||
-            member.name.toLowerCase().includes(searchKeyword)
+            member.name.toLowerCase().includes(searchKeyword) ||
+            member.email.toLowerCase().includes(searchKeyword)
         );
     });
 
@@ -61,33 +62,50 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
     return (
         <main className="admin-content-main">
             <section className="member-list-page">
-                <div className="admin-page-label">회원정보관리 화면</div>
+                <div className="member-page-header">
+                    <div>
+                        <span className="admin-section-label">Members</span>
+                        <h2>회원정보관리</h2>
+                        <p>가입 회원의 기본 정보와 계정 상태를 확인하고 관리합니다.</p>
+                    </div>
 
-                <h2 className="content-title">회원정보 목록</h2>
+                    <div className="member-summary-box">
+                        <span>전체 회원</span>
+                        <strong>{members.length}</strong>
+                    </div>
+                </div>
+
+                <div className="member-toolbar">
+                    <div>
+                        <h3>회원 목록</h3>
+                        <span>총 {filteredMembers.length}명의 회원이 조회되었습니다.</span>
+                    </div>
+
+                    <form className="member-search-box" onSubmit={handleSearchSubmit}>
+                        <input
+                            className="member-search-input"
+                            type="text"
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value)}
+                            placeholder="회원번호 / 아이디 / 이름 / 이메일"
+                        />
+
+                        <button className="member-search-button" type="submit">
+                            검색
+                        </button>
+                    </form>
+                </div>
 
                 <div className="member-list-box">
-                    <div className="member-list-top">
-                        <div className="member-column-header">
-                            <span>회원번호</span>
-                            <span>회원 아이디</span>
-                            <span>회원 이름</span>
-                            <span>가입일</span>
-                            <span>관리</span>
-                        </div>
-
-                        <form className="member-search-box" onSubmit={handleSearchSubmit}>
-                            <input
-                                className="member-search-input"
-                                type="text"
-                                value={searchInput}
-                                onChange={(event) => setSearchInput(event.target.value)}
-                                placeholder="회원번호 / 아이디 / 이름"
-                            />
-
-                            <button className="member-search-button" type="submit">
-                                검색
-                            </button>
-                        </form>
+                    <div className="member-table-header">
+                        <span>회원번호</span>
+                        <span>아이디</span>
+                        <span>이름</span>
+                        <span>생년월일</span>
+                        <span>가입일</span>
+                        <span>연락처</span>
+                        <span>이메일</span>
+                        <span>관리</span>
                     </div>
 
                     <div className="member-table">
@@ -97,7 +115,10 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
                                     <span>{member.memberNo}</span>
                                     <span>{member.userId}</span>
                                     <span>{member.name}</span>
+                                    <span>{member.birthDate}</span>
                                     <span>{member.joinedAt}</span>
+                                    <span>{member.phone}</span>
+                                    <span>{member.email}</span>
 
                                     <div className="member-actions">
                                         <button
@@ -131,7 +152,10 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
                 <div className="modal-backdrop">
                     <section className="member-edit-modal">
                         <div className="modal-header">
-                            <h2>회원정보 수정</h2>
+                            <div>
+                                <span className="admin-section-label">Edit Member</span>
+                                <h2>회원정보 수정</h2>
+                            </div>
 
                             <button
                                 className="modal-close-button"
@@ -204,7 +228,7 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
                                 />
                             </div>
 
-                            <div className="form-field">
+                            <div className="form-field full">
                                 <label>이메일</label>
                                 <input
                                     type="email"
@@ -224,7 +248,7 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
                                 </button>
 
                                 <button className="member-update-button" type="submit">
-                                    회원정보 수정
+                                    저장
                                 </button>
                             </div>
                         </form>

@@ -6,6 +6,7 @@ function Header({
     menuItems,
     rightButtons,
     logoTo = '/',
+    logoOnClick,
 }) {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
@@ -139,7 +140,11 @@ function Header({
                  style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px'}}>
 
                 <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-                    <Link to={logoTo} style={{display: 'flex', alignItems: 'center'}}>
+                    <Link
+                        to={logoTo}
+                        onClick={logoOnClick}
+                        style={{display: 'flex', alignItems: 'center'}}
+                    >
                         <img
                             src={moneymateLogo}
                             alt="MoneyMate 로고"

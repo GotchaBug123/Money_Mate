@@ -140,6 +140,8 @@ function AdminPage({
     const posts = externalPosts || localPosts;
     const memberCount = members.length;
     const postCount = posts.length;
+    const inquiryCount = inquiries.length;
+    const waitingInquiryCount = inquiries.filter((inquiry) => inquiry.status === '답변 전').length;
 
     const handleLogout = () => {
         localStorage.removeItem('isLoggedIn');
@@ -237,50 +239,107 @@ function AdminPage({
 
     return (
         <div className="admin-page">
-            <Header
-                logoTo="/admin"
-                menuItems={[
-                    {label: '회원정보관리', onClick: () => setActiveMenu('memberManage')},
-                    {label: '투자정보관리', onClick: () => setActiveMenu('investmentManage')},
-                    {label: '커뮤니티관리', onClick: () => setActiveMenu('communityManage')},
-                    {label: '고객문의관리', onClick: () => setActiveMenu('customerInquiryManage')},
-                ]}
-                rightButtons={[
-                    {
-                        label: '로그아웃',
-                        onClick: handleLogout,
-                    },
-                ]}
-            />
+           <Header
+               logoTo="/admin"
+               logoOnClick={() => setActiveMenu('dashboard')}
+               menuItems={[
+                   {label: '회원정보관리', onClick: () => setActiveMenu('memberManage')},
+                   {label: '투자정보관리', onClick: () => setActiveMenu('investmentManage')},
+                   {label: '커뮤니티관리', onClick: () => setActiveMenu('communityManage')},
+                   {label: '고객문의관리', onClick: () => setActiveMenu('customerInquiryManage')},
+               ]}
+               rightButtons={[
+                   {
+                       label: '로그아웃',
+                       onClick: handleLogout,
+                   },
+               ]}
+           />
 
             {activeMenu === 'dashboard' && (
                 <main className="admin-main">
+                    <section className="admin-hero">
+                        <div>
+                            <span className="admin-eyebrow">MoneyMate Admin</span>
+                            <h1>관리자 대시보드</h1>
+                            <p>회원, 투자정보, 커뮤니티, 고객문의를 한 곳에서 관리합니다.</p>
+                        </div>
+
+                        <button type="button" onClick={() => setActiveMenu('memberManage')}>
+                            관리 시작하기
+                        </button>
+                    </section>
+
+                    <section className="admin-summary-grid">
+                        <article className="admin-summary-card">
+                            <span>전체 회원</span>
+                            <strong>{memberCount}</strong>
+                            <p>가입 회원 관리</p>
+                        </article>
+
+                        <article className="admin-summary-card">
+                            <span>커뮤니티 글</span>
+                            <strong>{postCount}</strong>
+                            <p>게시글 관리</p>
+                        </article>
+
+                        <article className="admin-summary-card">
+                            <span>고객 문의</span>
+                            <strong>{inquiryCount}</strong>
+                            <p>문의 내역 관리</p>
+                        </article>
+
+                        <article className="admin-summary-card warning">
+                            <span>답변 대기</span>
+                            <strong>{waitingInquiryCount}</strong>
+                            <p>빠른 확인 필요</p>
+                        </article>
+                    </section>
+
                     <section className="admin-dashboard">
-                        <article className="admin-card member-card">
-                            <h2>회원정보</h2>
+                        <button
+                            type="button"
+                            className="admin-card member-card"
+                            onClick={() => setActiveMenu('memberManage')}
+                        >
+                            <span className="admin-card-icon">👤</span>
+                            <h2>회원정보관리</h2>
+                            <p>회원 정보 조회, 수정, 삭제를 관리합니다.</p>
+                            <strong>회원 {memberCount}명</strong>
+                        </button>
 
-                            <div className="count-box">
-                                <span>회원 수</span>
-                                <strong>{memberCount}</strong>
-                            </div>
-                        </article>
+                        <button
+                            type="button"
+                            className="admin-card invest-card"
+                            onClick={() => setActiveMenu('investmentManage')}
+                        >
+                            <span className="admin-card-icon">📈</span>
+                            <h2>투자정보관리</h2>
+                            <p>회원별 보유 주식과 투자 통계를 확인합니다.</p>
+                            <strong>투자 데이터 보기</strong>
+                        </button>
 
-                        <article className="admin-card community-card">
-                            <h2>커뮤니티글</h2>
+                        <button
+                            type="button"
+                            className="admin-card community-card"
+                            onClick={() => setActiveMenu('communityManage')}
+                        >
+                            <span className="admin-card-icon">💬</span>
+                            <h2>커뮤니티관리</h2>
+                            <p>게시글 수정, 삭제 및 커뮤니티 상태를 관리합니다.</p>
+                            <strong>게시글 {postCount}개</strong>
+                        </button>
 
-                            <div className="count-box">
-                                <span>게시글 수</span>
-                                <strong>{postCount}</strong>
-                            </div>
-                        </article>
-
-                        <article className="admin-card invest-card">
-                            <h2>투자정보</h2>
-                        </article>
-
-                        <article className="admin-card inquiry-card">
-                            <h2>고객 문의</h2>
-                        </article>
+                        <button
+                            type="button"
+                            className="admin-card inquiry-card"
+                            onClick={() => setActiveMenu('customerInquiryManage')}
+                        >
+                            <span className="admin-card-icon">🎧</span>
+                            <h2>고객문의관리</h2>
+                            <p>문의 답변, 삭제 조치, 처리 상태를 관리합니다.</p>
+                            <strong>대기 {waitingInquiryCount}건</strong>
+                        </button>
                     </section>
                 </main>
             )}

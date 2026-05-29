@@ -32,6 +32,9 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
         );
     });
 
+    const totalLikeCount = posts.reduce((sum, post) => sum + (post.likes || 0), 0);
+    const attachmentCount = posts.filter((post) => post.attachmentName).length;
+
     const handleSearchSubmit = (event) => {
         event.preventDefault();
         setSearchKeyword(searchInput.trim().toLowerCase());
@@ -83,7 +86,21 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
         return (
             <main className="admin-content-main community-content-main">
                 <section className="community-edit-page">
-                    <div className="admin-page-label">커뮤니티관리 화면</div>
+                    <div className="community-page-header">
+                        <div>
+                            <span className="admin-section-label">Edit Community Post</span>
+                            <h2>게시글 수정</h2>
+                            <p>커뮤니티 게시글의 작성자 정보, 제목, 내용, 첨부파일을 수정합니다.</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="community-back-button"
+                            onClick={() => setMode('list')}
+                        >
+                            목록으로
+                        </button>
+                    </div>
 
                     <form className="community-edit-form" onSubmit={handleSubmit}>
                         <div className="community-top-fields">
@@ -178,7 +195,7 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
                                 취소
                             </button>
                             <button type="submit">
-                                수정완료
+                                저장
                             </button>
                         </div>
                     </form>
@@ -190,8 +207,36 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
     return (
         <main className="admin-content-main community-content-main">
             <section className="community-manage-page">
-                <div className="community-page-top">
-                    <div className="admin-page-label">커뮤니티관리 화면</div>
+                <div className="community-page-header">
+                    <div>
+                        <span className="admin-section-label">Community</span>
+                        <h2>커뮤니티관리</h2>
+                        <p>회원 게시글을 확인하고 필요한 경우 수정 또는 삭제 처리합니다.</p>
+                    </div>
+
+                    <div className="community-summary-grid">
+                        <article>
+                            <span>전체 게시글</span>
+                            <strong>{posts.length}</strong>
+                        </article>
+
+                        <article>
+                            <span>총 좋아요</span>
+                            <strong>{totalLikeCount}</strong>
+                        </article>
+
+                        <article>
+                            <span>첨부파일</span>
+                            <strong>{attachmentCount}</strong>
+                        </article>
+                    </div>
+                </div>
+
+                <div className="community-toolbar">
+                    <div>
+                        <h3>게시글 목록</h3>
+                        <span>총 {filteredPosts.length}개의 게시글이 조회되었습니다.</span>
+                    </div>
 
                     <form className="community-search-box" onSubmit={handleSearchSubmit}>
                         <input
@@ -211,9 +256,10 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
                     <div className="community-table-header">
                         <span>게시글 번호</span>
                         <span>제목</span>
-                        <span>작성자 회원 ID</span>
+                        <span>작성자 ID</span>
                         <span>작성자</span>
                         <span>작성일</span>
+                        <span>좋아요</span>
                         <span>관리</span>
                     </div>
 
@@ -226,6 +272,7 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
                                     <span>{post.writerId}</span>
                                     <span>{post.writerName}</span>
                                     <span>{post.createdAt}</span>
+                                    <span>{post.likes || 0}</span>
 
                                     <div className="community-actions">
                                         <button
@@ -265,7 +312,10 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
                 <div className="modal-backdrop">
                     <section className="post-detail-modal">
                         <div className="modal-header">
-                            <h2>게시글 확인</h2>
+                            <div>
+                                <span className="admin-section-label">Post Detail</span>
+                                <h2>게시글 확인</h2>
+                            </div>
 
                             <button
                                 className="modal-close-button"
@@ -285,6 +335,16 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
                             <div className="post-detail-field">
                                 <label>회원 이름</label>
                                 <div>{selectedPost.writerName}</div>
+                            </div>
+
+                            <div className="post-detail-field">
+                                <label>작성일</label>
+                                <div>{selectedPost.createdAt}</div>
+                            </div>
+
+                            <div className="post-detail-field">
+                                <label>좋아요</label>
+                                <div>{selectedPost.likes || 0}</div>
                             </div>
 
                             <div className="post-detail-field full">

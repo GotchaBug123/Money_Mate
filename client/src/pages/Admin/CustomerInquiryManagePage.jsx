@@ -22,6 +22,10 @@ function CustomerInquiryManagePage({
         answer: '',
     });
 
+    const waitingCount = inquiries.filter((inquiry) => inquiry.status === '답변 전').length;
+    const completeCount = inquiries.filter((inquiry) => inquiry.status === '답변 완료').length;
+    const deletedCount = inquiries.filter((inquiry) => inquiry.status === '삭제 조치').length;
+
     const handleOpenInquiry = (inquiry) => {
         setAnswerForm({
             ...inquiry,
@@ -55,7 +59,21 @@ function CustomerInquiryManagePage({
         return (
             <main className="admin-content-main inquiry-content-main">
                 <section className="inquiry-answer-page">
-                    <div className="admin-page-label">고객센터관리화면</div>
+                    <div className="inquiry-page-header">
+                        <div>
+                            <span className="admin-section-label">Inquiry Answer</span>
+                            <h2>문의 답변 작성</h2>
+                            <p>회원 문의 내용을 확인하고 관리자 답변을 등록합니다.</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="inquiry-back-button"
+                            onClick={() => setMode('list')}
+                        >
+                            목록으로
+                        </button>
+                    </div>
 
                     <form className="inquiry-answer-form" onSubmit={handleSubmitAnswer}>
                         <div className="inquiry-top-fields">
@@ -99,7 +117,7 @@ function CustomerInquiryManagePage({
                         </div>
 
                         <div className="inquiry-form-field wide content-field">
-                            <label>내용</label>
+                            <label>문의 내용</label>
                             <textarea
                                 value={answerForm.content}
                                 readOnly
@@ -158,7 +176,7 @@ function CustomerInquiryManagePage({
                                 취소
                             </button>
                             <button type="submit">
-                                답변하기
+                                저장
                             </button>
                         </div>
                     </form>
@@ -170,7 +188,42 @@ function CustomerInquiryManagePage({
     return (
         <main className="admin-content-main inquiry-content-main">
             <section className="inquiry-manage-page">
-                <div className="admin-page-label">고객센터관리화면</div>
+                <div className="inquiry-page-header">
+                    <div>
+                        <span className="admin-section-label">Customer Inquiry</span>
+                        <h2>고객문의관리</h2>
+                        <p>고객 문의를 확인하고 답변 등록 또는 삭제 조치를 처리합니다.</p>
+                    </div>
+
+                    <div className="inquiry-summary-grid">
+                        <article>
+                            <span>전체 문의</span>
+                            <strong>{inquiries.length}</strong>
+                        </article>
+
+                        <article className="waiting">
+                            <span>답변 대기</span>
+                            <strong>{waitingCount}</strong>
+                        </article>
+
+                        <article>
+                            <span>답변 완료</span>
+                            <strong>{completeCount}</strong>
+                        </article>
+
+                        <article>
+                            <span>삭제 조치</span>
+                            <strong>{deletedCount}</strong>
+                        </article>
+                    </div>
+                </div>
+
+                <div className="inquiry-toolbar">
+                    <div>
+                        <h3>문의 목록</h3>
+                        <span>총 {inquiries.length}개의 문의가 등록되어 있습니다.</span>
+                    </div>
+                </div>
 
                 <div className="inquiry-list-box">
                     <div className="inquiry-table-header">

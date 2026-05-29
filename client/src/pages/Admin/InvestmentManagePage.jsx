@@ -85,7 +85,7 @@ function InvestmentManagePage() {
     const [activeTab, setActiveTab] = useState('memberInvestment');
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
-    const [openedStockMemberId, setOpenedStockMemberId] = useState(null);
+    const [selectedStockMember, setSelectedStockMember] = useState(null);
 
     const filteredMembers = investmentMembers.filter((member) => {
         if (!searchKeyword) {
@@ -100,13 +100,27 @@ function InvestmentManagePage() {
         );
     });
 
+    const totalInvestmentAmount = investmentMembers.reduce(
+        (sum, member) => sum + member.totalAmount,
+        0
+    );
+
+    const totalStockCount = investmentMembers.reduce(
+        (sum, member) => sum + member.stocks.length,
+        0
+    );
+
     const handleSearchSubmit = (event) => {
         event.preventDefault();
         setSearchKeyword(searchInput.trim().toLowerCase());
     };
 
-    const handleOpenStockList = (memberId) => {
-        setOpenedStockMemberId((prevId) => (prevId === memberId ? null : memberId));
+    const openStockModal = (member) => {
+        setSelectedStockMember(member);
+    };
+
+    const closeStockModal = () => {
+        setSelectedStockMember(null);
     };
 
     const formatWon = (amount) => {
@@ -116,10 +130,33 @@ function InvestmentManagePage() {
     return (
         <main className="admin-content-main investment-content-main">
             <section className="investment-manage-page">
-                <div className="admin-page-label">투자정보관리 화면</div>
+                <div className="investment-page-header">
+                    <div>
+                        <span className="admin-section-label">Investment</span>
+                        <h2>투자정보관리</h2>
+                        <p>회원별 보유 종목, 평가금액, 투자 유형과 통계를 확인합니다.</p>
+                    </div>
 
-                <div className="investment-layout">
-                    <aside className="investment-side-filter">
+                    <div className="investment-summary-grid">
+                        <article>
+                            <span>관리 회원</span>
+                            <strong>{investmentMembers.length}</strong>
+                        </article>
+
+                        <article>
+                            <span>보유 종목</span>
+                            <strong>{totalStockCount}</strong>
+                        </article>
+
+                        <article>
+                            <span>총 평가금액</span>
+                            <strong>{formatWon(totalInvestmentAmount)}원</strong>
+                        </article>
+                    </div>
+                </div>
+
+                <div className="investment-tab-toolbar">
+                    <div className="investment-tab-buttons">
                         <button
                             type="button"
                             className={activeTab === 'memberInvestment' ? 'active' : ''}
@@ -135,37 +172,50 @@ function InvestmentManagePage() {
                         >
                             통계
                         </button>
-                    </aside>
+                    </div>
 
-                    <section className="investment-content">
-                        <form className="investment-search-box" onSubmit={handleSearchSubmit}>
-                            <input
-                                type="text"
-                                value={searchInput}
-                                onChange={(event) => setSearchInput(event.target.value)}
-                                placeholder="회원 이름 / 아이디 / 종목 검색"
-                            />
+                    <form className="investment-search-box" onSubmit={handleSearchSubmit}>
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value)}
+                            placeholder="회원 이름 / 아이디 / 종목 검색"
+                        />
 
-                            <button type="submit">검색</button>
-                        </form>
+                        <button type="submit">검색</button>
+                    </form>
+                </div>
 
-                        {activeTab === 'memberInvestment' && (
+                <section className="investment-content">
+                    {activeTab === 'memberInvestment' && (
+                        <>
+                            <div className="investment-section-title">
+                                <div>
+                                    <h3>회원별 투자 현황</h3>
+                                    <span>총 {filteredMembers.length}명의 투자정보가 조회되었습니다.</span>
+                                </div>
+                            </div>
+
                             <section className="investment-card-grid">
                                 {filteredMembers.length > 0 ? (
                                     filteredMembers.map((member) => {
                                         const visibleStocks = member.stocks.slice(0, 5);
                                         const hiddenStockCount = member.stocks.length - visibleStocks.length;
-                                        const isStockListOpen = openedStockMemberId === member.id;
 
                                         return (
                                             <article className="investment-member-card" key={member.id}>
-                                                <div className="investment-member-name">
-                                                    {member.name}
+                                                <div className="investment-member-top">
+                                                    <div>
+                                                        <strong>{member.name}</strong>
+                                                        <span>{member.userId}</span>
+                                                    </div>
+
+                                                    <em>{member.type}</em>
                                                 </div>
 
                                                 <div className="investment-card-inner">
                                                     <div className="member-stock-box">
-                                                        <h3>담은 주식(5개)</h3>
+                                                        <h3>담은 주식</h3>
 
                                                         <ul>
                                                             {visibleStocks.map((stock) => (
@@ -177,29 +227,17 @@ function InvestmentManagePage() {
                                                             <button
                                                                 type="button"
                                                                 className="more-stock-button"
-                                                                onClick={() => handleOpenStockList(member.id)}
+                                                                onClick={() => openStockModal(member)}
                                                             >
                                                                 외 {hiddenStockCount}개 더 있음
                                                             </button>
                                                         )}
-
-                                                        {isStockListOpen && (
-                                                            <div className="all-stock-list">
-                                                                <strong>전체 담은 주식</strong>
-
-                                                                <ul>
-                                                                    {member.stocks.map((stock) => (
-                                                                        <li key={stock}>{stock}</li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )}
                                                     </div>
 
                                                     <div className="member-total-box">
-                                                        <h3>전체 통계</h3>
+                                                        <h3>평가금액</h3>
                                                         <strong>{formatWon(member.totalAmount)}원</strong>
-                                                        <span>{member.type}</span>
+                                                        <span>보유 종목 {member.stocks.length}개</span>
                                                     </div>
                                                 </div>
                                             </article>
@@ -211,71 +249,110 @@ function InvestmentManagePage() {
                                     </div>
                                 )}
                             </section>
-                        )}
+                        </>
+                    )}
 
-                        {activeTab === 'statistics' && (
-                            <section className="investment-statistics-page">
-                                <div className="statistics-chart-box">
+                    {activeTab === 'statistics' && (
+                        <section className="investment-statistics-page">
+                            <div className="statistics-chart-box">
+                                <div className="statistics-title">
+                                    <span className="admin-section-label">Statistics</span>
                                     <h2>연령대별 평균 투자 성향</h2>
-
-                                    <div className="line-chart-area">
-                                        <svg viewBox="0 0 600 300" role="img" aria-label="연령대별 투자 통계 그래프">
-                                            <polyline
-                                                points="60,220 180,150 300,175 420,195 540,230"
-                                                fill="none"
-                                                stroke="#5728f5"
-                                                strokeWidth="5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-
-                                            {statistics.map((item, index) => {
-                                                const points = [
-                                                    {x: 60, y: 220},
-                                                    {x: 180, y: 150},
-                                                    {x: 300, y: 175},
-                                                    {x: 420, y: 195},
-                                                    {x: 540, y: 230},
-                                                ];
-
-                                                return (
-                                                    <g key={item.ageGroup}>
-                                                        <circle
-                                                            cx={points[index].x}
-                                                            cy={points[index].y}
-                                                            r="8"
-                                                            fill="#5728f5"
-                                                        />
-                                                        <text
-                                                            x={points[index].x}
-                                                            y="270"
-                                                            textAnchor="middle"
-                                                            fontSize="16"
-                                                            fontWeight="700"
-                                                        >
-                                                            {item.ageGroup}
-                                                        </text>
-                                                    </g>
-                                                );
-                                            })}
-                                        </svg>
-                                    </div>
-
-                                    <div className="statistics-summary-list">
-                                        {statistics.map((item) => (
-                                            <article key={item.ageGroup}>
-                                                <strong>{item.ageGroup}</strong>
-                                                <span>{item.stock}</span>
-                                                <b>{item.value}%</b>
-                                            </article>
-                                        ))}
-                                    </div>
+                                    <p>연령대별로 선호하는 투자 상품과 비중을 확인합니다.</p>
                                 </div>
-                            </section>
-                        )}
+
+                                <div className="line-chart-area">
+                                    <svg viewBox="0 0 600 300" role="img" aria-label="연령대별 투자 통계 그래프">
+                                        <polyline
+                                            points="60,220 180,150 300,175 420,195 540,230"
+                                            fill="none"
+                                            stroke="#5728f5"
+                                            strokeWidth="5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+
+                                        {statistics.map((item, index) => {
+                                            const points = [
+                                                {x: 60, y: 220},
+                                                {x: 180, y: 150},
+                                                {x: 300, y: 175},
+                                                {x: 420, y: 195},
+                                                {x: 540, y: 230},
+                                            ];
+
+                                            return (
+                                                <g key={item.ageGroup}>
+                                                    <circle
+                                                        cx={points[index].x}
+                                                        cy={points[index].y}
+                                                        r="8"
+                                                        fill="#5728f5"
+                                                    />
+                                                    <text
+                                                        x={points[index].x}
+                                                        y="270"
+                                                        textAnchor="middle"
+                                                        fontSize="16"
+                                                        fontWeight="700"
+                                                    >
+                                                        {item.ageGroup}
+                                                    </text>
+                                                </g>
+                                            );
+                                        })}
+                                    </svg>
+                                </div>
+
+                                <div className="statistics-summary-list">
+                                    {statistics.map((item) => (
+                                        <article key={item.ageGroup}>
+                                            <strong>{item.ageGroup}</strong>
+                                            <span>{item.stock}</span>
+                                            <b>{item.value}%</b>
+                                        </article>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+                    )}
+                </section>
+            </section>
+
+            {selectedStockMember && (
+                <div className="investment-modal-backdrop">
+                    <section className="investment-stock-modal">
+                        <div className="investment-modal-header">
+                            <h2>{selectedStockMember.name}님의 보유 주식 전체 목록</h2>
+
+                            <button type="button" onClick={closeStockModal}>
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="investment-modal-user-info">
+                            <span>아이디: {selectedStockMember.userId}</span>
+                            <span>투자유형: {selectedStockMember.type}</span>
+                            <strong>총 평가금액 {formatWon(selectedStockMember.totalAmount)}원</strong>
+                        </div>
+
+                        <ul className="investment-modal-stock-list">
+                            {selectedStockMember.stocks.map((stock, index) => (
+                                <li key={stock}>
+                                    <span>{index + 1}</span>
+                                    <strong>{stock}</strong>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className="investment-modal-buttons">
+                            <button type="button" onClick={closeStockModal}>
+                                닫기
+                            </button>
+                        </div>
                     </section>
                 </div>
-            </section>
+            )}
         </main>
     );
 }
