@@ -1,318 +1,325 @@
-/* ─── 공통 래퍼 ─── */
+/* ─── 전체 래퍼 ─── */
 .pageWrapper {
-    width: 100%;
-    min-height: calc(100vh - 64px);
-    background: #fff;
-    box-sizing: border-box;
+    min-height: 100vh;
+    background: linear-gradient(150deg, #eef3fb 0%, #f8f9ff 50%, #fff 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 60px 40px;
+    padding: 48px 24px 80px;
+    box-sizing: border-box;
+}
+
+/* ─── 페이지 헤더 ─── */
+.pageHeader {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    max-width: 760px;
+    margin-bottom: 36px;
+}
+
+.headerIllust {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #e4eaf5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(27,94,217,0.08);
+}
+
+.headerText { flex: 1; }
+
+.headerTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 8px;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+}
+
+.headerHighlight { color: #1B5ED9; }
+
+.headerDesc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.7;
+    margin: 0;
 }
 
 /* ─── 폼 컨테이너 ─── */
 .formContainer {
     width: 100%;
-    max-width: 700px;
-    display: flex;
-    flex-direction: column;
+    max-width: 760px;
+    background: #fff;
+    border: 1px solid #e4eaf5;
+    border-radius: 20px;
+    padding: 8px 0;
+    box-shadow: 0 4px 24px rgba(27,94,217,0.06);
 }
 
-/* ─── 각 필드 행 ─── */
+/* ─── 필드 행 ─── */
 .fieldRow {
     display: flex;
     align-items: center;
-    padding: 22px 0;
-    border-bottom: 1px solid #ebebeb;
-    gap: 32px;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid #f3f5f9;
+    gap: 24px;
+}
+.fieldRow:last-of-type { border-bottom: none; }
+
+.fieldLeft {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
 }
 
-.fieldLabel {
-    font-size: 16px;
-    font-weight: 600;
-    color: #222;
-    width: 110px;
+.fieldIconWrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #EAF2FC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
 }
 
+.fieldIconEmoji { font-size: 20px; }
+
+.fieldLabel {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 3px;
+}
+
+.fieldDesc {
+    font-size: 12px;
+    color: #aaa;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ─── 입력 영역 ─── */
 .inputWrapper {
-    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    width: 280px;
 }
 
 .textInput {
     width: 100%;
-    padding: 14px 60px 14px 18px;
-    font-size: 15px;
+    padding: 12px 52px 12px 16px;
+    font-size: 14px;
     color: #111;
-    background: #f5f5f5;
-    border: 1.5px solid #e0e0e0;
-    border-radius: 8px;
+    background: #f7f8fb;
+    border: 1.5px solid #e4eaf5;
+    border-radius: 10px;
     outline: none;
     transition: border-color 0.15s, background 0.15s;
     box-sizing: border-box;
+    text-align: right;
 }
 
-.textInput::placeholder {
-    color: #bbb;
-    font-size: 14px;
-}
-
-.textInput:focus {
-    border-color: #1B5ED9;
-    background: #fff;
-}
-
-.inputFilled {
-    border-color: #1B5ED9;
-    background: #fff;
-}
+.textInput::placeholder { color: #c0c4cc; font-size: 13px; }
+.textInput:focus { border-color: #1B5ED9; background: #fff; }
+.inputFilled { border-color: #1B5ED9 !important; background: #fff !important; }
 
 .inputUnit {
     position: absolute;
-    right: 16px;
-    font-size: 13px;
+    right: 14px;
+    font-size: 12px;
     font-weight: 500;
     color: #1B5ED9;
     pointer-events: none;
 }
 
-/* ─── 버튼 영역 ─── */
+/* ─── 보안 배너 ─── */
+.securityBanner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0 32px;
+    padding: 14px 18px;
+    background: #f0f6ff;
+    border: 1px solid #d6e6fb;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.securityIcon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+.securityTitle {
+    font-size: 13px;
+    color: #333;
+    margin: 0 0 3px;
+}
+
+.securityHighlight { color: #1B5ED9; font-weight: 600; }
+
+.securityDesc {
+    font-size: 11px;
+    color: #888;
+    margin: 0;
+}
+
+/* ─── 제출 영역 ─── */
 .submitRow {
     display: flex;
-    justify-content: center;
-    margin-top: 40px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 32px 16px;
 }
 
 .submitBtn {
     background: #1B5ED9;
     color: #fff;
     border: none;
-    padding: 14px 60px;
+    padding: 16px 64px;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 12px;
     transition: background 0.15s, transform 0.1s;
-    box-shadow: 0 2px 10px rgba(27, 94, 217, 0.25);
+    box-shadow: 0 4px 16px rgba(27,94,217,0.3);
     letter-spacing: -0.01em;
+    width: 100%;
+    max-width: 360px;
 }
 
-.submitBtn:hover {
-    background: #1249B3;
-    transform: translateY(-1px);
-}
+.submitBtn:hover { background: #1249B3; transform: translateY(-1px); }
+.submitBtn:active { transform: translateY(0); }
 
 .submitBtnDisabled {
-    background: #c5cdd8;
-    box-shadow: none;
-    cursor: not-allowed;
+    background: #c5cdd8 !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
     transform: none !important;
 }
 
-/* ════════════════════════════════
-   RESULT 페이지
-════════════════════════════════ */
-.resultLayout {
+.submitHint {
+    font-size: 12px;
+    color: #aaa;
+    margin: 0;
+    text-align: center;
+}
+
+/* ─── 결과 페이지 (기존 유지) ─── */
+.resultLayout { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 64px); }
+.eyebrow { font-size: 12px; font-weight: 600; color: #1B5ED9; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 14px; }
+.resultLeft { padding: 56px 52px; background: #fff; border-right: 1px solid #e8ecf2; display: flex; flex-direction: column; }
+.resultTitle { font-size: 28px; font-weight: 800; color: #0d1b2a; letter-spacing: -0.03em; margin: 0 0 28px; }
+.scoreCard { border-radius: 16px; padding: 32px 36px; margin-bottom: 20px; }
+.scoreNumRow { display: flex; align-items: baseline; gap: 4px; margin-bottom: 10px; }
+.scoreNum { font-size: 64px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+.scoreMax { font-size: 20px; font-weight: 600; opacity: 0.7; }
+.scoreLabelBadge { display: inline-block; color: #fff; font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 99px; margin-bottom: 20px; }
+.gaugeTrack { width: 100%; height: 10px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+.gaugeFill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+.scoreComment { font-size: 13px; color: #555; line-height: 1.7; margin: 0; }
+.investCard { background: #f7f8fa; border: 1px solid #e8ecf2; border-radius: 14px; padding: 24px 28px; }
+.investCardLabel { font-size: 12px; font-weight: 600; color: #888; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 8px; }
+.investCardValue { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+.investCardDesc { font-size: 12px; color: #888; line-height: 1.6; margin: 0; }
+.resultRight { padding: 56px 52px; background: #f4f6f9; display: flex; flex-direction: column; justify-content: space-between; }
+.summaryCard { background: #fff; border: 1px solid #e8ecf2; border-radius: 16px; overflow: hidden; margin-bottom: 24px; flex: 1; }
+.summaryHeader { padding: 20px 28px; font-size: 13px; font-weight: 600; color: #333; border-bottom: 1px solid #f0f2f5; background: #fafbfc; }
+.summaryList { padding: 8px 0; }
+.summaryRow { display: flex; justify-content: space-between; align-items: center; padding: 16px 28px; border-bottom: 1px solid #f5f6f8; }
+.summaryRow:last-child { border-bottom: none; }
+.summaryKey { font-size: 13px; color: #888; }
+.summaryVal { font-size: 14px; font-weight: 600; color: #111; }
+.resultActions { display: flex; gap: 12px; }
+.secondaryBtn { background: #fff; color: #555; border: 1.5px solid #dde1e8; padding: 14px 28px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 10px; transition: border-color 0.15s, color 0.15s; flex: 1; }
+.secondaryBtn:hover { border-color: #1B5ED9; color: #1B5ED9; }
+.resultActions .submitBtn { flex: 2; width: auto; padding: 14px 28px; border-radius: 10px; }
+
+/* ══════════════════════════════
+   FinancialResult 전용
+══════════════════════════════ */
+.resultPage {
+    min-height: 100vh;
+    background: linear-gradient(150deg, #eef3fb 0%, #f8f9ff 50%, #fff 100%);
+}
+.resultGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     min-height: calc(100vh - 64px);
 }
-
-.eyebrow {
-    font-size: 12px;
-    font-weight: 600;
-    color: #1B5ED9;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin: 0 0 14px;
-}
-
 .resultLeft {
-    padding: 56px 52px;
-    background: #fff;
-    border-right: 1px solid #e8ecf2;
+    padding: 44px 48px;
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
+.resultSubtitle { font-size: 13px; color: #888; margin: 0; }
 
-.resultTitle {
-    font-size: 28px;
-    font-weight: 800;
-    color: #0d1b2a;
-    letter-spacing: -0.03em;
-    margin: 0 0 28px;
-}
+/* 원형 게이지 */
+.circleWrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+.circleCenterContent { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.circleScore { font-size: 28px; font-weight: 700; line-height: 1; }
+.circleMax { font-size: 11px; color: #aaa; }
 
-.scoreCard {
-    border-radius: 16px;
-    padding: 32px 36px;
-    margin-bottom: 20px;
-}
+/* 점수 카드 */
+.scoreCard { background: #fff; border: 1px solid #e4eaf5; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.scoreTop { display: flex; align-items: center; gap: 20px; }
+.scoreRight { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.levelBadge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; align-self: flex-start; }
+.scoreTitle { font-size: 15px; font-weight: 600; margin: 0; }
+.scoreComment { font-size: 12px; color: #555; line-height: 1.6; margin: 0; }
+.gaugeWrap { display: flex; align-items: center; gap: 10px; }
+.gaugeTrack { flex: 1; height: 8px; background: #eef0f5; border-radius: 99px; overflow: hidden; }
+.gaugeFill { height: 100%; border-radius: 99px; transition: width .8s ease; }
+.gaugePct { font-size: 12px; font-weight: 600; min-width: 32px; text-align: right; }
+.tipRow { display: flex; align-items: flex-start; gap: 8px; background: #f4f8ff; border-radius: 10px; padding: 10px 14px; }
+.tipIcon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.tipText { font-size: 12px; color: #555; line-height: 1.6; }
 
-.scoreNumRow {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    margin-bottom: 10px;
-}
+/* 투자 가능 금액 */
+.investCard { background: #fff; border: 1px solid #e4eaf5; border-radius: 16px; padding: 20px 24px; }
+.investLabel { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 4px; }
+.investVal { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+.investDesc { font-size: 12px; color: #aaa; margin: 0 0 14px; }
+.investTips { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.investTipItem { display: flex; flex-direction: column; align-items: center; gap: 4px; background: #f8f9fb; border-radius: 10px; padding: 10px 6px; text-align: center; }
+.investTipIcon { font-size: 16px; }
+.investTipText { font-size: 10px; color: #777; line-height: 1.5; white-space: pre-line; }
 
-.scoreNum {
-    font-size: 64px;
-    font-weight: 900;
-    letter-spacing: -0.04em;
-    line-height: 1;
-}
+/* 동기부여 */
+.motiveCard { background: #fff; border: 1px solid #e4eaf5; border-radius: 16px; padding: 18px 22px; display: flex; align-items: center; gap: 14px; }
+.motiveEmoji { font-size: 28px; flex-shrink: 0; }
+.motiveTitle { font-size: 13px; font-weight: 600; color: #111; margin: 0 0 3px; }
+.motiveDesc { font-size: 12px; color: #888; margin: 0; }
 
-.scoreMax {
-    font-size: 20px;
-    font-weight: 600;
-    opacity: 0.7;
-}
+/* 오른쪽 */
+.resultRight { padding: 44px 48px; background: #f4f6f9; display: flex; flex-direction: column; gap: 14px; }
+.summaryCard { background: #fff; border: 1px solid #e4eaf5; border-radius: 16px; overflow: hidden; flex: 1; }
+.summaryHeader { display: flex; align-items: center; gap: 8px; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; background: #fafbfc; font-size: 13px; font-weight: 600; color: #333; }
+.summaryRow { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f5f6f8; }
+.summaryRow:last-child { border-bottom: none; }
+.summaryLeft { display: flex; align-items: center; gap: 10px; }
+.summaryIcon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.summaryKey { font-size: 13px; color: #555; }
+.summaryVal { font-size: 13px; font-weight: 600; color: #111; }
 
-.scoreLabelBadge {
-    display: inline-block;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 14px;
-    border-radius: 99px;
-    margin-bottom: 20px;
-}
+.infoBanner { background: #EAF2FC; border: 1px solid #d4e6f8; border-radius: 10px; padding: 12px 16px; display: flex; gap: 8px; align-items: flex-start; }
+.infoIcon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.infoText { font-size: 12px; color: #185FA5; line-height: 1.6; margin: 0; }
 
-.gaugeTrack {
-    width: 100%;
-    height: 10px;
-    background: rgba(0,0,0,0.08);
-    border-radius: 99px;
-    overflow: hidden;
-    margin-bottom: 16px;
-}
-
-.gaugeFill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 0.8s ease;
-}
-
-.scoreComment {
-    font-size: 13px;
-    color: #555;
-    line-height: 1.7;
-    margin: 0;
-}
-
-.investCard {
-    background: #f7f8fa;
-    border: 1px solid #e8ecf2;
-    border-radius: 14px;
-    padding: 24px 28px;
-}
-
-.investCardLabel {
-    font-size: 12px;
-    font-weight: 600;
-    color: #888;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-}
-
-.investCardValue {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-}
-
-.investCardDesc {
-    font-size: 12px;
-    color: #888;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.resultRight {
-    padding: 56px 52px;
-    background: #f4f6f9;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.summaryCard {
-    background: #fff;
-    border: 1px solid #e8ecf2;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 24px;
-    flex: 1;
-}
-
-.summaryHeader {
-    padding: 20px 28px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 1px solid #f0f2f5;
-    background: #fafbfc;
-}
-
-.summaryList {
-    padding: 8px 0;
-}
-
-.summaryRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 28px;
-    border-bottom: 1px solid #f5f6f8;
-}
-
-.summaryRow:last-child {
-    border-bottom: none;
-}
-
-.summaryKey {
-    font-size: 13px;
-    color: #888;
-}
-
-.summaryVal {
-    font-size: 14px;
-    font-weight: 600;
-    color: #111;
-}
-
-.resultActions {
-    display: flex;
-    gap: 12px;
-}
-
-.secondaryBtn {
-    background: #fff;
-    color: #555;
-    border: 1.5px solid #dde1e8;
-    padding: 14px 28px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: border-color 0.15s, color 0.15s;
-    flex: 1;
-}
-
-.secondaryBtn:hover {
-    border-color: #1B5ED9;
-    color: #1B5ED9;
-}
-
-.resultActions .submitBtn {
-    flex: 2;
-    width: auto;
-    padding: 14px 28px;
-    border-radius: 10px;
-}
+.resultBtnRow { display: flex; gap: 10px; }
+.secBtn { flex: 1; padding: 13px; border: 1px solid #dde1e8; border-radius: 10px; font-size: 13px; color: #555; background: #fff; cursor: pointer; transition: border-color .15s, color .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.secBtn:hover { border-color: #1B5ED9; color: #1B5ED9; }
+.priBtn { flex: 2; padding: 13px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; color: #fff; background: #1B5ED9; cursor: pointer; transition: background .15s; }
+.priBtn:hover { background: #1249B3; }

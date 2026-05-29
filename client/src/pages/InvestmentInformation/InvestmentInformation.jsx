@@ -291,7 +291,7 @@ const InvestmentInformation = () => {
                     ))}
                     {showCount<filtered.length&&(
                         <button className={styles.moreBtn}
-                                onClick={()=>setShowCount(c=>Math.min(c+PAGE,filtered.length))}>
+                                onClick={()=>setShowCount(c=>Math.min(c+PAGE,Math.min(100,filtered.length)))}>
                             더보기 ({showCount}/{filtered.length}) ▼
                         </button>
                     )}

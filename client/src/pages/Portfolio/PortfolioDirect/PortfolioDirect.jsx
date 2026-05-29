@@ -57,30 +57,26 @@ const PortfolioDirect = () => {
     const navigate = useNavigate();
 
     const [portfolioName, setPortfolioName] = useState('');
-    const [currency,      setCurrency]      = useState('만원');
+    const [currency,      setCurrency]      = useState('원화');
     const [investAmount,  setInvestAmount]  = useState('');
+    const [addPeriod,     setAddPeriod]     = useState('없음');
+    const [addAmount,     setAddAmount]     = useState('');
     const [startDate,     setStartDate]     = useState('');
     const [endDate,       setEndDate]       = useState('');
     const [goalAmount,    setGoalAmount]    = useState('');
     const [cart,          setCart]          = useState([]);
-
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [searchQuery,     setSearchQuery]     = useState('');
     const [searchResults,   setSearchResults]   = useState([]);
-
     const [showNameModal, setShowNameModal] = useState(false);
     const [pendingAction, setPendingAction] = useState(null);
 
-    const handleSearch = () => {
-        setSearchResults(searchStocks(searchQuery));
-    };
+    const handleSearch = () => setSearchResults(searchStocks(searchQuery));
 
     const handleAdd = (stock) => {
-        if (cart.find(s => s.ticker === stock.ticker)) {
-            alert('이미 추가된 종목입니다.'); return;
-        }
+        if (cart.find(s => s.ticker === stock.ticker)) { alert('이미 추가된 종목입니다.'); return; }
         const newCart = [...cart, { ...stock, weight: 0 }];
-        const eq  = Math.floor(100 / newCart.length);
+        const eq = Math.floor(100 / newCart.length);
         const rem = 100 - eq * newCart.length;
         setCart(newCart.map((s,i) => ({ ...s, weight: i===0 ? eq+rem : eq })));
     };
@@ -88,7 +84,7 @@ const PortfolioDirect = () => {
     const handleRemove = (ticker) => {
         const newCart = cart.filter(s => s.ticker !== ticker);
         if (!newCart.length) { setCart([]); return; }
-        const eq  = Math.floor(100 / newCart.length);
+        const eq = Math.floor(100 / newCart.length);
         const rem = 100 - eq * newCart.length;
         setCart(newCart.map((s,i) => ({ ...s, weight: i===0 ? eq+rem : eq })));
     };
@@ -100,7 +96,7 @@ const PortfolioDirect = () => {
 
     const handleAutoWeight = () => {
         if (!cart.length) return;
-        const eq  = Math.floor(100 / cart.length);
+        const eq = Math.floor(100 / cart.length);
         const rem = 100 - eq * cart.length;
         setCart(cart.map((s,i) => ({ ...s, weight: i===0 ? eq+rem : eq })));
     };
@@ -123,8 +119,6 @@ const PortfolioDirect = () => {
     const handleSave = async () => {
         if (!portfolioName.trim()) { alert('포트폴리오 이름을 입력해주세요.'); return; }
         try {
-            // ✅ 실제 API 연결 시 주석 해제
-            // await fetch('/api/portfolio/direct/save', { method:'POST', ... });
             setShowNameModal(false);
             alert('포트폴리오가 저장되었습니다!');
             navigate('/portfolio');
@@ -137,59 +131,67 @@ const PortfolioDirect = () => {
         navigate('/portfolio/result', {
             state: {
                 stocks: cart.map(s => ({ name:s.name, ticker:s.ticker, weight:s.weight })),
-                investAmount, currency, startDate, endDate, goalAmount,
-                portfolioName, isDirect: true,
+                investAmount, currency, addPeriod, addAmount,
+                startDate, endDate, goalAmount, portfolioName, isDirect: true,
             },
         });
     };
 
-    const handleModalConfirm = () =>
-        pendingAction === 'save' ? handleSave() : handleResult();
+    const handleModalConfirm = () => pendingAction === 'save' ? handleSave() : handleResult();
 
     return (
         <div className={styles.pageWrapper}>
+            <div className={styles.pageHeader}>
+                <div className={styles.pageHeaderIcon}>
+                    <i className="ti ti-chart-pie" />
+                </div>
+                <div>
+                    <p className={styles.pageHeaderTitle}>포트폴리오 직접 생성</p>
+                    <p className={styles.pageHeaderDesc}>나만의 투자 목표에 맞는 포트폴리오를 직접 구성해보세요.</p>
+                </div>
+            </div>
+
             <div className={styles.layout}>
-
-                {/* ── 왼쪽: 입력 폼 ── */}
+                {/* 왼쪽 */}
                 <div className={styles.panel}>
-                    <div className={styles.panelHead}>
-                        <div className={styles.headIcon}>🎯</div>
-                        <div>
-                            <p className={styles.headTitle}>포트폴리오 직접 생성</p>
-                            <p className={styles.headDesc}>나만의 투자 목표에 맞는 포트폴리오를 직접 구성해보세요.</p>
-                        </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>목표 이름</label>
+                        <input className={styles.textInput} type="text" placeholder="목표 이름을 입력해주세요"
+                               value={portfolioName} onChange={e=>setPortfolioName(e.target.value)} />
                     </div>
 
-                    <div className={styles.field}>
-                        <div className={styles.fieldHead}>
-                            <span className={styles.fieldIcon}>🎯</span>
-                            <span className={styles.fieldLabel}>목표 이름</span>
-                        </div>
-                        <input className={styles.fieldInput} type="text" placeholder="목표 이름을 입력해주세요"
-                               value={portfolioName} onChange={e => setPortfolioName(e.target.value)} />
-                    </div>
-
-                    <div className={styles.field}>
-                        <div className={styles.fieldHead}>
-                            <span className={styles.fieldIcon}>💰</span>
-                            <span className={styles.fieldLabel}>투자 금액</span>
-                        </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>투자 금액</label>
                         <div className={styles.fieldRow}>
-                            <select className={styles.select} value={currency} onChange={e=>setCurrency(e.target.value)}>
-                                <option value="만원">만원</option>
-                                <option value="달러">달러</option>
+                            <select className={styles.sel} value={currency} onChange={e=>setCurrency(e.target.value)}>
+                                <option>원화</option>
+                                <option>달러</option>
                             </select>
-                            <input className={styles.rowInput} type="number" placeholder="투자 금액을 입력해주세요"
+                            <input className={styles.textInput} type="number" placeholder="금액 입력"
                                    value={investAmount} onChange={e=>setInvestAmount(e.target.value)} />
-                            <span className={styles.suffix}>{investAmount ? Number(investAmount).toLocaleString() : 0} {currency}</span>
                         </div>
                     </div>
 
-                    <div className={styles.field}>
-                        <div className={styles.fieldHead}>
-                            <span className={styles.fieldIcon}>📅</span>
-                            <span className={styles.fieldLabel}>투자 목표 기간</span>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>추가 납입금액</label>
+                        <div className={styles.fieldRow}>
+                            <select className={styles.sel} value={addPeriod} onChange={e=>{setAddPeriod(e.target.value); if(e.target.value==='없음') setAddAmount('');}}>
+                                <option>없음</option>
+                                <option>매달</option>
+                                <option>매분기</option>
+                                <option>매년</option>
+                            </select>
+                            <input
+                                className={addPeriod==='없음' ? styles.disabledInput : styles.textInput}
+                                type="number" placeholder="금액 입력"
+                                value={addAmount} onChange={e=>setAddAmount(e.target.value)}
+                                disabled={addPeriod==='없음'}
+                            />
                         </div>
+                    </div>
+
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>투자 목표 기간</label>
                         <div className={styles.dateRow}>
                             <input className={styles.dateInput} type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} />
                             <span className={styles.dateSep}>~</span>
@@ -197,48 +199,43 @@ const PortfolioDirect = () => {
                         </div>
                     </div>
 
-                    <div className={styles.field}>
-                        <div className={styles.fieldHead}>
-                            <span className={styles.fieldIcon}>🚩</span>
-                            <span className={styles.fieldLabel}>목표 금액</span>
-                        </div>
-                        <div className={styles.fieldRow}>
-                            <input className={styles.rowInput} type="number" placeholder="목표 금액을 입력해주세요"
-                                   value={goalAmount} onChange={e=>setGoalAmount(e.target.value)} />
-                            <span className={styles.suffix}>{goalAmount ? Number(goalAmount).toLocaleString() : 0} {currency}</span>
-                        </div>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.inputLabel}>목표 금액</label>
+                        <input className={styles.textInput} type="number" placeholder="목표 금액 입력"
+                               value={goalAmount} onChange={e=>setGoalAmount(e.target.value)} />
                     </div>
 
                     <div className={styles.btnRow}>
                         <button className={styles.saveBtn} onClick={() => openNameModal('save')}>
-                            💾 저장하기
+                            <i className="ti ti-device-floppy" />저장하기
                         </button>
                         <button className={styles.resultBtn} onClick={() => openNameModal('result')}>
-                            📊 결과 확인하기
+                            <i className="ti ti-chart-bar" />결과 확인하기
                         </button>
                     </div>
                 </div>
 
-                {/* ── 오른쪽: 투자 종목 ── */}
+                {/* 오른쪽 */}
                 <div className={styles.panel}>
                     <div className={styles.stockHead}>
                         <div className={styles.stockTitleRow}>
-                            <div className={styles.headIcon}>🚀</div>
-                            <span className={styles.headTitle}>투자 종목</span>
+                            <span className={styles.inputLabel}>투자 종목</span>
                             <span className={styles.stockBadge}>{cart.length}개</span>
                         </div>
                         <button className={styles.addStockBtn} onClick={() => {
                             setSearchQuery(''); setSearchResults([]); setShowSearchModal(true);
                         }}>
-                            + 종목 추가하기
+                            <i className="ti ti-plus" />종목 추가하기
                         </button>
                     </div>
 
                     {cart.length === 0 ? (
                         <div className={styles.emptyState}>
-                            <div className={styles.emptyIllust}>📋</div>
+                            <div className={styles.emptyIllust}>
+                                <i className="ti ti-clipboard-list" style={{ fontSize:'32px', color:'#185FA5' }} />
+                            </div>
                             <p className={styles.emptyTitle}>아직 추가된 종목이 없어요</p>
-                            <p className={styles.emptyDesc}>오른쪽 상단의 '종목 추가하기' 버튼을 눌러<br/>투자 종목을 추가해보세요.</p>
+                            <p className={styles.emptyDesc}>종목 추가하기 버튼을 눌러<br/>투자 종목을 추가해보세요.</p>
                         </div>
                     ) : (
                         <div className={styles.cartList}>
@@ -272,8 +269,8 @@ const PortfolioDirect = () => {
                         </div>
                     )}
 
-                    <button className={styles.cartConfirmBtn} onClick={() => openNameModal('result')}>
-                        🛒 장바구니 확인
+                    <button className={styles.cartBtn} onClick={() => openNameModal('result')}>
+                        <i className="ti ti-shopping-cart" />장바구니 담기
                     </button>
                 </div>
             </div>
@@ -288,8 +285,8 @@ const PortfolioDirect = () => {
                         </div>
                         <div className={styles.searchRow}>
                             <input className={styles.searchInput} type="text" placeholder="종목명 또는 티커 입력"
-                                   value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                                   onKeyDown={e => e.key==='Enter' && handleSearch()} autoFocus />
+                                   value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
+                                   onKeyDown={e=>e.key==='Enter' && handleSearch()} autoFocus />
                             <button className={styles.searchBtn} onClick={handleSearch}>검색</button>
                         </div>
                         <div className={styles.searchResults}>
@@ -328,8 +325,8 @@ const PortfolioDirect = () => {
                         <p className={styles.modalTitle}>포트폴리오 이름 설정</p>
                         <p className={styles.modalDesc}>이 포트폴리오를 어떻게 부를까요?</p>
                         <input className={styles.nameInput} type="text" placeholder="예: 내 성장주 포트폴리오"
-                               value={portfolioName} onChange={e => setPortfolioName(e.target.value)}
-                               onKeyDown={e => e.key==='Enter' && handleModalConfirm()} autoFocus />
+                               value={portfolioName} onChange={e=>setPortfolioName(e.target.value)}
+                               onKeyDown={e=>e.key==='Enter' && handleModalConfirm()} autoFocus />
                         <div className={styles.modalBtns}>
                             <button className={styles.modalCancelBtn} onClick={() => setShowNameModal(false)}>취소</button>
                             <button className={styles.modalConfirmBtn} onClick={handleModalConfirm}>

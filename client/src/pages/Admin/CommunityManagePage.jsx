@@ -5,6 +5,7 @@ import './communityManage.css';
 function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
     const [mode, setMode] = useState('list');
     const [selectedPost, setSelectedPost] = useState(null);
+    const [searchType, setSearchType] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [editForm, setEditForm] = useState({
@@ -23,12 +24,38 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
             return true;
         }
 
+        const postNo = post.postNo.toLowerCase();
+        const title = post.title.toLowerCase();
+        const writerId = post.writerId.toLowerCase();
+        const writerName = post.writerName.toLowerCase();
+        const createdAt = post.createdAt.toLowerCase();
+
+        if (searchType === 'postNo') {
+            return postNo.includes(searchKeyword);
+        }
+
+        if (searchType === 'title') {
+            return title.includes(searchKeyword);
+        }
+
+        if (searchType === 'writerId') {
+            return writerId.includes(searchKeyword);
+        }
+
+        if (searchType === 'writerName') {
+            return writerName.includes(searchKeyword);
+        }
+
+        if (searchType === 'createdAt') {
+            return createdAt.includes(searchKeyword);
+        }
+
         return (
-            post.postNo.toLowerCase().includes(searchKeyword) ||
-            post.title.toLowerCase().includes(searchKeyword) ||
-            post.writerId.toLowerCase().includes(searchKeyword) ||
-            post.writerName.toLowerCase().includes(searchKeyword) ||
-            post.createdAt.toLowerCase().includes(searchKeyword)
+            postNo.includes(searchKeyword) ||
+            title.includes(searchKeyword) ||
+            writerId.includes(searchKeyword) ||
+            writerName.includes(searchKeyword) ||
+            createdAt.includes(searchKeyword)
         );
     });
 
@@ -239,11 +266,24 @@ function CommunityManagePage({posts, onUpdatePost, onDeletePost}) {
                     </div>
 
                     <form className="community-search-box" onSubmit={handleSearchSubmit}>
+                        <select
+                            className="community-search-select"
+                            value={searchType}
+                            onChange={(event) => setSearchType(event.target.value)}
+                        >
+                            <option value="all">전체</option>
+                            <option value="postNo">게시글 번호</option>
+                            <option value="title">제목</option>
+                            <option value="writerId">작성자 ID</option>
+                            <option value="writerName">작성자 이름</option>
+                            <option value="createdAt">작성일</option>
+                        </select>
+
                         <input
                             type="text"
                             value={searchInput}
                             onChange={(event) => setSearchInput(event.target.value)}
-                            placeholder="게시글 번호 / 제목 / 작성자 검색"
+                            placeholder="검색어 입력"
                         />
 
                         <button type="submit">

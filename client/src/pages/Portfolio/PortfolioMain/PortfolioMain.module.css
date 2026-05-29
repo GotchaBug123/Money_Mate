@@ -1,252 +1,99 @@
-.pageWrapper {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 40px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-}
-
-/* 자동 생성 버튼 */
-.autoGenBtn {
-    align-self: flex-start;
-    padding: 12px 28px;
-    background: #e0e0e0;
-    color: #333;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-}
-
-.autoGenBtn:hover {
-    background: #1B5ED9;
-    color: #fff;
-}
+.pageWrapper { padding: 28px; background: #f4f6fb; min-height: 100vh; display: flex; flex-direction: column; gap: 28px; }
 
 /* 섹션 */
-.section {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+.section { display: flex; flex-direction: column; gap: 16px; }
+.secHead { display: flex; align-items: flex-start; gap: 12px; }
+.secIconWrap { width: 32px; height: 32px; border-radius: 8px; background: #EAF2FC; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.secIcon { font-size: 16px; }
+.secTitle { font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; }
+.secDesc { font-size: 13px; color: #999; margin: 0; line-height: 1.6; }
+.divider { height: 1px; background: #e8ecf2; }
+.loadingText { font-size: 13px; color: #aaa; }
 
-.sectionHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+/* 카드 행 */
+.cardRow { display: flex; gap: 16px; flex-wrap: wrap; }
 
-.sectionTitle {
-    font-size: 18px;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin: 0;
-}
-
-.sectionDesc {
-    font-size: 13px;
-    color: #999;
-    margin: 0;
-    line-height: 1.6;
-}
-
-/* 카드 가로 줄 */
-.cardRow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-/* 포트폴리오 카드 공통 */
+/* 포트폴리오 카드 - 가로 직사각형 */
 .card {
-    width: 300px;
     background: #fff;
-    border: 1.5px solid #e8e8e8;
+    border: 1px solid #e8ecf2;
     border-radius: 16px;
-    padding: 20px;
+    width: 600px;
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: box-shadow 0.2s, transform 0.15s;
+    transition: box-shadow 0.2s;
+    position: relative;
 }
+.card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); border-color: #d4e3f5; }
+.cardInner { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
 
-.card:hover {
-    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
-    transform: translateY(-2px);
-}
+/* 드롭다운 */
+.menuWrap { position: absolute; top: 14px; right: 14px; }
+.menuBtn { width: 30px; height: 30px; border-radius: 50%; background: none; border: none; cursor: pointer; font-size: 16px; color: #bbb; opacity: 0; transition: opacity .15s; letter-spacing: -1px; }
+.card:hover .menuBtn { opacity: 1; }
+.menuBtn:hover { background: #f5f5f5; color: #555; }
+.dropdown { position: absolute; top: 34px; right: 0; background: #fff; border: 1px solid #eef0f4; border-radius: 10px; overflow: hidden; width: 116px; box-shadow: 0 4px 16px rgba(0,0,0,.1); z-index: 20; }
+.dropItem { display: flex; align-items: center; padding: 9px 14px; font-size: 12px; color: #555; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+.dropItem:hover { background: #f8f9fb; color: #1a1a2e; }
+.dropDanger { color: #a32d2d; }
+.dropDanger:hover { background: #fff5f5 !important; color: #a32d2d !important; }
+.dropSep { height: 1px; background: #f0f0f0; margin: 2px 0; }
 
-.cardTop {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
+.cardName { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0; padding-right: 28px; }
+.cardDate { font-size: 11px; color: #ccc; margin: 0; }
 
-.cardName {
-    font-size: 14px;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin: 0;
-}
-
-.cardDate {
-    font-size: 11px;
-    color: #ccc;
-    margin: 0;
-}
-
-/* 자동생성 카드 수익 지표 */
-.cardStats {
-    display: flex;
-    gap: 0;
-    background: #f8f9fb;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.statBox {
-    flex: 1;
-    padding: 10px 8px;
-    text-align: center;
-    border-right: 1px solid #efefef;
-}
-
-.statBox:last-child {
-    border-right: none;
-}
-
-.statLabel {
-    font-size: 10px;
-    color: #aaa;
-    margin: 0 0 4px;
-}
-
-.statValue {
-    font-size: 13px;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin: 0;
-}
-
+/* 수익 지표 */
+.cardStats { display: flex; background: #f8f9fb; border-radius: 10px; overflow: hidden; }
+.statBox { flex: 1; padding: 10px 8px; text-align: center; border-right: 1px solid #eef0f4; }
+.statBox:last-child { border-right: none; }
+.statLabel { font-size: 10px; color: #aaa; margin: 0 0 3px; }
+.statVal { font-size: 14px; font-weight: 700; color: #1a1a2e; margin: 0; }
 .pos { color: #1A7A45 !important; }
 
-/* 종목 칩 */
-.cardStocks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
+/* 칩 */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 4px 10px; font-size: 11px; font-weight: 500; border-radius: 20px; }
 
-.stockChip {
-    background: #f0f4ff;
-    color: #1B5ED9;
-    font-size: 11px;
-    padding: 3px 9px;
-    border-radius: 20px;
-}
+/* 카드 하단 */
+.cardFoot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f2f5; padding-top: 10px; }
+.footPeriod { font-size: 12px; color: #888; }
+.footArrow { font-size: 18px; color: #bbb; }
 
-.stockChip strong {
-    margin-left: 3px;
-    color: #1B5ED9;
-}
-
-/* 하단 기간 + 목표 */
-.cardBottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 10px;
-}
-
-.cardPeriod {
-    font-size: 11px;
-    color: #bbb;
-}
-
-.cardGoal {
-    font-size: 11px;
-    font-weight: 700;
-    color: #1B5ED9;
-}
-
-/* 빈 카드 */
-.emptyCard {
-    width: 300px;
-    height: 150px;
-    background: #f8f9fb;
-    border: 2px dashed #ddd;
+/* CTA 카드 (자동생성) */
+.ctaCard {
+    background: #fff;
+    border: 1.5px dashed #d0dce8;
     border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    width: 300px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; padding: 32px 24px; cursor: pointer;
+    transition: border-color .15s, background .15s;
+    text-align: center;
 }
-
-.emptyText {
-    font-size: 13px;
-    color: #bbb;
-    margin: 0;
+.ctaCard:hover { border-color: #185FA5; background: #f4f8ff; }
+.ctaIllust { font-size: 40px; opacity: .7; }
+.ctaTitle { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0; }
+.ctaDesc { font-size: 12px; color: #888; line-height: 1.6; margin: 0; }
+.ctaBtn {
+    padding: 12px 24px; background: #185FA5; color: #fff; border: none;
+    border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
+    margin-top: 4px; transition: background .15s; width: 100%;
 }
+.ctaBtn:hover { background: #0C447C; }
 
-.emptyBtn {
-    font-size: 12px;
-    color: #1B5ED9;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-}
-
-/* + 생성하기 카드 */
+/* 추가 카드 */
 .addCard {
-    width: 300px;
-    height: 170px;
-    background: #f8f9fb;
-    border: 2px dashed #ddd;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    background: #fff; border: 1.5px dashed #d0dce8; border-radius: 16px;
+    width: 280px; min-height: 100px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; transition: border-color .15s, background .15s;
 }
+.addCard:hover { border-color: #185FA5; background: #f4f8ff; }
+.addIconWrap { width: 40px; height: 40px; border-radius: 50%; background: #EAF2FC; display: flex; align-items: center; justify-content: center; }
+.addPlus { font-size: 20px; color: #185FA5; }
+.addLabel { font-size: 13px; color: #555; font-weight: 500; }
+.addCard:hover .addLabel { color: #185FA5; }
 
-.addCard:hover {
-    border-color: #1B5ED9;
-    background: #E8F0FE;
-}
-
-.addIcon {
-    font-size: 30px;
-    color: #ccc;
-    line-height: 1;
-    transition: color 0.2s;
-}
-
-.addCard:hover .addIcon {
-    color: #1B5ED9;
-}
-
-.addText {
-    font-size: 14px;
-    font-weight: 700;
-    color: #ccc;
-    transition: color 0.2s;
-}
-
-.addCard:hover .addText {
-    color: #1B5ED9;
-}
-
-.loadingText {
-    font-size: 13px;
-    color: #aaa;
-    padding: 20px 0;
-}
+/* 빈 상태 */
+.emptyCard { width: 280px; height: 120px; background: #f8f9fb; border: 1px solid #eef0f4; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.emptyText { font-size: 13px; color: #aaa; }
+.emptyBtn { padding: 7px 16px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
