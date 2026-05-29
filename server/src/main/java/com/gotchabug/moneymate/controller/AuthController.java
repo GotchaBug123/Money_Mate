@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import com.gotchabug.moneymate.dto.auth.FindIdRequest;
+import com.gotchabug.moneymate.dto.auth.FindPasswordRequest;
 
 @Controller
 @RequiredArgsConstructor
@@ -74,6 +76,7 @@ public class AuthController {
             return "login";
         }
     }
+
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
