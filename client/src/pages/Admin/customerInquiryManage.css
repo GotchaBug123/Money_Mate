@@ -222,19 +222,24 @@
     border-radius: 26px;
     background: #ffffff;
     box-shadow: 0 16px 34px rgba(17, 24, 39, 0.055);
+    box-sizing: border-box;
 }
 
 .inquiry-top-fields {
+    width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 24px;
+    box-sizing: border-box;
 }
 
 .inquiry-form-field {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 24px;
+    box-sizing: border-box;
 }
 
 .inquiry-form-field.wide {
@@ -250,6 +255,7 @@
 .inquiry-form-field input,
 .inquiry-form-field textarea {
     width: 100%;
+    min-width: 0;
     border: 1px solid #dcdce7;
     border-radius: 14px;
     background: #ffffff;
@@ -257,6 +263,7 @@
     font-size: 15px;
     font-weight: 800;
     outline: none;
+    box-sizing: border-box;
 }
 
 .inquiry-form-field input {
@@ -287,12 +294,15 @@
 }
 
 .file-view-box {
+    width: 100%;
     display: flex;
     gap: 12px;
+    box-sizing: border-box;
 }
 
 .file-view-box input {
     flex: 1;
+    min-width: 0;
 }
 
 .file-view-box .file-open-button {
@@ -308,6 +318,7 @@
     font-size: 14px;
     font-weight: 900;
     text-decoration: none;
+    box-sizing: border-box;
 }
 
 .file-view-box .file-open-button.disabled {
