@@ -37,7 +37,6 @@ server:
 market:
   asset-master:
     enabled: true
-    kospi-zip-path: C:/Users/minta/Downloads/kospi_code.mst.zip
-    kosdaq-zip-path: C:/Users/minta/Downloads/kosdaq_code.mst.zip
+    csv-path: classpath:/data/kr_assets.csv
 
 
