@@ -83,6 +83,7 @@ const statistics = [
 
 function InvestmentManagePage() {
     const [activeTab, setActiveTab] = useState('memberInvestment');
+    const [searchType, setSearchType] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [selectedStockMember, setSelectedStockMember] = useState(null);
@@ -92,11 +93,32 @@ function InvestmentManagePage() {
             return true;
         }
 
+        const name = member.name.toLowerCase();
+        const userId = member.userId.toLowerCase();
+        const type = member.type.toLowerCase();
+        const stocks = member.stocks.map((stock) => stock.toLowerCase());
+
+        if (searchType === 'name') {
+            return name.includes(searchKeyword);
+        }
+
+        if (searchType === 'userId') {
+            return userId.includes(searchKeyword);
+        }
+
+        if (searchType === 'stock') {
+            return stocks.some((stock) => stock.includes(searchKeyword));
+        }
+
+        if (searchType === 'type') {
+            return type.includes(searchKeyword);
+        }
+
         return (
-            member.name.toLowerCase().includes(searchKeyword) ||
-            member.userId.toLowerCase().includes(searchKeyword) ||
-            member.type.toLowerCase().includes(searchKeyword) ||
-            member.stocks.some((stock) => stock.toLowerCase().includes(searchKeyword))
+            name.includes(searchKeyword) ||
+            userId.includes(searchKeyword) ||
+            type.includes(searchKeyword) ||
+            stocks.some((stock) => stock.includes(searchKeyword))
         );
     });
 
@@ -175,11 +197,23 @@ function InvestmentManagePage() {
                     </div>
 
                     <form className="investment-search-box" onSubmit={handleSearchSubmit}>
+                        <select
+                            className="investment-search-select"
+                            value={searchType}
+                            onChange={(event) => setSearchType(event.target.value)}
+                        >
+                            <option value="all">전체</option>
+                            <option value="name">회원 이름</option>
+                            <option value="userId">아이디</option>
+                            <option value="stock">종목명</option>
+                            <option value="type">투자유형</option>
+                        </select>
+
                         <input
                             type="text"
                             value={searchInput}
                             onChange={(event) => setSearchInput(event.target.value)}
-                            placeholder="회원 이름 / 아이디 / 종목 검색"
+                            placeholder="검색어 입력"
                         />
 
                         <button type="submit">검색</button>

@@ -78,6 +78,10 @@
 .inquiry-toolbar {
     margin-bottom: 18px;
     padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
     border: 1px solid #e8e8ef;
     border-radius: 22px;
     background: #ffffff;
@@ -95,6 +99,69 @@
     color: #8b8f9a;
     font-size: 14px;
     font-weight: 800;
+}
+
+.inquiry-search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inquiry-search-select {
+    width: 132px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #dcdce7;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 900;
+    outline: none;
+    cursor: pointer;
+}
+
+.inquiry-search-select:focus {
+    border-color: #5728f5;
+    box-shadow: 0 0 0 3px rgba(87, 40, 245, 0.12);
+}
+
+.inquiry-search-box input {
+    width: 300px;
+    height: 46px;
+    padding: 0 16px;
+    border: 1px solid #dcdce7;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 800;
+    outline: none;
+}
+
+.inquiry-search-box input::placeholder {
+    color: #9ca3af;
+}
+
+.inquiry-search-box input:focus {
+    border-color: #5728f5;
+    box-shadow: 0 0 0 3px rgba(87, 40, 245, 0.12);
+}
+
+.inquiry-search-box button {
+    width: 92px;
+    height: 46px;
+    border: 0;
+    border-radius: 14px;
+    color: #ffffff;
+    background: #5728f5;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.inquiry-search-box button:hover {
+    background: #4520d6;
 }
 
 .inquiry-list-box {
@@ -362,7 +429,8 @@
 }
 
 @media (max-width: 1300px) {
-    .inquiry-page-header {
+    .inquiry-page-header,
+    .inquiry-toolbar {
         align-items: stretch;
         flex-direction: column;
     }
@@ -370,6 +438,19 @@
     .inquiry-summary-grid {
         min-width: 0;
         grid-template-columns: repeat(4, 1fr);
+    }
+
+    .inquiry-search-box {
+        width: 100%;
+    }
+
+    .inquiry-search-select {
+        width: 150px;
+    }
+
+    .inquiry-search-box input {
+        flex: 1;
+        width: 100%;
     }
 
     .inquiry-list-box {
@@ -397,6 +478,15 @@
 
     .inquiry-toolbar {
         padding: 20px;
+    }
+
+    .inquiry-search-box {
+        flex-direction: column;
+    }
+
+    .inquiry-search-select,
+    .inquiry-search-box button {
+        width: 100%;
     }
 
     .inquiry-top-fields {

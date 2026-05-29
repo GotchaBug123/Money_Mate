@@ -8,6 +8,9 @@ function CustomerInquiryManagePage({
                                        onDeleteInquiry,
                                    }) {
     const [mode, setMode] = useState('list');
+    const [searchType, setSearchType] = useState('all');
+    const [searchInput, setSearchInput] = useState('');
+    const [searchKeyword, setSearchKeyword] = useState('');
     const [answerForm, setAnswerForm] = useState({
         inquiryNo: '',
         title: '',
@@ -22,9 +25,56 @@ function CustomerInquiryManagePage({
         answer: '',
     });
 
+    const filteredInquiries = inquiries.filter((inquiry) => {
+        if (!searchKeyword) {
+            return true;
+        }
+
+        const inquiryNo = inquiry.inquiryNo.toLowerCase();
+        const title = inquiry.title.toLowerCase();
+        const writerId = inquiry.writerId.toLowerCase();
+        const writerName = inquiry.writerName.toLowerCase();
+        const email = inquiry.email.toLowerCase();
+        const status = inquiry.status.toLowerCase();
+
+        if (searchType === 'inquiryNo') {
+            return inquiryNo.includes(searchKeyword);
+        }
+
+        if (searchType === 'title') {
+            return title.includes(searchKeyword);
+        }
+
+        if (searchType === 'writer') {
+            return (
+                writerId.includes(searchKeyword) ||
+                writerName.includes(searchKeyword) ||
+                email.includes(searchKeyword)
+            );
+        }
+
+        if (searchType === 'status') {
+            return status.includes(searchKeyword);
+        }
+
+        return (
+            inquiryNo.includes(searchKeyword) ||
+            title.includes(searchKeyword) ||
+            writerId.includes(searchKeyword) ||
+            writerName.includes(searchKeyword) ||
+            email.includes(searchKeyword) ||
+            status.includes(searchKeyword)
+        );
+    });
+
     const waitingCount = inquiries.filter((inquiry) => inquiry.status === '답변 전').length;
     const completeCount = inquiries.filter((inquiry) => inquiry.status === '답변 완료').length;
     const deletedCount = inquiries.filter((inquiry) => inquiry.status === '삭제 조치').length;
+
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        setSearchKeyword(searchInput.trim().toLowerCase());
+    };
 
     const handleOpenInquiry = (inquiry) => {
         setAnswerForm({
@@ -221,8 +271,33 @@ function CustomerInquiryManagePage({
                 <div className="inquiry-toolbar">
                     <div>
                         <h3>문의 목록</h3>
-                        <span>총 {inquiries.length}개의 문의가 등록되어 있습니다.</span>
+                        <span>총 {filteredInquiries.length}개의 문의가 조회되었습니다.</span>
                     </div>
+
+                    <form className="inquiry-search-box" onSubmit={handleSearchSubmit}>
+                        <select
+                            className="inquiry-search-select"
+                            value={searchType}
+                            onChange={(event) => setSearchType(event.target.value)}
+                        >
+                            <option value="all">전체</option>
+                            <option value="inquiryNo">문의 번호</option>
+                            <option value="title">문의 제목</option>
+                            <option value="writer">작성자</option>
+                            <option value="status">상태</option>
+                        </select>
+
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value)}
+                            placeholder="검색어 입력"
+                        />
+
+                        <button type="submit">
+                            검색
+                        </button>
+                    </form>
                 </div>
 
                 <div className="inquiry-list-box">
@@ -236,8 +311,8 @@ function CustomerInquiryManagePage({
                     </div>
 
                     <div className="inquiry-table-body">
-                        {inquiries.length > 0 ? (
-                            inquiries.map((inquiry) => (
+                        {filteredInquiries.length > 0 ? (
+                            filteredInquiries.map((inquiry) => (
                                 <div className="inquiry-row" key={inquiry.inquiryNo}>
                                     <span>{inquiry.inquiryNo}</span>
                                     <span>{inquiry.title}</span>
@@ -281,7 +356,7 @@ function CustomerInquiryManagePage({
                             ))
                         ) : (
                             <div className="empty-inquiry-list">
-                                문의 내역이 없습니다.
+                                검색 결과가 없습니다.
                             </div>
                         )}
                     </div>

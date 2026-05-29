@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import './memberManage.css';
 
 function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
+    const [searchType, setSearchType] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [selectedMember, setSelectedMember] = useState(null);
@@ -26,11 +27,32 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
             return true;
         }
 
+        const memberNo = member.memberNo.toLowerCase();
+        const userId = member.userId.toLowerCase();
+        const name = member.name.toLowerCase();
+        const email = member.email.toLowerCase();
+
+        if (searchType === 'memberNo') {
+            return memberNo.includes(searchKeyword);
+        }
+
+        if (searchType === 'userId') {
+            return userId.includes(searchKeyword);
+        }
+
+        if (searchType === 'name') {
+            return name.includes(searchKeyword);
+        }
+
+        if (searchType === 'email') {
+            return email.includes(searchKeyword);
+        }
+
         return (
-            member.memberNo.toLowerCase().includes(searchKeyword) ||
-            member.userId.toLowerCase().includes(searchKeyword) ||
-            member.name.toLowerCase().includes(searchKeyword) ||
-            member.email.toLowerCase().includes(searchKeyword)
+            memberNo.includes(searchKeyword) ||
+            userId.includes(searchKeyword) ||
+            name.includes(searchKeyword) ||
+            email.includes(searchKeyword)
         );
     });
 
@@ -82,12 +104,24 @@ function MemberManagePage({members, onDeleteMember, onUpdateMember}) {
                     </div>
 
                     <form className="member-search-box" onSubmit={handleSearchSubmit}>
+                        <select
+                            className="member-search-select"
+                            value={searchType}
+                            onChange={(event) => setSearchType(event.target.value)}
+                        >
+                            <option value="all">전체</option>
+                            <option value="memberNo">회원번호</option>
+                            <option value="userId">아이디</option>
+                            <option value="name">이름</option>
+                            <option value="email">이메일</option>
+                        </select>
+
                         <input
                             className="member-search-input"
                             type="text"
                             value={searchInput}
                             onChange={(event) => setSearchInput(event.target.value)}
-                            placeholder="회원번호 / 아이디 / 이름 / 이메일"
+                            placeholder="검색어 입력"
                         />
 
                         <button className="member-search-button" type="submit">
