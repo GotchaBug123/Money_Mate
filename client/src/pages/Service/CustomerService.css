@@ -1,0 +1,71 @@
+/* src/pages/CustomerService.css */
+
+.cs-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.cs-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 4개의 사각형 영역에 적용될 공통 카드 스타일 */
+.cs-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    background-color: white;
+    border-radius: 4px;
+    font-size: 18px;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.cs-card.notice {
+    height: 100px;
+}
+
+.cs-card.faq {
+    height: 160px;
+}
+
+/* 3. 반반 분할 영역 */
+.cs-split-row {
+    display: flex;
+    gap: 24px;
+}
+
+.cs-card.split {
+    flex: 1;
+    height: 200px;
+}
+
+/* 4. 하단 버튼 영역 */
+.cs-button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.cs-btn {
+    padding: 12px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.cs-btn.history {
+    background-color: #F3F4F6;
+}
+
+.cs-btn.write {
+    background-color: white;
+}

@@ -1,0 +1,242 @@
+/* src/pages/AssetDetail.css */
+
+/* 전체 레이아웃 */
+.asset-detail-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.asset-detail-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 상단 뒤로가기 링크 */
+.back-link-wrapper {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.back-link {
+    padding: 8px 16px;
+    background-color: #E5E7EB;
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+/* 상단 수익률 영역 */
+.return-section {
+    display: flex;
+    gap: 60px;
+    padding: 0 16px;
+}
+
+.return-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.return-item.end {
+    justify-content: flex-end;
+}
+
+.return-month {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.return-label {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.return-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #EF4444;
+}
+
+/* 공통 박스 디자인 */
+.common-box {
+    border: 1px solid var(--border-color);
+    background-color: white;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-main);
+    font-weight: bold;
+}
+
+/* 히스토그램 그래프 영역 */
+.graph-placeholder {
+    height: 250px;
+    background-color: #D1D5DB;
+    border: none;
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
+/* 하단 종목 리스트 2분할 영역 */
+.list-section {
+    display: flex;
+    gap: 24px;
+}
+
+.list-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.list-box {
+    height: 280px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 20px;
+    gap: 12px;
+}
+
+.list-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+/* 개별 종목 아이템 */
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.list-item-right {
+    display: flex;
+    gap: 16px;
+}
+
+.item-quantity {
+    color: var(--text-muted);
+}
+
+.item-return {
+    font-weight: bold;
+    width: 50px;
+    text-align: right;
+}
+
+/* 공통 버튼 디자인 */
+.action-btn {
+    padding: 8px 24px;
+    background-color: #E5E7EB;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* -------------------------------------
+ * 주식 사기 모달 (팝업) 스타일
+ * ------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 40px 30px;
+    border-radius: 4px;
+    width: 380px;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.modal-label {
+    position: absolute;
+    top: -12px;
+    left: 16px;
+    background-color: #E5E7EB;
+    padding: 4px 8px;
+    font-size: 13px;
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.search-placeholder-btn {
+    padding: 30px;
+    background-color: #BDBDBD;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+}
+
+.modal-bottom-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.select-placeholder {
+    display: flex;
+    align-items: center;
+    background-color: #BDBDBD;
+    padding: 8px 12px;
+    width: 60px;
+    justify-content: space-between;
+    border: 1px solid #999;
+}
+
+.select-arrow {
+    font-size: 12px;
+    color: white;
+}
+
+.select-value {
+    color: transparent;
+}
+
+.unit-text {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.modal-close-btn {
+    padding: 8px 16px;
+    background-color: #BDBDBD;
+    border: 1px solid #999;
+    font-size: 16px;
+    cursor: pointer;
+}

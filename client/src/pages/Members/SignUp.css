@@ -1,0 +1,141 @@
+/* src/pages/SignUp.css */
+
+/* 전체 레이아웃 */
+.signup-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.signup-card {
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+}
+
+.signup-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--primary-color);
+}
+
+/* 폼 입력 행 공통 스타일 */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* 유효성 검사 박스가 포함된 폼 그룹 */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group.large {
+    margin-bottom: 24px;
+}
+
+.form-row-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 입력 요소 스타일 */
+.form-label {
+    width: 100px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.form-input {
+    flex: 1;
+    padding: 12px;
+    background-color: #E5E7EB;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+}
+
+/* 생년월일 특화 스타일 */
+.birth-label {
+    width: 70px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.birth-input {
+    flex: 0.8;
+}
+
+/* 우측 버튼 스타일 */
+.form-btn {
+    padding: 12px 16px;
+    background-color: #D1D5DB;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 💡 조건 검증 안내 박스 (동적 색상) */
+.validation-box {
+    margin-left: 116px; /* 라벨 너비(100px) + 간격(16px) */
+    margin-top: 8px;
+    padding: 8px;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.validation-box.success {
+    background-color: #22C55E; /* 초록색 */
+}
+
+.validation-box.warning {
+    background-color: #F97316; /* 주황색 */
+}
+
+.validation-box.error {
+    background-color: #EF4444; /* 빨간색 */
+}
+
+/* 약관 동의 영역 */
+.terms-box {
+    margin-top: 32px;
+    padding: 16px;
+    background-color: #F3F4F6;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+}
+
+.terms-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.terms-checkbox {
+    width: 18px;
+    height: 18px;
+}
+
+/* 가입 완료 버튼 */
+.submit-btn {
+    width: 100%;
+    margin-top: 24px;
+    padding: 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import './SignUp.css';
 
 function SignUp() {
     const navigate = useNavigate();
@@ -53,156 +54,96 @@ function SignUp() {
         navigate('/signup-complete', {state: {userName: formData.name}});
     };
 
-    // 공통 스타일
-    const rowStyle = {display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px'};
-    const labelStyle = {width: '100px', fontWeight: 'bold', flexShrink: 0};
-    const inputStyle = {
-        flex: 1,
-        padding: '12px',
-        backgroundColor: '#E5E7EB',
-        border: 'none',
-        borderRadius: '4px',
-        fontSize: '15px'
-    };
-    const btnStyle = {
-        padding: '12px 16px',
-        backgroundColor: '#D1D5DB',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        whiteSpace: 'nowrap'
-    };
-
     return (
-        <div className="container" style={{display: 'flex', justifyContent: 'center', padding: '60px 20px'}}>
-            <div className="card" style={{width: '100%', maxWidth: '600px', padding: '40px'}}>
-                <h2 style={{textAlign: 'center', marginBottom: '40px', color: 'var(--primary-color)'}}>회원가입</h2>
+        <div className="container signup-wrapper">
+            <div className="card signup-card">
+                <h2 className="signup-title">회원가입</h2>
 
                 <form onSubmit={handleSignup}>
 
                     {/* 아이디 */}
-                    <div style={rowStyle}>
-                        <label style={labelStyle}>아이디</label>
-                        <input type="text" name="id" value={formData.id} onChange={handleChange} style={inputStyle}
+                    <div className="form-row">
+                        <label className="form-label">아이디</label>
+                        <input type="text" name="id" value={formData.id} onChange={handleChange} className="form-input"
                                placeholder="아이디 입력" required/>
-                        <button type="button" onClick={handleCheckId} style={btnStyle}>중복확인</button>
+                        <button type="button" onClick={handleCheckId} className="form-btn">중복확인</button>
                     </div>
 
                     {/* 비밀번호 */}
-                    <div style={{marginBottom: '16px'}}>
-                        <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-                            <label style={labelStyle}>비밀번호</label>
+                    <div className="form-group">
+                        <div className="form-row-inner">
+                            <label className="form-label">비밀번호</label>
                             <input type="password" name="password" value={formData.password} onChange={handleChange}
-                                   style={inputStyle} placeholder="비밀번호 입력" required/>
+                                   className="form-input" placeholder="비밀번호 입력" required/>
                         </div>
-                        {/* 비밀번호 기준 안내 (와이어프레임의 주황색 박스) */}
-                        <div style={{
-                            marginLeft: '116px',
-                            marginTop: '8px',
-                            padding: '8px',
-                            backgroundColor: isPasswordValid ? '#22C55E' : '#F97316', // 조건 만족 시 초록색, 불만족 시 주황색
-                            color: 'white',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            textAlign: 'center',
-                            transition: 'background-color 0.3s ease' // 색상이 부드럽게 바뀌도록 애니메이션 추가
-                        }}>
+                        {/* 비밀번호 기준 안내 (조건부 클래스 적용) */}
+                        <div className={`validation-box ${isPasswordValid ? 'success' : 'warning'}`}>
                             {isPasswordValid ? '사용 가능한 비밀번호입니다.' : '영문, 숫자, 특수문자 포함 8자 이상'}
                         </div>
                     </div>
 
                     {/* 비밀번호 확인 */}
-                    <div style={{marginBottom: '24px'}}>
-                        <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-                            <label style={labelStyle}>비밀번호 확인</label>
+                    <div className="form-group large">
+                        <div className="form-row-inner">
+                            <label className="form-label">비밀번호 확인</label>
                             <input type="password" name="passwordConfirm" value={formData.passwordConfirm}
-                                   onChange={handleChange} style={inputStyle} placeholder="비밀번호 재입력" required/>
+                                   onChange={handleChange} className="form-input" placeholder="비밀번호 재입력" required/>
                         </div>
-                        {/* 비밀번호 일치 확인 안내 (와이어프레임의 주황색 박스) */}
+                        {/* 비밀번호 일치 확인 안내 (조건부 클래스 적용) */}
                         {formData.passwordConfirm && (
-                            <div style={{
-                                marginLeft: '116px',
-                                marginTop: '8px',
-                                padding: '8px',
-                                backgroundColor: formData.password === formData.passwordConfirm ? '#22C55E' : '#EF4444',
-                                color: 'white',
-                                borderRadius: '4px',
-                                fontSize: '12px',
-                                textAlign: 'center'
-                            }}>
+                            <div
+                                className={`validation-box ${formData.password === formData.passwordConfirm ? 'success' : 'error'}`}>
                                 {formData.password === formData.passwordConfirm ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
                             </div>
                         )}
                     </div>
 
                     {/* 이름 & 생년월일 (한 줄에 배치) */}
-                    <div style={rowStyle}>
-                        <label style={labelStyle}>이름</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} style={inputStyle}
+                    <div className="form-row">
+                        <label className="form-label">이름</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange}
+                               className="form-input"
                                placeholder="이름 입력" required/>
 
-                        <label style={{width: '70px', fontWeight: 'bold', textAlign: 'center'}}>생년월일</label>
+                        <label className="birth-label">생년월일</label>
                         <input type="date" name="birthDate" value={formData.birthDate} onChange={handleChange}
-                               style={{...inputStyle, flex: '0.8'}} required/>
+                               className="form-input birth-input" required/>
                     </div>
 
                     {/* 전화번호 */}
-                    <div style={rowStyle}>
-                        <label style={labelStyle}>전화번호</label>
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} style={inputStyle}
+                    <div className="form-row">
+                        <label className="form-label">전화번호</label>
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
+                               className="form-input"
                                placeholder="010-0000-0000" required/>
-                        <button type="button" onClick={handleSendAuthCode} style={btnStyle}>인증받기</button>
+                        <button type="button" onClick={handleSendAuthCode} className="form-btn">인증받기</button>
                     </div>
 
                     {/* 인증번호 */}
-                    <div style={rowStyle}>
-                        <label style={labelStyle}>인증번호</label>
+                    <div className="form-row">
+                        <label className="form-label">인증번호</label>
                         <input type="text" name="verificationCode" value={formData.verificationCode}
-                               onChange={handleChange} style={inputStyle} placeholder="인증번호 입력" required/>
+                               onChange={handleChange} className="form-input" placeholder="인증번호 입력" required/>
                     </div>
 
                     {/* 이메일 */}
-                    <div style={rowStyle}>
-                        <label style={labelStyle}>이메일</label>
+                    <div className="form-row">
+                        <label className="form-label">이메일</label>
                         <input type="email" name="email" value={formData.email} onChange={handleChange}
-                               style={inputStyle} placeholder="example@email.com" required/>
+                               className="form-input" placeholder="example@email.com" required/>
                     </div>
 
                     {/* 약관 동의 영역 */}
-                    <div style={{
-                        marginTop: '32px',
-                        padding: '16px',
-                        backgroundColor: '#F3F4F6',
-                        borderRadius: '4px',
-                        display: 'flex',
-                        justifyContent: 'center'
-                    }}>
-                        <label style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                        }}>
+                    <div className="terms-box">
+                        <label className="terms-label">
                             <input type="checkbox" name="agreeTerms" checked={formData.agreeTerms}
-                                   onChange={handleChange} style={{width: '18px', height: '18px'}}/>
+                                   onChange={handleChange} className="terms-checkbox"/>
                             [필수] 이용약관 및 개인정보 처리방침에 동의합니다.
                         </label>
                     </div>
 
                     {/* 가입 완료 버튼 */}
-                    <button type="submit" style={{
-                        width: '100%',
-                        marginTop: '24px',
-                        padding: '16px',
-                        backgroundColor: 'var(--primary-color)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                    }}>
+                    <button type="submit" className="submit-btn">
                         회원가입 완료
                     </button>
 
