@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import {useModal} from '../../hooks/useModal';
-import './AssetDetail.css';
+import styles from './AssetDetail.module.css';
 
 function AssetDetail() {
     // 모달 표시 여부를 관리하는 상태
@@ -23,77 +23,78 @@ function AssetDetail() {
     };
 
     return (
-        <div className="asset-detail-wrapper">
-            <div className="asset-detail-container">
+        <div className={styles.pageWrapper}>
+            <div className={styles.container}>
 
-                <div className="back-link-wrapper">
-                    <Link to="/asset" className="back-link">
-                        &lt; 요약 화면(My Asset)으로 돌아가기
-                    </Link>
-                </div>
+                <Link to="/asset" className={styles.backLink}>
+                    &lt; 요약 화면(My Asset)으로 돌아가기
+                </Link>
 
-                {/* 1. 상단 수익률 */}
-                <div className="return-section">
-                    <div className="return-item">
-                        <div className="return-month">◀ 4월 ▶</div>
-                        <div className="return-label">월 수익률</div>
-                        <div className="return-value">{mockData.monthlyReturn}</div>
+                {/* 1. 상단 수익률 카드 */}
+                <div className={styles.topCard}>
+                    <div className={styles.returnItem}>
+                        <span className={styles.returnMonth}>◀ 4월 ▶</span>
+                        <span className={styles.returnLabel}>월 수익률</span>
+                        <span
+                            className={`${styles.returnValue} ${mockData.monthlyReturn.includes('-') ? styles.neg : styles.pos}`}>
+                            {mockData.monthlyReturn}
+                        </span>
                     </div>
-                    <div className="return-item end">
-                        <div className="return-label">종합 수익률</div>
-                        <div className="return-value">{mockData.totalReturn}</div>
+                    <div className={styles.returnItem}>
+                        <span className={styles.returnLabel}>종합 수익률</span>
+                        <span
+                            className={`${styles.returnValue} ${mockData.totalReturn.includes('-') ? styles.neg : styles.pos}`}>
+                            {mockData.totalReturn}
+                        </span>
                     </div>
                 </div>
 
                 {/* 2. 그래프 (히스토그램) 영역 */}
-                <div className="common-box graph-placeholder">
-                    그래프(히스토그램) - 데이터 연동 예정
+                <div className={styles.chartCard}>
+                    그래프(히스토그램) 영역 - 데이터 연동 예정
                 </div>
 
                 {/* 3. 종목 리스트 2분할 */}
-                <div className="list-section">
+                <div className={styles.listSection}>
 
                     {/* 투자 종목 영역 */}
-                    <div className="list-column">
-                        <div className="common-box list-box">
-                            <div className="list-title">투자 종목</div>
-
-                            {mockData.investedStocks.map(stock => (
-                                <div key={stock.id} className="list-item">
-                                    <span>{stock.name}</span>
-                                    <div className="list-item-right">
-                                        <span className="item-quantity">{stock.quantity}</span>
-                                        {/* 💡 수익률 색상 분기 처리를 위해 color만 인라인 스타일 유지 */}
-                                        <span
-                                            className="item-return"
-                                            style={{ color: stock.returnRate.includes('-') ? '#3B82F6' : '#EF4444' }}
-                                        >
-                                            {stock.returnRate}
-                                        </span>
+                    <div className={styles.listColumn}>
+                        <div className={styles.listBox}>
+                            <h3 className={styles.listTitle}>투자 종목</h3>
+                            {mockData.investedStocks.map(stock => {
+                                const isPos = !stock.returnRate.includes('-');
+                                return (
+                                    <div key={stock.id} className={styles.listItem}>
+                                        <span className={styles.itemName}>{stock.name}</span>
+                                        <div className={styles.itemRight}>
+                                            <span className={styles.itemQuantity}>{stock.quantity}</span>
+                                            <span className={`${styles.itemReturn} ${isPos ? styles.pos : styles.neg}`}>
+                                                {stock.returnRate}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
-                        <div className="btn-group">
-                            <button onClick={open} className="action-btn">주식 사기</button>
-                            <button className="action-btn">주식 팔기</button>
+                        <div className={styles.btnGroup}>
+                            <button onClick={open} className={styles.primaryBtn}>주식 사기</button>
+                            <button className={styles.secondaryBtn}>주식 팔기</button>
                         </div>
                     </div>
 
                     {/* 관심 종목 영역 */}
-                    <div className="list-column">
-                        <div className="common-box list-box">
-                            <div className="list-title">관심 종목</div>
-
+                    <div className={styles.listColumn}>
+                        <div className={styles.listBox}>
+                            <h3 className={styles.listTitle}>관심 종목</h3>
                             {mockData.watchList.map(stock => (
-                                <div key={stock.id} className="list-item">
-                                    <span>{stock.name}</span>
-                                    <span>{stock.currentPrice}</span>
+                                <div key={stock.id} className={styles.listItem}>
+                                    <span className={styles.itemName}>{stock.name}</span>
+                                    <span className={styles.itemQuantity}>{stock.currentPrice}</span>
                                 </div>
                             ))}
                         </div>
-                        <div className="btn-group">
-                            <button className="action-btn">관심 종목 담기</button>
+                        <div className={styles.btnGroup}>
+                            <button className={styles.secondaryBtn}>관심 종목 담기</button>
                         </div>
                     </div>
 
@@ -102,25 +103,29 @@ function AssetDetail() {
 
             {/* 💡 주식사기화면 모달 (팝업) */}
             {isOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
+                <div className={styles.modalOverlay} onClick={close}>
+                    <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
 
-                        <div className="modal-label">주식사기화면</div>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>주식 사기</h3>
+                            <button onClick={close} className={styles.modalCloseBtn}>✕</button>
+                        </div>
 
-                        <div className="modal-body">
-                            <button className="search-placeholder-btn">주식 검색</button>
+                        <button className={styles.searchPlaceholderBtn}>
+                            + 종목 검색하기
+                        </button>
 
-                            <div className="modal-bottom-row">
-                                <div className="select-placeholder">
-                                    <span className="select-value">0</span>
-                                    <span className="select-arrow">▼</span>
-                                </div>
-                                <span className="unit-text">주</span>
-
-                                <button onClick={close} className="modal-close-btn">
-                                    닫기
-                                </button>
+                        <div className={styles.modalBottomRow}>
+                            <div className={styles.qtyControl}>
+                                <input type="number" defaultValue={0} min={0} className={styles.qtyInput}/>
+                                <span className={styles.unitText}>주</span>
                             </div>
+                            <button className={styles.buyBtn} onClick={() => {
+                                alert('매수 기능은 준비 중입니다.');
+                                close();
+                            }}>
+                                매수하기
+                            </button>
                         </div>
 
                     </div>

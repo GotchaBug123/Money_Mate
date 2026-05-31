@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import './FindPassword.css';
+import styles from './FindPassword.module.css';
 
 function FindPassword() {
     const navigate = useNavigate();
@@ -38,61 +38,69 @@ function FindPassword() {
     };
 
     return (
-        <div className="container find-pw-wrapper">
-            <div className="card find-pw-card">
-                <h2 className="find-pw-title">비밀번호 찾기</h2>
+        <div className={styles.pageWrapper}>
+            <div className={styles.card}>
+                <h2 className={styles.title}>비밀번호 찾기</h2>
 
-                <div className="form-row">
-                    <label className="form-label">아이디</label>
-                    <input
-                        type="text"
-                        value={id}
-                        onChange={(e) => setId(e.target.value)}
-                        className="form-input"
-                        disabled={isVerified}
-                    />
-                </div>
+                <div className={styles.form}>
+                    {/* 아이디 입력 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>아이디</label>
+                        <input
+                            type="text"
+                            value={id}
+                            onChange={(e) => setId(e.target.value)}
+                            className={styles.input}
+                            placeholder="아이디를 입력해주세요"
+                            disabled={isVerified}
+                        />
+                    </div>
 
-                <div className="form-row">
-                    <label className="form-label">전화번호</label>
-                    <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="form-input"
-                        disabled={isVerified}
-                    />
-                </div>
+                    {/* 전화번호 입력 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>전화번호</label>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className={styles.input}
+                            placeholder="010-0000-0000"
+                            disabled={isVerified}
+                        />
+                    </div>
 
-                <div className="form-row">
-                    <label className="form-label">인증번호</label>
-                    <input
-                        type="text"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        placeholder="6자리"
-                        className="form-input code-input"
-                        maxLength={6}
-                        disabled={isVerified}
-                    />
-                    <button
-                        onClick={handleVerify}
-                        disabled={isVerified}
-                        className={`verify-btn ${isVerified ? 'verified' : ''}`}
-                    >
-                        {isVerified ? '인증완료' : '인증확인'}
-                    </button>
+                    {/* 인증번호 입력 및 확인 버튼 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>인증번호</label>
+                        <div className={styles.verifyRow}>
+                            <input
+                                type="text"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                placeholder="6자리"
+                                className={styles.verifyInput}
+                                maxLength={6}
+                                disabled={isVerified}
+                            />
+                            <button
+                                onClick={handleVerify}
+                                disabled={isVerified}
+                                className={isVerified ? styles.verifyBtnDone : styles.verifyBtn}
+                            >
+                                {isVerified ? '인증완료' : '인증확인'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* 다음 단계 버튼 */}
-                <div className="next-btn-wrapper">
-                    <button
-                        onClick={handleNext}
-                        className={`next-btn ${isVerified ? 'active' : 'disabled'}`}
-                    >
-                        다음
-                    </button>
-                </div>
+                <button
+                    onClick={handleNext}
+                    className={isVerified ? styles.nextBtnActive : styles.nextBtnDisabled}
+                    disabled={!isVerified}
+                >
+                    다음
+                </button>
             </div>
         </div>
     );

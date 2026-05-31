@@ -1,0 +1,336 @@
+/* src/pages/AssetDetail.module.css */
+
+/* 전체 레이아웃 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 상단 뒤로가기 링크 */
+.backLink {
+    align-self: flex-start;
+    padding: 10px 20px;
+    background: #fff;
+    color: #555;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.backLink:hover {
+    background: #f8f9fb;
+    color: #1a1a2e;
+}
+
+/* 상단 수익률 카드 */
+.topCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 32px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    justify-content: flex-start;
+    gap: 60px;
+    align-items: center;
+}
+
+.returnItem {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.returnMonth {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1B5ED9;
+    background: #EAF2FC;
+    padding: 4px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+    margin-bottom: 4px;
+}
+
+.returnLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+}
+
+.returnValue {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* 동적 색상 제어 (팀원들의 포트폴리오 스타일 통일) */
+.pos {
+    color: #1A7A45;
+}
+
+.neg {
+    color: #C0392B;
+}
+
+/* 차트 영역 (점선 플레이스홀더 디자인) */
+.chartCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #bbb;
+    border: 2px dashed #e8eaf0;
+}
+
+/* 하단 종목 리스트 2분할 */
+.listSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.listColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.listBox {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 280px;
+}
+
+.listTitle {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+}
+
+.listItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #f8f9fb;
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.listItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.itemName {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.itemRight {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.itemQuantity {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+}
+
+.itemReturn {
+    font-size: 14px;
+    font-weight: 800;
+    min-width: 50px;
+    text-align: right;
+}
+
+/* 버튼 그룹 */
+.btnGroup {
+    display: flex;
+    gap: 12px;
+}
+
+.primaryBtn {
+    flex: 1;
+    padding: 14px 0;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.primaryBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}
+
+.secondaryBtn {
+    flex: 1;
+    padding: 14px 0;
+    background: #fff;
+    color: #1B5ED9;
+    border: 1.5px solid #1B5ED9;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.secondaryBtn:hover {
+    background: #E8F0FE;
+}
+
+/* -------------------------------------
+ * 모달 (팝업) 스타일 (팀원 UI 차용)
+ * ------------------------------------- */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.modalCloseBtn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #bbb;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modalCloseBtn:hover {
+    color: #333;
+}
+
+.searchPlaceholderBtn {
+    padding: 24px;
+    background: #f8f9fb;
+    border: 2px dashed #e8eaf0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.searchPlaceholderBtn:hover {
+    background: #EAF2FC;
+    border-color: #1B5ED9;
+    color: #1B5ED9;
+}
+
+.modalBottomRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fb;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.qtyControl {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.qtyInput {
+    width: 60px;
+    padding: 8px 12px;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 8px;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.qtyInput:focus {
+    border-color: #1B5ED9;
+}
+
+.unitText {
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
+}
+
+.buyBtn {
+    padding: 12px 24px;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.buyBtn:hover {
+    background: #1449b0;
+}

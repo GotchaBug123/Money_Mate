@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import './ResetPassword.css';
+import styles from './ResetPassword.module.css';
 
 function ResetPassword() {
     const navigate = useNavigate();
@@ -36,47 +36,50 @@ function ResetPassword() {
     };
 
     return (
-        <div className="container reset-pw-wrapper">
-            <div className="card reset-pw-card">
-                <h2 className="reset-pw-title">새 비밀번호 재설정</h2>
+        <div className={styles.pageWrapper}>
+            <div className={styles.card}>
+                <h2 className={styles.title}>새 비밀번호 재설정</h2>
 
                 {/* 새 비밀번호 입력 */}
-                <div className="input-group">
-                    <label className="form-label">새 비밀번호 입력</label>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>새 비밀번호 입력</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="form-input"
+                        className={styles.input}
+                        placeholder="새 비밀번호를 입력해주세요"
                     />
-                    {/* 조건 검증 상태창 (와이어프레임의 주황/초록 박스) */}
-                    <div className={`status-box ${isPasswordValid ? 'success' : 'warning'}`}>
-                        {isPasswordValid ? '사용 가능한 비밀번호입니다.' : '영문, 숫자, 특수문자 포함 8자 이상'}
+                    {/* 조건 검증 상태창 (모던 테마 & 아이콘 추가) */}
+                    <div
+                        className={`${styles.statusBox} ${isPasswordValid ? styles.statusSuccess : styles.statusWarning}`}>
+                        {isPasswordValid ? '✓ 사용 가능한 비밀번호입니다.' : '! 영문, 숫자, 특수문자 포함 8자 이상'}
                     </div>
                 </div>
 
                 {/* 새 비밀번호 확인 */}
-                <div className="input-group last">
-                    <label className="form-label">새 비밀번호 확인</label>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>새 비밀번호 확인</label>
                     <input
                         type="password"
                         value={passwordConfirm}
                         onChange={(e) => setPasswordConfirm(e.target.value)}
-                        className="form-input"
+                        className={styles.input}
+                        placeholder="비밀번호를 다시 한 번 입력해주세요"
                     />
+                    {/* 비밀번호 일치 검증 상태창 */}
                     {passwordConfirm && (
-                        <div className={`status-box ${password === passwordConfirm ? 'success' : 'error'}`}>
-                            {password === passwordConfirm ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
+                        <div
+                            className={`${styles.statusBox} ${password === passwordConfirm ? styles.statusSuccess : styles.statusError}`}>
+                            {password === passwordConfirm ? '✓ 비밀번호가 일치합니다.' : '✕ 비밀번호가 일치하지 않습니다.'}
                         </div>
                     )}
                 </div>
 
                 {/* 완료 버튼 */}
-                <div className="submit-btn-wrapper">
-                    <button onClick={handleComplete} className="submit-btn">
-                        완료
-                    </button>
-                </div>
+                <button onClick={handleComplete} className={styles.submitBtn}>
+                    완료
+                </button>
             </div>
         </div>
     );

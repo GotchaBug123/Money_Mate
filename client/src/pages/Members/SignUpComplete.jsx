@@ -1,6 +1,6 @@
 import React from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import './SignUpComplete.css';
+import styles from './SignUpComplete.module.css';
 
 function SignUpComplete() {
     const navigate = useNavigate();
@@ -16,26 +16,30 @@ function SignUpComplete() {
     };
 
     return (
-        <div className="container signup-complete-wrapper">
-            <div className="card signup-complete-card">
+        <div className={styles.pageWrapper}>
+            <div className={styles.card}>
+
+                {/* 축하 일러스트 영역 */}
+                <div className={styles.illust}>🎉</div>
 
                 {/* 환영 메시지 영역 */}
-                <div className="welcome-message-box">
-                    <h1 className="welcome-title">
-                        <span className="welcome-name">{userName}</span>님<br/>
+                <div>
+                    <h1 className={styles.title}>
+                        <span className={styles.highlight}>{userName}</span>님<br/>
                         환영합니다!
                     </h1>
+                    <p className={styles.desc}>
+                        머니메이트의 모든 서비스를 이용해보세요.
+                    </p>
                 </div>
 
                 {/* 완료 버튼 영역 */}
-                <div className="finish-btn-wrapper">
-                    <button
-                        onClick={handleFinish}
-                        className="finish-btn"
-                    >
-                        완료
-                    </button>
-                </div>
+                <button
+                    onClick={handleFinish}
+                    className={styles.submitBtn}
+                >
+                    로그인하러 가기
+                </button>
 
             </div>
         </div>
