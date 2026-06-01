@@ -8,7 +8,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,14 +18,8 @@ public class MyAssetController {
 
     private final FinancialProfileService financialProfileService;
 
-    @GetMapping("/my-asset")
-    public String myAssetMain() {
-        return "my-asset";
-    }
-
     @GetMapping("/my-asset/financial")
     public String myAssetFinancialPage(HttpSession session, Model model) {
-
         Object loginUserObj = session.getAttribute("loginUser");
 
         if (!(loginUserObj instanceof Member loginUser)) {
@@ -41,7 +37,6 @@ public class MyAssetController {
 
     @GetMapping("/my-asset/financial/edit")
     public String financialEditPage(HttpSession session, Model model) {
-
         Object loginUserObj = session.getAttribute("loginUser");
 
         if (!(loginUserObj instanceof Member loginUser)) {

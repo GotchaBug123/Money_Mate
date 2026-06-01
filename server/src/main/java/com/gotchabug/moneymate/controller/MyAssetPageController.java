@@ -32,28 +32,34 @@ public class MyAssetPageController {
         }
 
         Long memberId = loginUser.getMemberId();
+
         model.addAttribute("member", loginUser);
 
         // 재무정보
         try {
             FinancialProfileResponse profile =
                     financialProfileService.getMyFinancialProfile(loginUser);
+
             model.addAttribute("profile", profile);
         } catch (Exception e) {
             model.addAttribute("profile", null);
         }
 
-        // 장바구니 (investment_holding)
+        // 장바구니 / 내가 담은 투자 종목
         try {
-            List<HoldingDto> holdings = holdingService.getHoldingList(memberId);
+            List<HoldingDto> holdings =
+                    holdingService.getHoldingList(memberId);
+
             model.addAttribute("holdings", holdings);
         } catch (Exception e) {
             model.addAttribute("holdings", List.of());
         }
 
-        // 관심 종목 (watchlist)
+        // 관심 종목
         try {
-            List<WatchlistDto> watchlistItems = watchlistService.getWatchlist(memberId);
+            List<WatchlistDto> watchlistItems =
+                    watchlistService.getWatchlist(memberId);
+
             model.addAttribute("watchlistItems", watchlistItems);
         } catch (Exception e) {
             model.addAttribute("watchlistItems", List.of());
