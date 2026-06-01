@@ -2,99 +2,130 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>MoneyMate - 커뮤니티 게시글 확인</title>
-    <link rel="stylesheet" href="/css/common.css">
+    <title>MoneyMate 게시글 확인</title>
+    <link rel="stylesheet" href="/css/admin.css">
     <style>
-        body { background: #f8fafc; }
-        .admin-header { border-bottom: 1px solid #d0d5dd; background: #fff; }
-        .admin-nav { max-width: 1180px; margin: 0 auto; display: flex; gap: 36px; align-items: center; padding: 12px 16px; }
-        .admin-logo { font-weight: 800; color: #155eef; }
-        .admin-nav a { border: 1px solid #d0d5dd; border-radius: 6px; padding: 10px 24px; color: #101828; text-decoration: none; background: #fff; }
-        .admin-nav .logout { margin-left: auto; }
-        .admin-main { max-width: 820px; min-height: 670px; margin: 0 auto; padding: 42px 16px 70px; }
-        .message { margin-bottom: 14px; padding: 12px; border: 1px solid #c7d7fe; border-radius: 8px; color: #155eef; background: #eff4ff; font-weight: 700; }
-        .panel { border: 1px solid #d0d5dd; border-radius: 6px; background: #fff; padding: 30px; }
-        .row { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; margin-bottom: 18px; align-items: start; }
-        .label { font-weight: 800; color: #101828; }
-        .value { min-height: 38px; border: 1px solid #d0d5dd; border-radius: 6px; background: #f2f4f7; padding: 10px 12px; white-space: pre-wrap; }
-        .content { min-height: 220px; }
-        .meta { color: #667085; font-size: 14px; }
-        .actions { margin-top: 24px; display: flex; justify-content: center; gap: 10px; }
-        .btn { display: inline-block; border: 1px solid #155eef; border-radius: 6px; background: #155eef; color: #fff; padding: 10px 18px; text-decoration: none; font-weight: 700; cursor: pointer; }
-        .btn.gray { border-color: #667085; background: #667085; }
-        .btn.red { border-color: #f04438; background: #f04438; }
-        .admin-footer { height: 96px; background: #777; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .admin-detail-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+        .admin-secondary-btn {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 12px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 850;
+            border: none;
+            cursor: pointer;
+        }
+        .admin-danger-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 850;
+            border: none;
+            cursor: pointer;
+        }
+        .attachment-list { margin: 0; padding-left: 18px; }
     </style>
 </head>
 <body>
-<header class="admin-header">
-    <nav class="admin-nav">
-        <div class="admin-logo">관리자 화면</div>
-        <a href="/admin">회원정보관리</a>
-        <a href="/admin">투자정보관리</a>
-        <a href="/admin/community">커뮤니티관리</a>
-        <a href="/admin">고객문의관리</a>
-        <a class="logout" href="/logout">로그아웃</a>
-    </nav>
-</header>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community" class="active">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
+            <a href="/admin/inquiries">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
 
-<main class="admin-main">
-    <div th:if="${message}" class="message" th:text="${message}"></div>
+    <main class="admin-main">
+        <section class="admin-top">
+            <div>
+                <h1>게시글 확인</h1>
+                <p>커뮤니티 게시글의 상세 내용을 확인합니다.</p>
+            </div>
+        </section>
 
-    <section class="panel">
-        <div class="row">
-            <div class="label">회원 ID</div>
-            <div class="value" th:text="${post.authorId}">1</div>
-        </div>
-        <div class="row">
-            <div class="label">회원 이름</div>
-            <div class="value" th:text="${post.authorName}">작성자</div>
-        </div>
-        <div class="row">
-            <div class="label">게시글 제목</div>
-            <div class="value">
-                <span th:text="${post.title}">제목</span>
-                <span th:if="${post.edited}" class="meta">(수정됨)</span>
+        <section class="admin-detail-card">
+            <div class="detail-header">
+                <div>
+                    <span class="status-badge" th:text="${post.category}">FREE</span>
+                    <h2>
+                        <span th:text="${post.title}">게시글 제목</span>
+                        <span th:if="${post.edited}" class="status-badge answered">수정됨</span>
+                    </h2>
+                </div>
+                <a class="admin-action-btn" href="/admin/community">목록으로</a>
             </div>
-        </div>
-        <div class="row">
-            <div class="label">작성일</div>
-            <div class="value">
-                <span th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">2026-05-28 18:30</span>
-                <span th:if="${post.edited}" class="meta"> · 수정됨</span>
+
+            <div class="detail-info-grid">
+                <div>
+                    <span>게시글 번호</span>
+                    <strong th:text="${post.postId}">1</strong>
+                </div>
+                <div>
+                    <span>작성자 ID</span>
+                    <strong th:text="${post.authorId}">1</strong>
+                </div>
+                <div>
+                    <span>작성자</span>
+                    <strong th:text="${post.authorName}">작성자</strong>
+                </div>
+                <div>
+                    <span>조회수</span>
+                    <strong th:text="${post.viewCount}">0</strong>
+                </div>
+                <div>
+                    <span>테마</span>
+                    <strong th:text="${post.themeName != null ? post.themeName : '-'}">테마</strong>
+                </div>
+                <div>
+                    <span>종목명</span>
+                    <strong th:text="${post.stockName != null ? post.stockName : '-'}">종목명</strong>
+                </div>
+                <div>
+                    <span>종목코드</span>
+                    <strong th:text="${post.stockSymbol != null ? post.stockSymbol : '-'}">종목코드</strong>
+                </div>
+                <div>
+                    <span>작성일</span>
+                    <strong th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</strong>
+                </div>
             </div>
-        </div>
-        <div class="row" th:if="${post.edited}">
-            <div class="label">수정일</div>
-            <div class="value" th:text="${post.updatedAt != null ? #temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm') : '-'}">2026-05-28 18:40</div>
-        </div>
-        <div class="row">
-            <div class="label">내용</div>
-            <div class="value content" th:text="${post.content}">내용</div>
-        </div>
-        <div class="row">
-            <div class="label">첨부파일</div>
-            <div class="value">
-                <span th:if="${#lists.isEmpty(post.attachments)}">첨부파일 없음</span>
-                <ul th:if="${!#lists.isEmpty(post.attachments)}">
+
+            <div class="detail-content-box">
+                <h3>내용</h3>
+                <p th:text="${post.content}">게시글 내용</p>
+            </div>
+
+            <div class="detail-content-box answer">
+                <h3>첨부파일</h3>
+                <p th:if="${#lists.isEmpty(post.attachments)}">첨부파일이 없습니다.</p>
+                <ul th:if="${!#lists.isEmpty(post.attachments)}" class="attachment-list">
                     <li th:each="attachment : ${post.attachments}">
-                        <a th:href="${attachment.attachmentUrl}" th:text="${attachment.attachmentName}" target="_blank">첨부파일</a>
+                        <a th:href="${attachment.attachmentUrl}"
+                           th:text="${attachment.attachmentName}"
+                           target="_blank">첨부파일</a>
                     </li>
                 </ul>
             </div>
-        </div>
 
-        <div class="actions">
-            <a class="btn gray" href="/admin/community">목록으로</a>
-            <a class="btn" th:href="@{/admin/community/posts/{postId}/edit(postId=${post.postId})}">수정</a>
-            <form th:action="@{/admin/community/posts/{postId}/delete(postId=${post.postId})}" method="post"
-                  onsubmit="return confirm('이 게시글을 삭제하시겠습니까?');">
-                <button class="btn red" type="submit">삭제</button>
-            </form>
-        </div>
-    </section>
-</main>
-
-<footer class="admin-footer">Footer 영역</footer>
+            <div class="admin-detail-actions">
+                <a class="admin-secondary-btn" href="/admin/community">목록으로</a>
+                <a class="admin-submit-btn" th:href="@{/admin/community/posts/{postId}/edit(postId=${post.postId})}">수정</a>
+                <form th:action="@{/admin/community/posts/{postId}/delete(postId=${post.postId})}"
+                      method="post"
+                      onsubmit="return confirm('이 게시글을 삭제하시겠습니까?');">
+                    <button class="admin-danger-btn" type="submit">삭제</button>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
 </body>
 </html>

@@ -8,59 +8,7 @@
 </head>
 <body>
 
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">MoneyMate</div>
-
-
-      <nav class="nav">
-        <div class="nav-dropdown">
-          <span class="nav-link disabled-link">MY 자산</span>
-          <div class="dropdown-menu">
-            <a href="/my-asset/financial">내 재무 정보</a>
-            <a href="/my-investment">내 투자 정보</a>
-          </div>
-        </div>
-
-        <div class="nav-dropdown">
-          <span class="nav-link disabled-link">포트폴리오</span>
-          <div class="dropdown-menu">
-            <a href="/rebalancing">리밸런싱</a>
-            <a href="#">포트폴리오 생성</a>
-          </div>
-        </div>
-
-        <a href="/investment-info">투자정보</a>
-        <a href="/community">커뮤니티</a>
-
-        <div class="nav-dropdown">
-          <span class="nav-link disabled-link">고객센터</span>
-          <div class="dropdown-menu">
-            <a href="/customer-center">고객문의</a>
-            <a href="#">공지사항</a>
-          </div>
-        </div>
-      </nav>
-
-    <div class="header-buttons">
-
-      <!-- 로그인 안된 상태 -->
-      <div th:if="${loginUser == null}">
-        <a href="/login" class="login-btn">로그인</a>
-        <a href="/signup" class="join-btn">회원가입</a>
-      </div>
-
-      <!-- 로그인 된 상태 -->
-      <div th:if="${loginUser != null}">
-        <span class="welcome-text" th:text="|${session.loginUser.name}님 환영합니다 👋|">
-        </span>
-        <a href="/mypage" class="mypage-btn">마이페이지</a>
-        <a href="/logout" class="login-btn">로그아웃</a>
-      </div>
-
-    </div>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: globalHeader('home')}"></header>
 
 <main>
   <section class="hero-section">
