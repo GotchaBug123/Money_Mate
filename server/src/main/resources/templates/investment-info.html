@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>투자정보 - MoneyMate</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/investment-info.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">MoneyMate</div>
+        <nav class="nav">
+            <a href="/my-asset">MY 자산</a>
+            <a href="#">포트폴리오</a>
+            <a href="#">리밸런싱</a>
+            <a href="/investment-info" class="nav-current">투자정보</a>
+            <a href="#">커뮤니티</a>
+        </nav>
+        <div class="header-buttons">
+            <span class="welcome-text" th:text="|${session.loginUser.name}님 환영합니다 👋|"></span>
+            <a href="/mypage" class="mypage-btn">마이페이지</a>
+            <a href="/logout" class="login-btn">로그아웃</a>
+        </div>
+    </div>
+</header>
+
+<main class="invest-wrap">
+
+    <!-- ===== 섹션 1: 지수 카드 (실시간 API) ===== -->
+    <!--
+        변경: JS fetch('/api/market/index') → Yahoo Finance 5분봉 실시간 + 스파크라인
+
+        흐름:
+          DOMContentLoaded
+            → loadMarketIndex() 즉시 호출
+              → fetch('/api/market/index')
+                → MarketIndexController
+                  → MarketIndexService → Yahoo Finance API
+                → renderIndexCards(data)
+                  → <canvas> 스파크라인 그리기
+            → setInterval(60초) 자동 갱신
+    -->
+    <section class="index-section" id="indexSection">
+        <!-- JS가 렌더링. 로딩 중 스켈레톤 표시 -->
+        <div class="index-card skeleton"><p class="index-label">로딩 중...</p><p class="index-value">-</p><p class="index-change">-</p></div>
+        <div class="index-card skeleton"><p class="index-label">로딩 중...</p><p class="index-value">-</p><p class="index-change">-</p></div>
+        <div class="index-card skeleton"><p class="index-label">로딩 중...</p><p class="index-value">-</p><p class="index-change">-</p></div>
+        <div class="index-card skeleton"><p class="index-label">로딩 중...</p><p class="index-value">-</p><p class="index-change">-</p></div>
+    </section>
+
+    <script>
+        /* =====================================================
+           시장 지수 카드 실시간 렌더링
+           API: GET /api/market/index  (MarketIndexController)
+           응답: List<MarketIndexDto>
+             - label, name, priceLabel, changeLabel, rise
+             - marketStateLabel, sparkline[]
+           60초마다 자동 갱신
+        ===================================================== */
+
+        const INDEX_API_URL  = '/api/market/index';
+        const INDEX_INTERVAL = 60000; // 60초
+
+        /** API 호출 → 카드 렌더링 */
+        async function loadMarketIndex() {
+            try {
+                const res  = await fetch(INDEX_API_URL);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                renderIndexCards(data);
+            } catch (e) {
+                console.error('[지수카드] 조회 실패:', e);
+            }
+        }
+
+        /** 카드 4개 HTML 생성 + 스파크라인 그리기 */
+        function renderIndexCards(items) {
+            const section = document.getElementById('indexSection');
+            if (!section) return;
+
+            section.innerHTML = items.map((item, idx) => {
+                const riseClass = item.rise ? 'rise' : 'fall';
+                const canvasId  = 'sparkCanvas' + idx;
+                return `
+            <div class="index-card">
+                <div class="index-card-top">
+                    <p class="index-label">${item.label}</p>
+                    <span class="market-state-badge">${item.marketStateLabel || ''}</span>
+                </div>
+                <p class="index-name">${item.name}</p>
+                <p class="index-value">${item.priceLabel || '-'}</p>
+                <p class="index-change ${riseClass}">${item.changeLabel || '-'}</p>
+                <canvas id="${canvasId}" class="sparkline-canvas" width="220" height="55"></canvas>
+            </div>`;
+            }).join('');
+
+            // 카드 렌더 후 스파크라인 그리기
+            items.forEach((item, idx) => {
+                if (item.sparkline && item.sparkline.length > 1) {
+                    drawSparkline('sparkCanvas' + idx, item.sparkline, item.rise);
+                }
+            });
+        }
+
+        /**
+         * HTML Canvas 스파크라인
+         * @param canvasId  canvas 엘리먼트 id
+         * @param data      종가 배열 (null 제거 완료)
+         * @param isRise    상승 여부 (색상)
+         */
+        function drawSparkline(canvasId, data, isRise) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height, pad = 4;
+
+            const min   = Math.min(...data);
+            const max   = Math.max(...data);
+            const range = max - min || 1;
+
+            const points = data.map((v, i) => ({
+                x: pad + (i / (data.length - 1)) * (W - pad * 2),
+                y: H - pad - ((v - min) / range) * (H - pad * 2)
+            }));
+
+            ctx.clearRect(0, 0, W, H);
+
+            const lineColor = isRise ? '#ef4444' : '#3b82f6'; // 한국식: 상승=빨강
+
+            // 채우기 그라데이션
+            const gradient = ctx.createLinearGradient(0, 0, 0, H);
+            gradient.addColorStop(0, isRise ? 'rgba(239,68,68,0.25)' : 'rgba(59,130,246,0.25)');
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, H);
+            ctx.lineTo(points[0].x, points[0].y);
+            points.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.lineTo(points[points.length - 1].x, H);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // 라인
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            points.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth   = 1.8;
+            ctx.lineJoin    = 'round';
+            ctx.stroke();
+        }
+
+        // 페이지 로드 시 즉시 실행 + 60초 자동 갱신
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMarketIndex();
+            setInterval(loadMarketIndex, INDEX_INTERVAL);
+        });
+    </script>
+
+    <!-- ===== 섹션 2: 실시간 차트 ===== -->
+    <section class="chart-section">
+        <div class="chart-top">
+            <h2 class="chart-title">실시간 차트</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="종목명 또는 티커 검색">
+                <button class="search-btn" onclick="doSearch()">검색</button>
+            </div>
+        </div>
+        <div class="tab-bar">
+            <a th:href="@{/investment-info(market='ALL')}" th:class="${selectedMarket == 'ALL'} ? 'tab on' : 'tab'">전체</a>
+            <a th:href="@{/investment-info(market='KR')}" th:class="${selectedMarket == 'KR'} ? 'tab on' : 'tab'">국내</a>
+            <a th:href="@{/investment-info(market='OVERSEAS')}" th:class="${selectedMarket == 'OVERSEAS'} ? 'tab on' : 'tab'">해외</a>
+            <a th:href="@{/investment-info(market='ETF')}" th:class="${selectedMarket == 'ETF'} ? 'tab on' : 'tab'">ETF</a>
+            <div class="sort-area">
+                <button class="sort-btn" id="sortByValue" onclick="sortToggle('tradingValue')">거래대금</button>
+                <button class="sort-btn"    id="sortByVol"   onclick="sortToggle('volume')">거래량</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="asset-table" id="assetTable">
+                <thead>
+                <tr><th>순위</th><th>종목명</th><th>티커</th><th>시장</th><th>현재가</th><th>전일대비</th><th>거래대금</th><th>거래량</th><th>장바구니</th><th>관심</th></tr>
+                </thead>
+                <tbody id="assetTbody">
+                <tr th:each="item, stat : ${assetList}" th:attr="data-name=${item.assetName},data-ticker=${item.ticker},data-market=${item.market},data-trading-value=${item.tradingValue},data-volume=${item.volume},data-price-date=${item.priceDate}">
+                    <td class="td-rank" th:text="${stat.index + 1}">1</td>
+                    <td class="td-name" th:text="${item.assetName}">삼성전자</td>
+                    <td class="td-ticker" th:text="${item.ticker}">005930</td>
+                    <td th:text="${item.market}">KOSPI</td>
+                    <td class="td-price" th:text="${item.closePriceLabel}">75,400원</td>
+                    <td th:class="${item.rise} ? 'rise' : 'fall'" th:text="${item.dailyReturnLabel}">+1.23%</td>
+                    <td th:text="${item.tradingValueLabel}">11,310억</td>
+                    <td th:text="${item.volumeLabel}">15,000,000</td>
+                    <td><button class="icon-btn" th:attr="data-asset-id=${item.assetId},data-asset-name=${item.assetName},data-close-price=${item.closePrice},data-currency=${item.currency}" onclick="addToCart(this)" title="장바구니에 추가">🛒</button></td>
+                    <td><button class="icon-btn watch-btn" th:attr="data-asset-id=${item.assetId},data-asset-name=${item.assetName}" onclick="toggleWatch(this)" title="관심종목 추가/제거">☆</button></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(assetList)}"><td colspan="10" class="no-data">조회된 종목이 없습니다.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===== 섹션 3: 필터 버튼 — 대장주 pill (KakaoTalk 스타일) ===== -->
+    <div class="filter-section-wrap">
+        <button class="filter-arrow filter-arrow-left" onclick="scrollFilter(-1)" aria-label="왼쪽으로">&#8249;</button>
+        <section class="filter-section" id="filterSection">
+            <div class="filter-scroll">
+
+                <!-- 전체 -->
+                <button class="filter-btn on" onclick="filterTheme(this, '')">
+                    <span class="fbtn-icon" style="background:#64748b">전체</span>
+                    <span class="fbtn-label">전체</span>
+                </button>
+
+                <!-- 반도체 대장주: semiList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, '반도체')"
+                        th:if="${semiList != null and !#lists.isEmpty(semiList)}">
+                <span class="fbtn-icon" style="background:#3b82f6"
+                      th:text="${semiList[0].avatarText}">삼성</span>
+                    <span class="fbtn-label" th:text="${semiList[0].assetName}">삼성전자</span>
+                </button>
+
+                <!-- 2차전지 대장주: batteryList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, '2차전지')"
+                        th:if="${batteryList != null and !#lists.isEmpty(batteryList)}">
+                <span class="fbtn-icon" style="background:#22c55e"
+                      th:text="${batteryList[0].avatarText}">LG</span>
+                    <span class="fbtn-label" th:text="${batteryList[0].assetName}">LG에너지솔루션</span>
+                </button>
+
+                <!-- AI·로봇 대장주: aiList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, 'AI')"
+                        th:if="${aiList != null and !#lists.isEmpty(aiList)}">
+                <span class="fbtn-icon" style="background:#a855f7"
+                      th:text="${aiList[0].avatarText}">AI</span>
+                    <span class="fbtn-label" th:text="${aiList[0].assetName}">AI 대장주</span>
+                </button>
+
+                <!-- 바이오 대장주: bioList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, '바이오')"
+                        th:if="${bioList != null and !#lists.isEmpty(bioList)}">
+                <span class="fbtn-icon" style="background:#f97316"
+                      th:text="${bioList[0].avatarText}">삼바</span>
+                    <span class="fbtn-label" th:text="${bioList[0].assetName}">삼성바이오로직스</span>
+                </button>
+
+                <!-- 금융 대장주: finList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, '금융')"
+                        th:if="${finList != null and !#lists.isEmpty(finList)}">
+                <span class="fbtn-icon" style="background:#1e40af"
+                      th:text="${finList[0].avatarText}">KB</span>
+                    <span class="fbtn-label" th:text="${finList[0].assetName}">KB금융</span>
+                </button>
+
+                <!-- 에너지 대장주: energyList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, '에너지')"
+                        th:if="${energyList != null and !#lists.isEmpty(energyList)}">
+                <span class="fbtn-icon" style="background:#eab308"
+                      th:text="${energyList[0].avatarText}">두산</span>
+                    <span class="fbtn-label" th:text="${energyList[0].assetName}">두산에너빌리티</span>
+                </button>
+
+                <!-- 가전·소비재 대장주: consumeList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, '소비재')"
+                        th:if="${consumeList != null and !#lists.isEmpty(consumeList)}">
+                <span class="fbtn-icon" style="background:#ef4444"
+                      th:text="${consumeList[0].avatarText}">소비</span>
+                    <span class="fbtn-label" th:text="${consumeList[0].assetName}">가전·소비재</span>
+                </button>
+
+                <!-- IT 대장주: itList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, 'IT')"
+                        th:if="${itList != null and !#lists.isEmpty(itList)}">
+                <span class="fbtn-icon" style="background:#06b6d4"
+                      th:text="${itList[0].avatarText}">IT</span>
+                    <span class="fbtn-label" th:text="${itList[0].assetName}">IT 대장주</span>
+                </button>
+
+                <!-- ETF 대장주: etfThemeList 1위 종목 -->
+                <button class="filter-btn" onclick="filterTheme(this, 'ETF')"
+                        th:if="${etfThemeList != null and !#lists.isEmpty(etfThemeList)}">
+                <span class="fbtn-icon" style="background:#0f172a"
+                      th:text="${etfThemeList[0].avatarText}">ETF</span>
+                    <span class="fbtn-label" th:text="${etfThemeList[0].assetName}">ETF 특집</span>
+                </button>
+
+            </div>
+        </section>
+        <button class="filter-arrow filter-arrow-right" onclick="scrollFilter(1)" aria-label="오른쪽으로">&#8250;</button>
+    </div>
+
+    <!-- ===== 섹션 4: 테마별 종목 카드 ===== -->
+    <section class="theme-section">
+        <h2 class="section-title">테마별 종목</h2>
+        <div class="theme-grid" id="themeGrid">
+
+            <div class="theme-card" data-sector="반도체">
+                <div class="theme-card-header">
+                    <span class="theme-dot blue"></span>
+                    <span class="theme-card-title">반도체</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${semiList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">삼성</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">삼성전자</p><p class="tl-price" th:text="${item.closePriceLabel}">75,400원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+2.56%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(semiList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="2차전지">
+                <div class="theme-card-header">
+                    <span class="theme-dot green"></span>
+                    <span class="theme-card-title">2차전지</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${batteryList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">LG</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">LG에너지솔루션</p><p class="tl-price" th:text="${item.closePriceLabel}">390,000원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+6.94%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(batteryList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="AI">
+                <div class="theme-card-header">
+                    <span class="theme-dot purple"></span>
+                    <span class="theme-card-title">AI·로봇</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${aiList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">NV</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">NVIDIA</p><p class="tl-price" th:text="${item.closePriceLabel}">$135.00</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+0.49%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(aiList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="바이오">
+                <div class="theme-card-header">
+                    <span class="theme-dot orange"></span>
+                    <span class="theme-card-title">바이오</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${bioList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">셀트</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">셀트리온</p><p class="tl-price" th:text="${item.closePriceLabel}">185,000원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+3.20%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(bioList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="금융">
+                <div class="theme-card-header">
+                    <span class="theme-dot navy"></span>
+                    <span class="theme-card-title">금융</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${finList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">KB</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">KB금융</p><p class="tl-price" th:text="${item.closePriceLabel}">85,000원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+1.50%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(finList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="에너지">
+                <div class="theme-card-header">
+                    <span class="theme-dot yellow"></span>
+                    <span class="theme-card-title">에너지</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${energyList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">SK</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">SK이노베이션</p><p class="tl-price" th:text="${item.closePriceLabel}">120,000원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+2.10%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(energyList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="소비재">
+                <div class="theme-card-header">
+                    <span class="theme-dot coral"></span>
+                    <span class="theme-card-title">가전·소비재</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${consumeList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">삼성</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">삼성전자</p><p class="tl-price" th:text="${item.closePriceLabel}">75,400원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+3.50%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(consumeList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="IT">
+                <div class="theme-card-header">
+                    <span class="theme-dot teal"></span>
+                    <span class="theme-card-title">IT</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${itList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">카카</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">카카오</p><p class="tl-price" th:text="${item.closePriceLabel}">52,000원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+1.80%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(itList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+            <div class="theme-card" data-sector="ETF">
+                <div class="theme-card-header">
+                    <span class="theme-dot dark"></span>
+                    <span class="theme-card-title">ETF 특집</span>
+                    <span class="theme-card-sub">1개월 수익률</span>
+                </div>
+                <ul class="theme-list">
+                    <li th:each="item, stat : ${etfThemeList}" class="tl-clickable" th:attr="data-ticker=${item.ticker},data-market=${item.market},data-close-price=${item.closePrice},data-currency=${item.currency},data-asset-name=${item.assetName}" onclick="openThemeDetail(this.closest('.theme-card'))">
+                        <span class="tl-rank" th:text="${stat.index + 1}">1</span>
+                        <div class="tl-avatar" th:text="${item.avatarText}">KO</div>
+                        <div class="tl-info"><p class="tl-name" th:text="${item.assetName}">KODEX 200</p><p class="tl-price" th:text="${item.closePriceLabel}">35,000원</p></div>
+                        <span th:class="${item.monthlyRise} ? 'tl-pct up' : 'tl-pct down'" th:text="${item.monthlyReturnLabel}">+2.30%</span>
+                    </li>
+                    <li th:if="${#lists.isEmpty(etfThemeList)}" class="tl-empty">데이터 없음</li>
+                </ul>
+                <button class="theme-more-btn" onclick="openThemeDetail(this.closest('.theme-card'))">자세히 보기</button>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ===== 섹션 5: 배당금 TOP 6 (실시간 API) ===== -->
+    <section class="dividend-section">
+        <div class="div-section-header">
+            <h2 class="section-title">배당금이 포함된 주식</h2>
+            <div class="div-meta">
+                <span class="div-refresh-badge" id="divRefreshBadge">⏳ 로딩 중...</span>
+                <button class="div-refresh-btn" onclick="loadDividendTop6()" title="지금 새로고침">↻ 새로고침</button>
+            </div>
+        </div>
+        <div class="dividend-grid">
+            <!-- 국내 -->
+            <div class="dividend-card">
+                <p class="div-card-title">국내</p>
+                <ul class="div-list" id="divListKorean">
+                    <li class="div-loading">불러오는 중...</li>
+                </ul>
+            </div>
+            <!-- 해외 -->
+            <div class="dividend-card">
+                <p class="div-card-title">해외</p>
+                <ul class="div-list" id="divListOverseas">
+                    <li class="div-loading">불러오는 중...</li>
+                </ul>
+            </div>
+            <!-- ETF -->
+            <div class="dividend-card">
+                <p class="div-card-title">ETF</p>
+                <ul class="div-list" id="divListEtf">
+                    <li class="div-loading">불러오는 중...</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        /* =====================================================
+           배당금 TOP 6 실시간 API 연동
+           - GET /api/dividend/top6 호출
+           - asset 마스터 DB에서 market + asset_type 필터링
+             국내  : market IN ('KOSPI','KOSDAQ') & asset_type='STOCK'
+             해외  : market IN ('NYSE','NASDAQ')  & asset_type='STOCK'
+             ETF   : asset_type='ETF'
+           - 30초마다 자동 갱신
+        ===================================================== */
+
+        const DIV_API_URL    = '/api/dividend/top6';
+        const DIV_INTERVAL   = 30000; // 30초
+        let   divTimerId     = null;
+
+        /** API 호출 → DOM 렌더링 */
+        async function loadDividendTop6() {
+            const badge = document.getElementById('divRefreshBadge');
+            if (badge) badge.textContent = '⏳ 갱신 중...';
+
+            try {
+                const res  = await fetch(DIV_API_URL);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                renderDivList('divListKorean',   data.korean   || []);
+                renderDivList('divListOverseas',  data.overseas || []);
+                renderDivList('divListEtf',       data.etf      || []);
+
+                if (badge) {
+                    badge.textContent = '✅ ' + (data.updatedAt || new Date().toLocaleTimeString()) + ' 기준';
+                }
+            } catch (e) {
+                console.error('[배당 TOP6] 조회 실패:', e);
+                ['divListKorean', 'divListOverseas', 'divListEtf'].forEach(id => {
+                    const ul = document.getElementById(id);
+                    if (ul) ul.innerHTML = '<li class="div-error">데이터를 불러올 수 없습니다.</li>';
+                });
+                if (badge) badge.textContent = '⚠️ 오류 발생';
+            }
+        }
+
+        /** 종목 리스트 ul 렌더링 */
+        function renderDivList(ulId, items) {
+            const ul = document.getElementById(ulId);
+            if (!ul) return;
+
+            if (!items || items.length === 0) {
+                ul.innerHTML = '<li class="div-empty">데이터 없음</li>';
+                return;
+            }
+
+            ul.innerHTML = items.map((item, idx) => {
+                const returnLabel = item.monthlyReturnLabel || '-';
+                const isUp        = returnLabel.startsWith('+');
+                const isDown      = returnLabel.startsWith('-');
+                const yieldClass  = isUp ? 'div-yield up' : isDown ? 'div-yield down' : 'div-yield';
+                const rank        = idx + 1;
+
+                return `
+                <li>
+                    <span class="div-rank">${rank}</span>
+                    <span class="div-name">${item.assetName || '-'}</span>
+                    <span class="${yieldClass}">${returnLabel}</span>
+                </li>`;
+            }).join('');
+        }
+
+        /** 30초마다 자동 갱신 시작 */
+        function startDivAutoRefresh() {
+            loadDividendTop6(); // 최초 즉시 호출
+            divTimerId = setInterval(loadDividendTop6, DIV_INTERVAL);
+        }
+
+        // 페이지 로드 시 자동 시작
+        document.addEventListener('DOMContentLoaded', startDivAutoRefresh);
+    </script>
+
+    </section>
+
+</main>
+
+<div id="modal" class="modal-bg" style="display:none;" onclick="closeModalBg(event)">
+    <div class="modal-box">
+        <div class="modal-panel"><p class="modal-panel-title">투자 종목</p><div class="modal-body" id="cartBody"><p class="modal-empty">선택한 종목이 없습니다.</p></div><div class="modal-footer"><button class="modal-btn buy" onclick="alertAction('매수')">주식 사기</button><button class="modal-btn sell" onclick="alertAction('매도')">주식 팔기</button></div></div>
+        <div class="modal-panel"><p class="modal-panel-title">관심 종목</p><div class="modal-body" id="watchBody"><p class="modal-empty">관심 종목이 없습니다.</p></div><div class="modal-footer"><button class="modal-btn close-btn" onclick="closeModal()">관심 종목 닫기</button></div></div>
+    </div>
+</div>
+
+<div id="themeDetailModal" class="modal-bg" style="display:none;" onclick="closeThemeDetailBg(event)">
+    <div class="theme-detail-box">
+        <div class="tdm-header">
+            <span class="theme-dot" id="tdmDot"></span>
+            <span id="tdmTitle" class="tdm-title-text"></span>
+            <span class="tdm-sub">1개월 수익률</span>
+            <button class="tdm-close" onclick="closeThemeDetail()">✕</button>
+        </div>
+        <ul id="tdmList" class="tdm-list"></ul>
+        <div class="tdm-footer">
+            <button class="tdm-add-all-btn" onclick="selectAllThemeItems()">한번에 담기</button>
+            <button class="tdm-add-now-btn" onclick="addThemeItems()">바로 담기</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer"><p>© 2025 MoneyMate | 버그잡아조 팀</p></footer>
+<script src="/js/investment-info.js"></script>
+</body>
+</html>

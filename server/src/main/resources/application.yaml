@@ -5,14 +5,14 @@ spring:
 
 
   datasource:
-    url: jdbc:mysql://localhost:3307/moneymate_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/moneymate_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
     username: moneymate_user
     password: qwer1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update # validate를 update로  변경
     show-sql: true
     properties:
       hibernate:
