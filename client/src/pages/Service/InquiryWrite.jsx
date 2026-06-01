@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import './InquiryWrite.css';
+import styles from './InquiryWrite.module.css';
 
 function InquiryWrite() {
     const navigate = useNavigate();
@@ -36,68 +36,73 @@ function InquiryWrite() {
     };
 
     return (
-        <div className="container inquiry-write-wrapper">
-            <div className="inquiry-write-container">
+        <div className={styles.pageWrapper}>
+            <div className={styles.container}>
+                <div className={styles.card}>
+                    <h2 className={styles.title}>고객센터 문의하기</h2>
 
-                <h2 className="inquiry-write-title">고객센터 문의하기</h2>
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        {/* 1. 제목 입력 */}
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>제목</label>
+                            <input
+                                type="text"
+                                name="title"
+                                placeholder="문의 제목을 입력해주세요"
+                                value={formData.title}
+                                onChange={handleChange}
+                                className={styles.input}
+                            />
+                        </div>
 
-                <form onSubmit={handleSubmit} className="inquiry-form">
+                        {/* 2. 문의 유형 선택 (Select) */}
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>문의 유형</label>
+                            <select
+                                name="type"
+                                value={formData.type}
+                                onChange={handleChange}
+                                className={`${styles.input} ${styles.select}`}
+                            >
+                                <option value="" disabled>문의 유형 선택</option>
+                                <option value="account">계정/로그인 문의</option>
+                                <option value="service">서비스 이용 문의</option>
+                                <option value="error">오류 신고</option>
+                                <option value="other">기타</option>
+                            </select>
+                        </div>
 
-                    {/* 1. 제목 입력 */}
-                    <input
-                        type="text"
-                        name="title"
-                        placeholder="제목"
-                        value={formData.title}
-                        onChange={handleChange}
-                        className="inquiry-input"
-                    />
+                        {/* 3. 문의 내용 입력 (Textarea) */}
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>문의 내용</label>
+                            <textarea
+                                name="content"
+                                placeholder="문의하실 내용을 상세히 적어주세요."
+                                value={formData.content}
+                                onChange={handleChange}
+                                className={`${styles.input} ${styles.textarea}`}
+                            />
+                        </div>
 
-                    {/* 2. 문의 유형 선택 (Select) */}
-                    <select
-                        name="type"
-                        value={formData.type}
-                        onChange={handleChange}
-                        className="inquiry-input inquiry-select"
-                    >
-                        <option value="" disabled>문의 유형 선택</option>
-                        <option value="account">계정/로그인 문의</option>
-                        <option value="service">서비스 이용 문의</option>
-                        <option value="error">오류 신고</option>
-                        <option value="other">기타</option>
-                    </select>
+                        {/* 4. 파일 첨부 */}
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>첨부 파일 (선택)</label>
+                            <div className={styles.fileWrapper}>
+                                <input
+                                    type="file"
+                                    name="file"
+                                    onChange={handleChange}
+                                    className={styles.fileInput}
+                                />
+                            </div>
+                        </div>
 
-                    {/* 3. 문의 내용 입력 (Textarea) - 와이어프레임의 오타 수정 반영 */}
-                    <textarea
-                        name="content"
-                        placeholder="문의 내용"
-                        value={formData.content}
-                        onChange={handleChange}
-                        className="inquiry-input inquiry-textarea"
-                    />
-
-                    {/* 4. 파일 첨부 */}
-                    <div className="inquiry-file-wrapper">
-                        <input
-                            type="file"
-                            name="file"
-                            onChange={handleChange}
-                            className="inquiry-file-input"
-                        />
-                    </div>
-
-                    {/* 5. 문의 등록 버튼 */}
-                    <div className="inquiry-submit-wrapper">
-                        <button
-                            type="submit"
-                            className="inquiry-submit-btn"
-                        >
-                            문의 등록
+                        {/* 5. 문의 등록 버튼 */}
+                        <button type="submit" className={styles.submitBtn}>
+                            문의 등록하기
                         </button>
-                    </div>
-
-                </form>
-
+                    </form>
+                </div>
             </div>
         </div>
     );

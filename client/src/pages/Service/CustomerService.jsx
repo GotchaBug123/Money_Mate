@@ -1,17 +1,17 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import './CustomerService.css';
+import styles from './CustomerService.module.css'; // 💡 올바른 모듈 CSS 불러오기 방식
 
 function CustomerService() {
     const navigate = useNavigate();
 
     return (
-        <div className="container cs-wrapper">
-            <div className="cs-container">
+        <div className={styles.pageWrapper}>
+            <div className={styles.container}>
 
                 {/* 1. 공지사항 (전체 너비) */}
                 <div
-                    className="cs-card notice"
+                    className={`${styles.card} ${styles.notice}`}
                     onClick={() => alert('공지사항 페이지로 이동합니다.')}
                 >
                     공지사항
@@ -19,39 +19,39 @@ function CustomerService() {
 
                 {/* 2. 자주하는 질문 (전체 너비, 약간 더 높게) */}
                 <div
-                    className="cs-card faq"
+                    className={`${styles.card} ${styles.faq}`}
                     onClick={() => alert('FAQ 페이지로 이동합니다.')}
                 >
                     자주하는 질문(FAQ) 8개
                 </div>
 
                 {/* 3. 반반 분할 영역 (주식 준비 & 고객의 소리) */}
-                <div className="cs-split-row">
+                <div className={styles.splitRow}>
                     <div
-                        className="cs-card split"
+                        className={`${styles.card} ${styles.splitCard}`}
                         onClick={() => alert('주식 준비 가이드로 이동합니다.')}
                     >
                         주식 준비 step 5단계
                     </div>
                     <div
-                        className="cs-card split"
+                        className={`${styles.card} ${styles.splitCard}`}
                         onClick={() => alert('고객의 소리 페이지로 이동합니다.')}
                     >
                         고객의 소리
                     </div>
                 </div>
 
-                {/* 4. 하단 버튼 영역 (내 문의내역 & 문의하기 버튼 나란히 배치) */}
-                <div className="cs-button-group">
+                {/* 4. 하단 버튼 영역 */}
+                <div className={styles.btnGroup}>
                     <button
                         onClick={() => navigate('/inquiry-list')}
-                        className="cs-btn history"
+                        className={`${styles.btn} ${styles.historyBtn}`}
                     >
                         내 문의내역
                     </button>
                     <button
                         onClick={() => navigate('/inquiry-write')}
-                        className="cs-btn write"
+                        className={`${styles.btn} ${styles.writeBtn}`}
                     >
                         문의하기
                     </button>

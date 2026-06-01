@@ -1,0 +1,209 @@
+/* src/pages/InquiryList.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin: 0;
+}
+
+/* 상단 요약 통계 카드 (팀원들 스타일 차용) */
+.summaryCard {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    overflow: hidden;
+}
+
+.statItem {
+    flex: 1;
+    padding: 24px;
+    text-align: center;
+    border-right: 1.5px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statItem:last-child {
+    border-right: none;
+}
+
+.statLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+}
+
+/* 통계 텍스트 강조 색상 */
+.textWarning {
+    color: #B47D0C;
+}
+
+.textSuccess {
+    color: #1A7A45;
+}
+
+/* 테이블 영역 카드 */
+.tableCard {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.th {
+    padding: 18px 16px;
+    background: #f8f9fb;
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
+    text-align: center;
+    border-bottom: 1.5px solid #e8eaf0;
+}
+
+/* 열 너비 지정 */
+.colId {
+    width: 10%;
+}
+
+.colType {
+    width: 20%;
+}
+
+.colTitle {
+    width: 40%;
+    text-align: left;
+}
+
+.colDate {
+    width: 15%;
+}
+
+.colStatus {
+    width: 15%;
+}
+
+.td {
+    padding: 18px 16px;
+    font-size: 14px;
+    color: #1a1a2e;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+/* 마지막 행 테두리 제거 */
+.table tbody tr:last-child .td {
+    border-bottom: none;
+}
+
+.tdTitle {
+    text-align: left;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.tdTitle:hover {
+    color: #1B5ED9;
+}
+
+/* 💡 동적 상태 배지(Badge) 스타일 */
+.statusBadge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.statusCompleted {
+    background: #EDFAF4;
+    color: #1A7A45;
+}
+
+.statusPending {
+    background: #FAEEDA;
+    color: #B47D0C;
+}
+
+/* 빈 상태 */
+.emptyRow {
+    padding: 60px 20px;
+    text-align: center;
+    color: #bbb;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* 하단 영역 (페이지네이션 및 버튼) */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.pagination {
+    padding: 10px 24px;
+    background: #fff;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pagination:hover {
+    background: #f8f9fb;
+}
+
+.writeBtn {
+    padding: 14px 32px;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.writeBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}

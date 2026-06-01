@@ -1,0 +1,131 @@
+/* src/pages/InquiryWrite.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 메인 폼 카드 */
+.card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin: 0 0 32px 0;
+}
+
+/* 폼 영역 (세로 배치) */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+/* 공통 입력창 스타일 */
+.input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.input:focus {
+    border-color: #1B5ED9;
+}
+
+.input::placeholder {
+    color: #bbb;
+}
+
+/* Select 특화 스타일 */
+.select {
+    cursor: pointer;
+    appearance: auto;
+}
+
+/* Textarea 특화 스타일 */
+.textarea {
+    min-height: 240px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* 파일 첨부 영역 스타일 (모던한 점선 박스) */
+.fileWrapper {
+    border: 1.5px dashed #e8eaf0;
+    border-radius: 10px;
+    padding: 24px;
+    background-color: #f8f9fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.fileWrapper:hover {
+    border-color: #1B5ED9;
+    background-color: #EAF2FC;
+}
+
+.fileInput {
+    font-size: 14px;
+    color: #888;
+    cursor: pointer;
+}
+
+/* 문의 등록 버튼 */
+.submitBtn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 16px;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.submitBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}

@@ -1,0 +1,97 @@
+/* src/pages/CustomerService.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 4개의 사각형 영역에 적용될 공통 카드 스타일 */
+.card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    color: #1B5ED9;
+}
+
+/* 개별 카드 높이 */
+.notice {
+    height: 100px;
+}
+
+.faq {
+    height: 160px;
+}
+
+/* 반반 분할 영역 */
+.splitRow {
+    display: flex;
+    gap: 20px;
+}
+
+.splitCard {
+    flex: 1;
+    height: 200px;
+}
+
+/* 하단 버튼 영역 */
+.btnGroup {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.historyBtn {
+    background: #f8f9fb;
+    color: #555;
+    border: 1.5px solid #e8eaf0;
+}
+
+.historyBtn:hover {
+    background: #e8eaf0;
+}
+
+.writeBtn {
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+}
+
+.writeBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}
