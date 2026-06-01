@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import './InquiryList.css';
 
 function InquiryList() {
     const navigate = useNavigate();
@@ -15,69 +16,45 @@ function InquiryList() {
     const pendingCount = inquiries.filter(item => item.status === '답변대기').length;
     const completedCount = inquiries.filter(item => item.status === '답변완료').length;
 
-    // 테이블 공통 스타일
-    const thStyle = {
-        padding: '16px',
-        borderBottom: '2px solid var(--border-color)',
-        textAlign: 'center',
-        fontWeight: 'bold'
-    };
-    const tdStyle = {
-        padding: '16px',
-        borderBottom: '1px solid var(--border-color)',
-        textAlign: 'center',
-        color: 'var(--text-main)'
-    };
-
     return (
-        <div className="container" style={{display: 'flex', justifyContent: 'center', padding: '60px 20px'}}>
-            <div style={{width: '100%', maxWidth: '900px', display: 'flex', flexDirection: 'column', gap: '32px'}}>
+        <div className="container inquiry-list-wrapper">
+            <div className="inquiry-list-container">
 
-                <h2 style={{textAlign: 'center', color: 'var(--text-main)', margin: 0}}>나의 문의 내역</h2>
+                <h2 className="inquiry-list-title">나의 문의 내역</h2>
 
                 {/* 상단: 나의 문의 현황 요약 박스 */}
-                <div style={{
-                    padding: '20px',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '4px',
-                    backgroundColor: 'white',
-                    fontWeight: 'bold',
-                    fontSize: '16px'
-                }}>
+                <div className="inquiry-summary-box">
                     나의 문의 현황: [전체 {totalCount}] [답변대기 {pendingCount}] [답변완료 {completedCount}]
                 </div>
 
                 {/* 중단: 문의 내역 테이블 */}
-                <table style={{width: '100%', borderCollapse: 'collapse', backgroundColor: 'white'}}>
+                <table className="inquiry-table">
                     <thead>
                     <tr>
-                        <th style={{...thStyle, width: '10%'}}>번호</th>
-                        <th style={{...thStyle, width: '20%'}}>유형</th>
-                        <th style={{...thStyle, width: '40%', textAlign: 'left'}}>제목</th>
-                        <th style={{...thStyle, width: '15%'}}>날짜</th>
-                        <th style={{...thStyle, width: '15%'}}>상태</th>
+                        <th className="inquiry-th th-id">번호</th>
+                        <th className="inquiry-th th-type">유형</th>
+                        <th className="inquiry-th th-title">제목</th>
+                        <th className="inquiry-th th-date">날짜</th>
+                        <th className="inquiry-th th-status">상태</th>
                     </tr>
                     </thead>
                     <tbody>
                     {inquiries.length > 0 ? (
                         inquiries.map((inquiry) => (
                             <tr key={inquiry.id}>
-                                <td style={tdStyle}>{inquiry.id}</td>
-                                <td style={tdStyle}>{inquiry.type}</td>
-                                <td style={{...tdStyle, textAlign: 'left', cursor: 'pointer'}}>{inquiry.title}</td>
-                                <td style={tdStyle}>{inquiry.date}</td>
-                                <td style={{
-                                    ...tdStyle,
-                                    color: inquiry.status === '답변완료' ? 'var(--primary-color)' : '#F97316',
-                                    fontWeight: '500'
-                                }}>
+                                <td className="inquiry-td">{inquiry.id}</td>
+                                <td className="inquiry-td">{inquiry.type}</td>
+                                <td className="inquiry-td td-title">{inquiry.title}</td>
+                                <td className="inquiry-td">{inquiry.date}</td>
+                                {/* 💡 조건부 클래스로 상태별 색상 적용 */}
+                                <td className={`inquiry-td td-status ${inquiry.status === '답변완료' ? 'status-completed' : 'status-pending'}`}>
                                     {inquiry.status}
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="5" style={{padding: '40px', textAlign: 'center', color: 'var(--text-muted)'}}>
+                            <td colSpan="5" className="empty-row">
                                 문의 내역이 없습니다.
                             </td>
                         </tr>
@@ -86,33 +63,19 @@ function InquiryList() {
                 </table>
 
                 {/* 하단: 페이지네이션 및 새 문의 작성 버튼 */}
-                <div
-                    style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px'}}>
+                <div className="inquiry-footer">
                     {/* 와이어프레임의 임시 페이지네이션 모양 */}
-                    <div style={{
-                        padding: '8px 24px',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '4px',
-                        backgroundColor: 'white'
-                    }}>
+                    <div className="pagination-mock">
                         &gt; 1 &lt;
                     </div>
 
                     <button
                         onClick={() => navigate('/inquiry-write')}
-                        style={{
-                            padding: '12px 32px',
-                            border: '1px solid var(--border-color)',
-                            backgroundColor: 'white',
-                            borderRadius: '4px',
-                            fontSize: '16px',
-                            cursor: 'pointer'
-                        }}
+                        className="new-inquiry-btn"
                     >
                         새 문의 작성
                     </button>
                 </div>
-
             </div>
         </div>
     );

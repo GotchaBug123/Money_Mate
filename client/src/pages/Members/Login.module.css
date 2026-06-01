@@ -1,0 +1,112 @@
+/* src/pages/Login.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px); /* 헤더 제외 높이 */
+    background: #f4f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* 메인 로그인 카드 */
+.loginCard {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04); /* 부드러운 입체감 */
+}
+
+/* 타이틀 */
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin: 0 0 40px 0;
+}
+
+/* 폼 영역 */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.input {
+    padding: 14px 16px;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.input:focus {
+    border-color: #1B5ED9; /* 포커스 시 메인 컬러(파란색) 하이라이트 */
+}
+
+.input::placeholder {
+    color: #bbb;
+}
+
+/* 로그인 버튼 */
+.submitBtn {
+    margin-top: 12px;
+    padding: 16px;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.submitBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}
+
+/* 하단 3개 버튼 (아이디 찾기, 비밀번호 찾기, 회원가입) 영역 */
+.bottomLinks {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.linkBtn {
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    background: #f8f9fb;
+    color: #555;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.linkBtn:hover {
+    background: #E8F0FE; /* 팀원들의 버튼 호버 스타일 (연한 파란색 배경) */
+    color: #1B5ED9;
+}

@@ -1,0 +1,164 @@
+/* src/pages/FindId.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* 메인 카드 */
+.findIdCard {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+/* 타이틀 */
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin: 0 0 32px 0;
+}
+
+/* 폼 영역 (세로 배치) */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.input {
+    padding: 14px 16px;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: #1B5ED9;
+}
+
+.input::placeholder {
+    color: #bbb;
+}
+
+/* 인증번호 입력 & 확인 버튼을 나란히 두기 위한 래퍼 */
+.verifyRow {
+    display: flex;
+    gap: 8px;
+}
+
+.verifyInput {
+    flex: 1;
+    padding: 14px 16px;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s ease;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.verifyInput:focus {
+    border-color: #1B5ED9;
+}
+
+.verifyBtn {
+    padding: 0 20px;
+    background: #f8f9fb;
+    color: #1B5ED9;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.verifyBtn:hover {
+    background: #E8F0FE;
+    border-color: #1B5ED9;
+}
+
+/* 아이디 결과 출력 박스 */
+.resultBox {
+    margin-top: 24px;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* 결과 출력 상태에 따른 디자인 변화 */
+.resultSuccess {
+    background: #EAF2FC;
+    color: #1B5ED9;
+    border: 1.5px solid #1B5ED9; /* 성공 시 파란 테두리 */
+}
+
+.resultEmpty {
+    background: #f8f9fb;
+    color: #888;
+    border: 1.5px dashed #e8eaf0; /* 대기 중일 땐 연한 점선 테두리 */
+}
+
+/* 하단 이동 버튼 (비밀번호 찾기, 회원가입) */
+.bottomLinks {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.linkBtn {
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    background: #f8f9fb;
+    color: #555;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.linkBtn:hover {
+    background: #E8F0FE;
+    color: #1B5ED9;
+}

@@ -1,0 +1,85 @@
+/* src/pages/SignUpComplete.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* 메인 카드 (다른 인증 페이지들과 너비 통일) */
+.card {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 60px 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+/* 축하 일러스트(이모지) 영역 */
+.illust {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 8px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 환영 메시지 타이틀 */
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a2e;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.highlight {
+    color: #1B5ED9;
+}
+
+/* 서브 설명 */
+.desc {
+    font-size: 15px;
+    color: #888;
+    margin: 0;
+}
+
+/* 완료 버튼 */
+.submitBtn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 16px;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.submitBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import './InquiryWrite.css';
 
 function InquiryWrite() {
     const navigate = useNavigate();
@@ -34,24 +35,13 @@ function InquiryWrite() {
         navigate('/customer-service'); // 등록 완료 후 고객센터 메인으로 복귀
     };
 
-    // 공통 입력창 스타일
-    const inputStyle = {
-        width: '100%',
-        padding: '16px',
-        border: '1px solid var(--border-color)',
-        borderRadius: '4px',
-        fontSize: '16px',
-        boxSizing: 'border-box',
-        backgroundColor: 'white'
-    };
-
     return (
-        <div className="container" style={{display: 'flex', justifyContent: 'center', padding: '60px 20px'}}>
-            <div style={{width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '24px'}}>
+        <div className="container inquiry-write-wrapper">
+            <div className="inquiry-write-container">
 
-                <h2 style={{textAlign: 'center', marginBottom: '24px', color: 'var(--text-main)'}}>고객센터 문의하기</h2>
+                <h2 className="inquiry-write-title">고객센터 문의하기</h2>
 
-                <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                <form onSubmit={handleSubmit} className="inquiry-form">
 
                     {/* 1. 제목 입력 */}
                     <input
@@ -60,7 +50,7 @@ function InquiryWrite() {
                         placeholder="제목"
                         value={formData.title}
                         onChange={handleChange}
-                        style={inputStyle}
+                        className="inquiry-input"
                     />
 
                     {/* 2. 문의 유형 선택 (Select) */}
@@ -68,7 +58,7 @@ function InquiryWrite() {
                         name="type"
                         value={formData.type}
                         onChange={handleChange}
-                        style={{...inputStyle, cursor: 'pointer', appearance: 'auto'}}
+                        className="inquiry-input inquiry-select"
                     >
                         <option value="" disabled>문의 유형 선택</option>
                         <option value="account">계정/로그인 문의</option>
@@ -83,38 +73,24 @@ function InquiryWrite() {
                         placeholder="문의 내용"
                         value={formData.content}
                         onChange={handleChange}
-                        style={{...inputStyle, minHeight: '300px', resize: 'vertical'}}
+                        className="inquiry-input inquiry-textarea"
                     />
 
                     {/* 4. 파일 첨부 */}
-                    <div style={{
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '4px',
-                        padding: '16px',
-                        backgroundColor: 'white',
-                        display: 'flex',
-                        alignItems: 'center'
-                    }}>
+                    <div className="inquiry-file-wrapper">
                         <input
                             type="file"
                             name="file"
                             onChange={handleChange}
-                            style={{fontSize: '16px', color: 'var(--text-muted)'}}
+                            className="inquiry-file-input"
                         />
                     </div>
 
                     {/* 5. 문의 등록 버튼 */}
-                    <div style={{display: 'flex', justifyContent: 'center', marginTop: '24px'}}>
+                    <div className="inquiry-submit-wrapper">
                         <button
                             type="submit"
-                            style={{
-                                padding: '16px 60px',
-                                border: '1px solid var(--border-color)',
-                                backgroundColor: 'white',
-                                borderRadius: '4px',
-                                fontSize: '18px',
-                                cursor: 'pointer'
-                            }}
+                            className="inquiry-submit-btn"
                         >
                             문의 등록
                         </button>

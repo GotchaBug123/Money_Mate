@@ -1,0 +1,180 @@
+/* src/pages/SignUp.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+/* 메인 카드 */
+.card {
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+/* 타이틀 */
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin: 0 0 32px 0;
+}
+
+/* 폼 영역 */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 이름 & 생년월일 2단 그리드 */
+.halfRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+/* 입력 필드 기본 */
+.input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: #1B5ED9;
+}
+
+.input::placeholder {
+    color: #bbb;
+}
+
+/* 인풋 + 우측 버튼 조합 행 */
+.actionRow {
+    display: flex;
+    gap: 8px;
+}
+
+.actionBtn {
+    padding: 0 20px;
+    background: #f8f9fb;
+    color: #1B5ED9;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+    background: #E8F0FE;
+    border-color: #1B5ED9;
+}
+
+/* 조건 검증 상태창 (모던 뱃지 스타일) */
+.statusBox {
+    margin-top: 4px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.statusSuccess {
+    background: #EDFAF4;
+    color: #1A7A45;
+    border: 1.5px solid #1A7A45;
+}
+
+.statusWarning {
+    background: #FAEEDA;
+    color: #B47D0C;
+    border: 1.5px solid #B47D0C;
+}
+
+.statusError {
+    background: #FFF0EE;
+    color: #C0392B;
+    border: 1.5px solid #C0392B;
+}
+
+/* 약관 동의 영역 */
+.termsBox {
+    margin-top: 12px;
+    padding: 16px;
+    background: #f8f9fb;
+    border-radius: 10px;
+    border: 1.5px solid #e8eaf0;
+    display: flex;
+    justify-content: center;
+}
+
+.termsLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.termsCheckbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #1B5ED9;
+    cursor: pointer;
+}
+
+/* 가입 완료 버튼 */
+.submitBtn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 16px;
+    background: #1B5ED9;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.submitBtn:hover {
+    background: #1449b0;
+    transform: translateY(-1px);
+}

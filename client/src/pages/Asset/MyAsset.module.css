@@ -1,0 +1,183 @@
+/* src/pages/MyAsset.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 상단 이동 링크 */
+.topNavWrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.topNavLink {
+    padding: 10px 20px;
+    background: #fff;
+    color: #555;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.topNavLink:hover {
+    background: #f8f9fb;
+    color: #1a1a2e;
+}
+
+/* 페이지 타이틀 */
+.pageTitle {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin: 0 0 8px 0;
+}
+
+/* 1. 재무 평가 점수 카드 */
+.scoreCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.scoreLabel {
+    font-size: 15px;
+    color: #888;
+    font-weight: 600;
+}
+
+.scoreValue {
+    font-size: 36px;
+    font-weight: 800;
+    color: #1B5ED9;
+}
+
+/* 2. 차트 영역 (점선 플레이스홀더 디자인) */
+.chartCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #bbb;
+    border: 2px dashed #e8eaf0;
+}
+
+/* 3. 필터 버튼 그룹 */
+.filterGroup {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filterBtn {
+    padding: 10px 20px;
+    background: #fff;
+    color: #555;
+    border: 1.5px solid #e8eaf0;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+    background: #EAF2FC;
+    border-color: #1B5ED9;
+    color: #1B5ED9;
+}
+
+/* 4. 하단 재무 요약 정보 카드 */
+.summaryCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* 투자 가능 금액 (상단) */
+.investableRow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 32px;
+    border-bottom: 1.5px solid #f0f0f0;
+}
+
+.investableLabel {
+    font-size: 16px;
+    font-weight: 600;
+    color: #888;
+}
+
+.investableValue {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a2e;
+}
+
+/* 4개 항목 2단 Grid */
+.summaryGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 16px;
+    column-gap: 24px;
+}
+
+.gridItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #f8f9fb;
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gridItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.gridLabel {
+    font-size: 14px;
+    color: #555;
+    font-weight: 600;
+}
+
+.gridValue {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+}

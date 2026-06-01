@@ -1,0 +1,129 @@
+/* src/pages/MyPage.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: #f4f6fb;
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    gap: 24px;
+}
+
+/* 왼쪽: 회원 정보 수정 패널 */
+.leftPanel {
+    flex: 1;
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    min-height: 500px;
+}
+
+.sectionTitle {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0 0 24px 0;
+}
+
+.infoContent {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* 오른쪽: 프로필 및 진단 정보 영역 */
+.rightPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 우측 상단 프로필 카드 */
+.profileCard {
+    align-self: flex-end;
+    min-width: 200px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    text-align: center;
+}
+
+.profileTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    margin: 0 0 8px 0;
+}
+
+.profileTier {
+    color: #1B5ED9;
+    font-weight: 800;
+    font-size: 24px;
+    margin: 0;
+}
+
+/* 4개의 네모 박스 그리드 */
+.financeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex: 1;
+}
+
+.financeCard {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.financeCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.financeTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    margin: 0 0 12px 0;
+}
+
+/* 수치 텍스트 공통 및 사이즈별 스타일 */
+.financeValue {
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.large {
+    font-size: 28px;
+}
+
+.medium {
+    font-size: 24px;
+}
+
+.small {
+    font-size: 20px;
+}
+
+/* 특정 텍스트 색상 강조용 (메인 컬러) */
+.primary {
+    color: #1B5ED9;
+}

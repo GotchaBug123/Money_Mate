@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
+import styles from './Login.module.css';
 
 function Login() {
     const [id, setId] = useState('');
@@ -19,95 +20,53 @@ function Login() {
     };
 
     return (
-        <div className="container" style={{display: 'flex', justifyContent: 'center', padding: '80px 20px'}}>
-            <div className="card" style={{width: '100%', maxWidth: '500px', padding: '40px'}}>
-                <h2 style={{textAlign: 'center', marginBottom: '40px', color: 'var(--primary-color)'}}>로그인</h2>
+        <div className={styles.pageWrapper}>
+            <div className={styles.loginCard}>
+                <h2 className={styles.title}>로그인</h2>
 
-                <form onSubmit={handleLogin} style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
-
+                <form onSubmit={handleLogin} className={styles.form}>
                     {/* 아이디 입력 */}
-                    <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-                        <label style={{width: '80px', fontWeight: 'bold'}}>아이디</label>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>아이디</label>
                         <input
                             type="text"
                             value={id}
                             onChange={(e) => setId(e.target.value)}
-                            style={{
-                                flex: 1,
-                                padding: '16px',
-                                backgroundColor: '#E5E7EB',
-                                border: 'none',
-                                borderRadius: '4px',
-                                fontSize: '16px'
-                            }}
+                            className={styles.input}
+                            placeholder="아이디를 입력해주세요"
                         />
                     </div>
 
                     {/* 비밀번호 입력 */}
-                    <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-                        <label style={{width: '80px', fontWeight: 'bold'}}>비밀번호</label>
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>비밀번호</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            style={{
-                                flex: 1,
-                                padding: '16px',
-                                backgroundColor: '#E5E7EB',
-                                border: 'none',
-                                borderRadius: '4px',
-                                fontSize: '16px'
-                            }}
+                            className={styles.input}
+                            placeholder="비밀번호를 입력해주세요"
                         />
                     </div>
 
-                    {/* 추가된 로그인 버튼 */}
-                    <button
-                        type="submit"
-                        style={{
-                            marginTop: '16px', padding: '16px',
-                            backgroundColor: 'var(--primary-color)', color: 'white',
-                            border: 'none', borderRadius: '8px', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer'
-                        }}
-                    >
+                    {/* 로그인 버튼 */}
+                    <button type="submit" className={styles.submitBtn}>
                         로그인
                     </button>
                 </form>
 
-                {/* 하단 3개 버튼 (아이디 찾기, 비밀번호 찾기, 회원가입) */}
-                <div style={{display: 'flex', justifyContent: 'space-between', gap: '12px', marginTop: '32px'}}>
-                    <Link to="/find-id" className="btn-light" style={{
-                        flex: 1,
-                        padding: '12px 0',
-                        textAlign: 'center',
-                        backgroundColor: '#E5E7EB',
-                        borderRadius: '4px',
-                        fontSize: '14px'
-                    }}>
+                {/* 하단 3개 링크 */}
+                <div className={styles.bottomLinks}>
+                    <Link to="/find-id" className={styles.linkBtn}>
                         아이디 찾기
                     </Link>
-                    <Link to="/find-pw" className="btn-light" style={{
-                        flex: 1,
-                        padding: '12px 0',
-                        textAlign: 'center',
-                        backgroundColor: '#E5E7EB',
-                        borderRadius: '4px',
-                        fontSize: '14px'
-                    }}>
+                    <Link to="/find-pw" className={styles.linkBtn}>
                         비밀번호 찾기
                     </Link>
-                    <Link to="/signup" className="btn-light" style={{
-                        flex: 1,
-                        padding: '12px 0',
-                        textAlign: 'center',
-                        backgroundColor: '#E5E7EB',
-                        borderRadius: '4px',
-                        fontSize: '14px'
-                    }}>
+                    <Link to="/signup" className={styles.linkBtn}>
                         회원가입
                     </Link>
                 </div>
-
             </div>
         </div>
     );

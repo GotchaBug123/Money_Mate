@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
+import styles from './FindId.module.css';
 
 function FindId() {
     const [name, setName] = useState('');
@@ -25,115 +26,69 @@ function FindId() {
         }
     };
 
-    // 공통 스타일 세팅
-    const rowStyle = {display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px'};
-    const labelStyle = {width: '80px', fontWeight: 'bold', fontSize: '18px', textAlign: 'center'};
-    const inputStyle = {
-        flex: 1,
-        padding: '16px',
-        backgroundColor: '#E5E7EB',
-        border: 'none',
-        borderRadius: '4px',
-        fontSize: '16px'
-    };
-
     return (
-        <div className="container" style={{display: 'flex', justifyContent: 'center', padding: '80px 20px'}}>
-            <div className="card" style={{width: '100%', maxWidth: '600px', padding: '60px 40px'}}>
+        <div className={styles.pageWrapper}>
+            <div className={styles.findIdCard}>
+                <h2 className={styles.title}>아이디 찾기</h2>
 
-                {/* 이름 입력 */}
-                <div style={rowStyle}>
-                    <label style={labelStyle}>이름</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        style={inputStyle}
-                    />
+                <div className={styles.form}>
+                    {/* 이름 입력 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>이름</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className={styles.input}
+                            placeholder="이름을 입력해주세요"
+                        />
+                    </div>
+
+                    {/* 전화번호 입력 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>전화번호</label>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className={styles.input}
+                            placeholder="010-0000-0000"
+                        />
+                    </div>
+
+                    {/* 인증번호 입력 및 확인 버튼 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>인증번호</label>
+                        <div className={styles.verifyRow}>
+                            <input
+                                type="text"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                placeholder="6자리"
+                                className={styles.verifyInput}
+                                maxLength={6}
+                            />
+                            <button
+                                onClick={handleVerify}
+                                className={styles.verifyBtn}
+                            >
+                                인증확인
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                {/* 전화번호 입력 */}
-                <div style={rowStyle}>
-                    <label style={labelStyle}>전화번호</label>
-                    <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        style={inputStyle}
-                    />
-                </div>
-
-                {/* 인증번호 입력 및 확인 버튼 */}
-                <div style={rowStyle}>
-                    <label style={labelStyle}>인증번호</label>
-                    <input
-                        type="text"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        placeholder="6자리"
-                        style={{...inputStyle, textAlign: 'center'}}
-                        maxLength={6}
-                    />
-                    <button
-                        onClick={handleVerify}
-                        style={{
-                            padding: '16px 32px',
-                            backgroundColor: '#D1D5DB',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '16px',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        인증확인
-                    </button>
-                </div>
-
-                {/* 아이디 결과 출력 박스 */}
-                <div style={{
-                    marginTop: '32px',
-                    padding: '30px',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '4px',
-                    textAlign: 'center',
-                    minHeight: '80px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    color: foundId ? 'var(--primary-color)' : 'var(--text-muted)'
-                }}>
+                {/* 💡 아이디 결과 출력 박스 (조건부 스타일 적용) */}
+                <div className={`${styles.resultBox} ${foundId ? styles.resultSuccess : styles.resultEmpty}`}>
                     {foundId ? `당신의 아이디는 ${foundId} 입니다.` : '인증을 완료하면 아이디가 표시됩니다.'}
                 </div>
 
                 {/* 하단 이동 버튼 (비밀번호 찾기, 회원가입) */}
-                <div style={{display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '40px'}}>
-                    <Link to="/find-pw" style={{
-                        flex: 1,
-                        maxWidth: '200px',
-                        padding: '16px',
-                        backgroundColor: '#E5E7EB',
-                        textAlign: 'center',
-                        borderRadius: '4px',
-                        textDecoration: 'none',
-                        color: 'var(--text-main)',
-                        fontWeight: '500'
-                    }}>
+                <div className={styles.bottomLinks}>
+                    <Link to="/find-pw" className={styles.linkBtn}>
                         비밀번호 찾기
                     </Link>
-                    <Link to="/signup" style={{
-                        flex: 1,
-                        maxWidth: '200px',
-                        padding: '16px',
-                        backgroundColor: '#E5E7EB',
-                        textAlign: 'center',
-                        borderRadius: '4px',
-                        textDecoration: 'none',
-                        color: 'var(--text-main)',
-                        fontWeight: '500'
-                    }}>
+                    <Link to="/signup" className={styles.linkBtn}>
                         회원가입
                     </Link>
                 </div>

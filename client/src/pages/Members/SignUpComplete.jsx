@@ -1,5 +1,6 @@
 import React from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
+import styles from './SignUpComplete.module.css';
 
 function SignUpComplete() {
     const navigate = useNavigate();
@@ -15,58 +16,31 @@ function SignUpComplete() {
     };
 
     return (
-        <div className="container" style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: 'calc(100vh - 120px)', // 헤더와 푸터 높이를 제외한 중앙 배치
-            padding: '20px'
-        }}>
-            <div className="card" style={{
-                width: '100%',
-                maxWidth: '800px',
-                padding: '100px 40px', // 와이어프레임처럼 넓은 여백
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '40px',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'white'
-            }}>
+        <div className={styles.pageWrapper}>
+            <div className={styles.card}>
+
+                {/* 축하 일러스트 영역 */}
+                <div className={styles.illust}>🎉</div>
+
                 {/* 환영 메시지 영역 */}
-                <div style={{marginBottom: '20px'}}>
-                    <h1 style={{
-                        fontSize: '48px',
-                        fontWeight: 'bold',
-                        color: 'var(--text-main)',
-                        lineHeight: '1.4'
-                    }}>
-                        <span style={{color: 'var(--primary-color)'}}>{userName}</span>님<br/>
+                <div>
+                    <h1 className={styles.title}>
+                        <span className={styles.highlight}>{userName}</span>님<br/>
                         환영합니다!
                     </h1>
+                    <p className={styles.desc}>
+                        머니메이트의 모든 서비스를 이용해보세요.
+                    </p>
                 </div>
 
                 {/* 완료 버튼 영역 */}
-                <div style={{display: 'flex', justifyContent: 'center'}}>
-                    <button
-                        onClick={handleFinish}
-                        style={{
-                            padding: '12px 60px',
-                            backgroundColor: '#D1D5DB', // 와이어프레임의 회색 버튼 색상
-                            color: 'var(--text-main)',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s'
-                        }}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#9CA3AF'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#D1D5DB'}
-                    >
-                        완료
-                    </button>
-                </div>
+                <button
+                    onClick={handleFinish}
+                    className={styles.submitBtn}
+                >
+                    로그인하러 가기
+                </button>
+
             </div>
         </div>
     );

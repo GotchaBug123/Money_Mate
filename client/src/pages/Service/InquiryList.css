@@ -1,0 +1,122 @@
+/* src/pages/InquiryList.css */
+
+.inquiry-list-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.inquiry-list-container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.inquiry-list-title {
+    text-align: center;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* 상단 요약 박스 */
+.inquiry-summary-box {
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* 테이블 공통 및 헤더 스타일 */
+.inquiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.inquiry-th {
+    padding: 16px;
+    border-bottom: 2px solid var(--border-color);
+    text-align: center;
+    font-weight: bold;
+}
+
+.th-id {
+    width: 10%;
+}
+
+.th-type {
+    width: 20%;
+}
+
+.th-title {
+    width: 40%;
+    text-align: left;
+}
+
+.th-date {
+    width: 15%;
+}
+
+.th-status {
+    width: 15%;
+}
+
+/* 테이블 바디 셀 스타일 */
+.inquiry-td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+    color: var(--text-main);
+}
+
+.td-title {
+    text-align: left;
+    cursor: pointer;
+}
+
+.td-status {
+    font-weight: 500;
+}
+
+/* 💡 동적 상태 색상 제어 */
+.status-completed {
+    color: var(--primary-color);
+}
+
+.status-pending {
+    color: #F97316;
+}
+
+.empty-row {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* 하단 영역 (페이지네이션 및 버튼) */
+.inquiry-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.pagination-mock {
+    padding: 8px 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+}
+
+.new-inquiry-btn {
+    padding: 12px 32px;
+    border: 1px solid var(--border-color);
+    background-color: white;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
