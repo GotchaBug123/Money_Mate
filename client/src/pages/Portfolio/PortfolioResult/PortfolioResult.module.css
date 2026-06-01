@@ -2,32 +2,61 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 40px 24px;
+    background: #f0f2f8;
+    min-height: 100vh;
 }
 
 .layout {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
 }
 
-/* ── 상단 카드 2개 ── */
-.topSection {
+/* ── 상단 행: 카드 + 일러스트 ── */
+.topRow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: start;
+}
+
+.topCards {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
 .topCard {
-    background: #f8f9fb;
-    border-radius: 14px;
-    padding: 20px 24px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 26px;
+    border: 0.5px solid rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
+    gap: 12px;
+}
+
+.cardLabelRow {
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-.topCardLabel {
-    font-size: 15px;
+.cardIcon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconBlue  { background: #e8f0fe; color: #1B5ED9; }
+.iconGreen { background: #e6f4ec; color: #1A7A45; }
+
+.cardLabel {
+    font-size: 14px;
     font-weight: 700;
     color: #1a1a2e;
     margin: 0;
@@ -41,23 +70,23 @@
 
 .gaugeTrack {
     flex: 1;
-    height: 12px;
-    background: #e0e0e0;
-    border-radius: 6px;
+    height: 10px;
+    background: #eaeaea;
+    border-radius: 5px;
     overflow: hidden;
 }
 
 .gaugeFill {
     height: 100%;
-    background: #1B5ED9;
-    border-radius: 6px;
+    background: linear-gradient(90deg, #4a7fe8 0%, #1B5ED9 100%);
+    border-radius: 5px;
     transition: width 0.8s ease;
 }
 
 .gaugeFillGreen {
     height: 100%;
-    background: #1A7A45;
-    border-radius: 6px;
+    background: linear-gradient(90deg, #2ea866 0%, #1A7A45 100%);
+    border-radius: 5px;
     transition: width 0.8s ease;
 }
 
@@ -79,10 +108,21 @@
     text-align: right;
 }
 
-.dateRange {
+.cardMeta {
     font-size: 12px;
     color: #999;
     margin: 0;
+}
+
+/* ── 일러스트 ── */
+.illustWrap {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.illustSvg {
+    width: 100%;
+    height: auto;
 }
 
 /* ── 수익 지표 카드들 ── */
@@ -94,17 +134,18 @@
 
 .statCard {
     background: #fff;
-    border: 1.5px solid #f0f0f0;
-    border-radius: 12px;
-    padding: 16px 14px;
+    border: 0.5px solid rgba(0, 0, 0, 0.07);
+    border-radius: 14px;
+    padding: 18px 16px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
     transition: box-shadow 0.2s;
 }
 
 .statCard:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
 }
 
 .statLabel {
@@ -115,7 +156,7 @@
 }
 
 .statValue {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
     color: #1a1a2e;
     margin: 0;
@@ -128,17 +169,34 @@
     margin-left: 2px;
 }
 
+.statIcon {
+    position: absolute;
+    top: 16px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconWallet { background: #eef2ff; color: #4a7fe8; }
+.iconPos    { background: #e6f4ec; color: #1A7A45; }
+.iconNeg    { background: #fdf0ee; color: #C0392B; }
+
 .pos { color: #1A7A45 !important; }
 .neg { color: #C0392B !important; }
 
 /* ── 바 차트 ── */
 .chartSection {
-    background: #f8f9fb;
-    border-radius: 14px;
-    padding: 20px 24px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 26px;
+    border: 0.5px solid rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
 .chartTitle {
@@ -151,7 +209,7 @@
 .barChart {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .barRow {
@@ -160,17 +218,24 @@
     gap: 12px;
 }
 
+.barDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
 .barLabel {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
-    width: 100px;
+    width: 88px;
     flex-shrink: 0;
 }
 
 .barTrack {
     flex: 1;
-    height: 10px;
-    background: #e8e8e8;
+    height: 9px;
+    background: #f0f0f0;
     border-radius: 5px;
     overflow: hidden;
 }
@@ -181,21 +246,22 @@
     transition: width 0.6s ease;
 }
 
-.barPos { background: #1A7A45; color: #1A7A45; }
-.barNeg { background: #C0392B; color: #C0392B; }
+.barPos { background: #1A7A45; }
+.barNeg { background: #C0392B; }
 
 .barValue {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
-    min-width: 60px;
+    min-width: 58px;
     text-align: right;
 }
 
 /* ── 종목 요약 ── */
 .stockSummary {
-    background: #f8f9fb;
-    border-radius: 14px;
-    padding: 20px 24px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 26px;
+    border: 0.5px solid rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -208,11 +274,11 @@
 }
 
 .stockChip {
-    background: #fff;
-    border: 1.5px solid #e0e0e0;
+    background: #f5f7ff;
+    border: 1px solid #dde3f8;
     border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 12px;
+    padding: 6px 14px;
+    font-size: 13px;
     color: #444;
 }
 
@@ -238,6 +304,9 @@
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: background 0.2s, transform 0.1s;
 }
 
@@ -255,6 +324,9 @@
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: all 0.2s;
 }
 

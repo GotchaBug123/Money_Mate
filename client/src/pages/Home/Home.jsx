@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
 import styles from './Home.module.css';
 
@@ -26,7 +27,7 @@ const TYPE_DATA = [
 ];
 
 const PRODUCT_INFO = {
-    주식: {
+    stock: {
         title: '주식이란?',
         sections: [
             { heading: '🍕 주식이란?', body: '친구가 피자가게를 오픈하려고 하는데 내가 10%를 보태줬다면, 나는 그 피자가게의 10% 주인이 됩니다. 이를 증명하는 문서가 바로 \'주식\'입니다.' },
@@ -35,7 +36,7 @@ const PRODUCT_INFO = {
             { heading: '💡 결론', body: '그래서 우리는 분산투자와 리밸런싱으로 위험은 깎아내고 수익은 안정적으로 챙기는 전략을 씁니다! 😉' },
         ],
     },
-    ETF: {
+    etf: {
         title: 'ETF란?',
         sections: [
             { heading: '🍱 ETF란?', body: '금융 전문가들이 여러 기업을 한 바구니에 담아놓고, 딱 1주만 사도 그 안의 모든 기업에 자동으로 분산 투자가 되도록 만든 상품입니다.' },
@@ -44,7 +45,7 @@ const PRODUCT_INFO = {
             { heading: '💡 결론', body: '안정 추구형에 가까울수록 ETF 비중을 높여서 포트폴리오를 짜 드립니다. 😉' },
         ],
     },
-    로보어드바이저: {
+    robo: {
         title: '로보어드바이저란?',
         sections: [
             { heading: '🤖 로보어드바이저가 무엇인가요?', body: '"로봇 + 자산관리사" — 유저님만을 위해 24시간 내내 열일하는 AI 자산관리사입니다.' },
@@ -55,9 +56,9 @@ const PRODUCT_INFO = {
 };
 
 const products = [
-    { icon: '📈', title: '주식',          desc: '국내·해외 개별 종목 분석 및 직접 투자',   stat: '상장 종목 3,800+' },
-    { icon: '🗂️', title: 'ETF',           desc: '분산 투자로 리스크를 줄이는 스마트 투자', stat: '국내외 ETF 700+' },
-    { icon: '🤖', title: '로보어드바이저', desc: 'AI가 자동으로 포트폴리오를 설계·운용',   stat: '평균 수익률 +11.4%' },
+    { icon: '📈', title: '주식',   key: 'stock', desc: '국내·해외 개별 종목 분석 및 직접 투자',   stat: '상장 종목 3,800+' },
+    { icon: '🗂️', title: 'ETF',     key: 'etf',   desc: '분산 투자로 리스크를 줄이는 스마트 투자', stat: '국내외 ETF 700+' },
+    { icon: '🤖', title: '로보어드바이저', key: 'robo', desc: 'AI가 자동으로 포트폴리오를 설계·운용',   stat: '평균 수익률 +11.4%' },
 ];
 
 // 사용 가이드 단계
@@ -191,7 +192,7 @@ const GuideModal = ({ onClose }) => (
 
 // 상품 설명 팝업
 const ProductModal = ({ product, onClose }) => {
-    const info = PRODUCT_INFO[product.title];
+    const info = PRODUCT_INFO[product.key];
     if (!info) return null;
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
