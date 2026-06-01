@@ -3,6 +3,7 @@ package com.gotchabug.moneymate.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "investment_holding")
 @Getter
+@Setter
 @NoArgsConstructor
 public class InvestmentHolding {
 
