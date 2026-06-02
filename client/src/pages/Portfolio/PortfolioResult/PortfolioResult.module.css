@@ -1,0 +1,401 @@
+/* src/pages/Portfolio/PortfolioResult.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px 90px;
+}
+
+/* 💡 결과 요약 화면에 최적화된 1000px 레이아웃 유지 */
+.layout {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ── 상단 행: 카드 + 일러스트 ── */
+.topRow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+}
+
+.topCards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.topCard {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 24px 32px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cardLabelRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cardIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.iconBlue {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.iconGreen {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.cardLabel {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.gaugeRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.gaugeTrack {
+    flex: 1;
+    height: 10px;
+    background: var(--color-bg-input);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+/* 💡 그라데이션 대신 글로벌 변수 적용으로 깔끔함 유지 */
+.gaugeFill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 99px;
+    transition: width 0.8s ease;
+}
+
+.gaugeFillGreen {
+    height: 100%;
+    background: var(--color-success);
+    border-radius: 99px;
+    transition: width 0.8s ease;
+}
+
+.gaugeValue {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--color-primary);
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: right;
+}
+
+.gaugeValueGreen {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--color-success);
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: right;
+}
+
+.cardMeta {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ── 일러스트 ── */
+.illustWrap {
+    width: 220px;
+    flex-shrink: 0;
+}
+
+.illustSvg {
+    width: 100%;
+    height: auto;
+}
+
+/* ── 수익 지표 카드들 ── */
+.statsSection {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.statCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-primary);
+}
+
+.statLabel {
+    font-size: 13px;
+    color: var(--color-text-sub);
+    font-weight: 700;
+    margin: 0;
+}
+
+.statValue {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.statUnit {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-left: 2px;
+}
+
+.statIcon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconWallet {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.iconPos {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.iconNeg {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+}
+
+.pos {
+    color: var(--color-success) !important;
+}
+
+.neg {
+    color: var(--color-error) !important;
+}
+
+/* ── 바 차트 ── */
+.chartSection {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chartTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.barChart {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.barRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.barDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.barLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-sub);
+    width: 90px;
+    flex-shrink: 0;
+}
+
+.barTrack {
+    flex: 1;
+    height: 10px;
+    background: var(--color-bg-input);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.barFill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.barPos {
+    background: var(--color-success);
+}
+
+.barNeg {
+    background: var(--color-error);
+}
+
+.barValue {
+    font-size: 14px;
+    font-weight: 800;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* ── 종목 요약 ── */
+.stockSummary {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.stockChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stockChip {
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border-light);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-sub);
+    transition: all 0.2s;
+}
+
+.stockChip strong {
+    color: var(--color-primary);
+    margin-left: 6px;
+    font-weight: 800;
+}
+
+/* ── 버튼 ── */
+.actionRow {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding-top: 16px;
+}
+
+.primaryBtn {
+    padding: 16px 32px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.primaryBtn:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+.secondaryBtn {
+    padding: 16px 32px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.secondaryBtn:hover {
+    background: var(--color-primary-light);
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+    .topRow {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .illustWrap {
+        display: none;
+    }
+
+    .statsSection {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .actionRow {
+        flex-direction: column;
+    }
+}

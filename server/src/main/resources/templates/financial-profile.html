@@ -2,88 +2,121 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>MoneyMate - 재무정보 입력</title>
+    <title>MoneyMate - 재무 진단</title>
+
     <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/financial-profile.css">
 </head>
 <body>
 
 <header class="header">
     <div class="header-inner">
-        <a href="/main" class="logo">MoneyMate</a>
+
+        <a href="/" class="logo">
+            MoneyMate
+        </a>
 
         <nav class="nav">
-            <a href="/financial-profile">MY 자산</a>
-            <a href="#">포트폴리오</a>
-            <a href="#">대시보드</a>
-            <a href="#">투자정보</a>
-            <a href="#">고객센터</a>
+            <a href="/">홈</a>
+            <a href="/mypage">마이페이지</a>
         </nav>
 
-        <div class="header-actions">
-            <a href="/mypage" class="mypage-btn">마이페이지</a>
+        <div class="header-buttons">
+            <a href="/logout" class="login-btn">
+                로그아웃
+            </a>
         </div>
+
     </div>
 </header>
 
-<main class="financial-page">
-    <section class="page-hero">
-        <p class="eyebrow">Financial Profile</p>
-        <h1>나의 재무정보 입력</h1>
-        <p>
-            월 수입, 지출, 자산 정보를 입력하면 MoneyMate가 투자 가능 금액을 계산합니다.
-        </p>
-    </section>
+<main style="padding: 60px 20px; max-width: 900px; margin: auto;">
 
-    <section class="form-card">
-        <div class="card-header">
-            <h2>기본 재무정보</h2>
-            <p>금액은 원 단위로 입력해주세요.</p>
-        </div>
+    <h1 style="margin-bottom: 10px;">
+        재무 진단
+    </h1>
 
-        <form action="/financial-profile" method="post">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="monthlyIncome">월 수입</label>
-                    <input type="number" id="monthlyIncome" name="monthlyIncome" placeholder="예: 3000000" required>
-                </div>
+    <p style="margin-bottom: 40px; color: #666;">
+        수입과 지출 정보를 입력하면
+        투자 가능 금액을 계산합니다.
+    </p>
 
-                <div class="form-group">
-                    <label for="monthlyFixedExpense">월 고정 지출</label>
-                    <input type="number" id="monthlyFixedExpense" name="monthlyFixedExpense" placeholder="예: 900000" required>
-                </div>
+    <form action="/financial/profile"
+          method="post">
 
-                <div class="form-group">
-                    <label for="monthlyVariableExpense">월 변동 지출</label>
-                    <input type="number" id="monthlyVariableExpense" name="monthlyVariableExpense" placeholder="예: 700000" required>
-                </div>
+        <div style="display:flex; flex-direction:column; gap:25px;">
 
-                <div class="form-group">
-                    <label for="totalAsset">총 자산</label>
-                    <input type="number" id="totalAsset" name="totalAsset" placeholder="예: 15000000" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="totalLiability">총 부채</label>
-                    <input type="number" id="totalLiability" name="totalLiability" placeholder="예: 3000000" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="cashAsset">현금성 자산</label>
-                    <input type="number" id="cashAsset" name="cashAsset" placeholder="예: 5000000" required>
-                </div>
+            <div>
+                <label>월 수입</label>
+                <input type="number"
+                       name="monthlyIncome"
+                       th:value="${profile != null ? profile.monthlyIncome : 0}"
+                       required
+                       style="width:100%; padding:14px;">
             </div>
 
-            <button type="submit" class="submit-btn">재무정보 저장하기</button>
-        </form>
+            <div>
+                <label>월 고정 지출</label>
+                <input type="number"
+                       name="monthlyFixedExpense"
+                       th:value="${profile != null ? profile.monthlyFixedExpense : 0}"
+                       required
+                       style="width:100%; padding:14px;">
+            </div>
 
-        <div id="resultBox" class="result-box hidden">
-            <h3>저장 결과</h3>
-            <p id="resultText"></p>
+            <div>
+                <label>월 변동 지출</label>
+                <input type="number"
+                       name="monthlyVariableExpense"
+                       th:value="${profile != null ? profile.monthlyVariableExpense : 0}"
+                       required
+                       style="width:100%; padding:14px;">
+            </div>
+
+            <div>
+                <label>총 자산</label>
+                <input type="number"
+                       name="totalAsset"
+                       th:value="${profile != null ? profile.totalAsset : 0}"
+                       required
+                       style="width:100%; padding:14px;">
+            </div>
+
+            <div>
+                <label>총 부채</label>
+                <input type="number"
+                       name="totalLiability"
+                       th:value="${profile != null ? profile.totalLiability : 0}"
+                       required
+                       style="width:100%; padding:14px;">
+            </div>
+
+            <div>
+                <label>현금 자산</label>
+                <input type="number"
+                       name="cashAsset"
+                       th:value="${profile != null ? profile.cashAsset : 0}"
+                       required
+                       style="width:100%; padding:14px;">
+            </div>
+
+            <button type="submit"
+                    style="
+                    padding:16px;
+                    border:none;
+                    background:#2563eb;
+                    color:white;
+                    font-size:16px;
+                    border-radius:10px;
+                    cursor:pointer;
+                    ">
+                재무 정보 저장
+            </button>
+
         </div>
-    </section>
-</main>
 
+    </form>
+
+</main>
 
 </body>
 </html>

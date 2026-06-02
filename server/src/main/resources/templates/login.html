@@ -3,41 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <title>MoneyMate - 로그인</title>
+
   <link rel="stylesheet" href="/css/common.css">
   <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
 
 <div class="login-page">
+
   <div class="login-box">
+
     <h1>로그인</h1>
-    <p class="login-desc">이메일로 MoneyMate에 로그인하세요.</p>
 
-    <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+    <p class="login-desc">
+      이메일로 MoneyMate에 로그인하세요.
+    </p>
 
-    <form action="/login" method="post" th:object="${loginRequest}">
+    <!-- 에러 -->
+    <p class="error-msg"
+       th:if="${error}"
+       th:text="${error}">
+    </p>
+
+    <form action="/login"
+          method="post"
+          th:object="${loginRequest}">
 
       <label>이메일</label>
+
       <input type="email"
-             name="email"
              th:field="*{email}"
              placeholder="example@email.com"
              required>
 
       <label>비밀번호</label>
+
       <input type="password"
-             name="password"
              th:field="*{password}"
              placeholder="비밀번호 입력"
              required>
 
-      <button type="submit" class="login-btn">로그인</button>
+      <button type="submit"
+              class="login-btn">
+        로그인
+      </button>
+
     </form>
 
     <p class="join-link">
-      계정이 없으신가요?   <a href="/signup" >회원가입</a>
+      계정이 없으신가요?
+      <a href="/signup">회원가입</a>
     </p>
+
   </div>
+
 </div>
 
 </body>

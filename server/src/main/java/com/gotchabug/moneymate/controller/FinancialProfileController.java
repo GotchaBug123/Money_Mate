@@ -1,74 +1,77 @@
 package com.gotchabug.moneymate.controller;
 
-import com.gotchabug.moneymate.dto.financial.FinancialProfileRequest;
-import com.gotchabug.moneymate.dto.financial.FinancialProfileResponse;
+import com.gotchabug.moneymate.entity.FinancialProfile;
 import com.gotchabug.moneymate.entity.Member;
+import com.gotchabug.moneymate.repository.FinancialProfileRepository;
 import com.gotchabug.moneymate.service.FinancialProfileService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-/*
-추가 설명 코드
-로그인한 사용자의 재무정보를 저장 및 조회하는 컨트롤러
-*/
+import java.math.BigDecimal;
 
-@RestController
-@RequestMapping("/api/financial-profile")
+@Controller
 @RequiredArgsConstructor
+@RequestMapping("/financial")
 public class FinancialProfileController {
 
+    private final FinancialProfileRepository financialProfileRepository;
     private final FinancialProfileService financialProfileService;
 
-    /*
-    재무정보 저장 및 수정
-     */
-    @PostMapping("/me")
-    public FinancialProfileResponse saveOrUpdateMyFinancialProfile(
-            @Valid @RequestBody FinancialProfileRequest request,
-            HttpSession session
+    @GetMapping("/profile")
+    public String financialProfilePage(
+            HttpSession session,
+            Model model
     ) {
 
-        Member loginUser = getLoginUser(session);
+        Member loginUser =
+                (Member) session.getAttribute("loginUser");
 
-        return financialProfileService.saveOrUpdate(loginUser, request);
-    }
-
-    /*
-    내 재무정보 조회
-     */
-    @GetMapping("/me")
-    public FinancialProfileResponse getMyFinancialProfile(
-            HttpSession session
-    ) {
-
-        Member loginUser = getLoginUser(session);
-
-        return financialProfileService.getMyFinancialProfile(loginUser);
-    }
-
-    /*
-    로그인 세션 확인
-     */
-    private Member getLoginUser(HttpSession session) {
-
-        Object loginUser = session.getAttribute("loginUser");
-
-        if (!(loginUser instanceof Member member)) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "로그인이 필요합니다."
-            );
+        if (loginUser == null) {
+            return "redirect:/login";
         }
 
-        return member;
+        FinancialProfile profile =
+                financialProfileRepository
+                        .findByMember_MemberId(loginUser.getMemberId())
+                        .orElse(null);
+
+        model.addAttribute("profile", profile);
+
+        return "financial-profile";
     }
 
+    @PostMapping("/profile")
+    public String updateFinancialProfile(
+            HttpSession session,
+
+            @RequestParam BigDecimal monthlyIncome,
+            @RequestParam BigDecimal monthlyFixedExpense,
+            @RequestParam BigDecimal monthlyVariableExpense,
+            @RequestParam BigDecimal totalAsset,
+            @RequestParam BigDecimal totalLiability,
+            @RequestParam BigDecimal cashAsset
+    ) {
+
+        Member loginUser =
+                (Member) session.getAttribute("loginUser");
+
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        financialProfileService.updateFinancialProfile(
+                loginUser.getMemberId(),
+                monthlyIncome,
+                monthlyFixedExpense,
+                monthlyVariableExpense,
+                totalAsset,
+                totalLiability,
+                cashAsset
+        );
+
+        return "redirect:/mypage";
+    }
 }

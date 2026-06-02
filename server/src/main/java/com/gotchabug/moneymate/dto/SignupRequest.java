@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,6 +22,8 @@ public class SignupRequest {
 
     @NotBlank(message = "이름은 필수입니다.")
     private String name;
+
+    private LocalDate birthDate;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
     @Size(min = 4, max = 20)
