@@ -28,10 +28,10 @@ public class Member {
 
     private LocalDate birthDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String signupStatus = "ACTIVE";
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String role = "USER";
 
     private LocalDateTime createdAt;
