@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 관리자</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin" class="active">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
+            <a href="/admin/inquiries">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-top">
+            <h1>관리자 화면</h1>
+            <p>관리자 메뉴에서 필요한 관리 화면으로 이동합니다.</p>
+        </section>
+
+        <section class="admin-card-section">
+            <div class="admin-card">
+                <h2>회원정보 관리</h2>
+                <a href="/admin/members">이동</a>
+            </div>
+            <div class="admin-card">
+                <h2>투자정보 관리</h2>
+                <a href="/admin/investment-info">이동</a>
+            </div>
+            <div class="admin-card">
+                <h2>커뮤니티 관리</h2>
+                <a href="/admin/community">이동</a>
+            </div>
+            <div class="admin-card">
+                <h2>공지사항 관리</h2>
+                <a href="/admin/notices">이동</a>
+            </div>
+            <div class="admin-card">
+                <h2>고객문의 관리</h2>
+                <a href="/admin/inquiries">이동</a>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

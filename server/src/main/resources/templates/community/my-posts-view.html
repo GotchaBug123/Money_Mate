@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 내 게시글</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .page { max-width: 1080px; margin: 0 auto; padding: 34px 20px 70px; background: #f8fafc; min-height: calc(100vh - 78px); }
+        .panel { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #ffffff; }
+        th, td { border-bottom: 1px solid #eaecf0; padding: 12px 10px; text-align: left; vertical-align: top; }
+        th { color: #344054; background: #f9fafb; }
+        .btn { border: 1px solid #d0d5dd; border-radius: 8px; background: #ffffff; padding: 8px 12px; font-weight: 700; cursor: pointer; }
+        .btn.primary { border-color: #155eef; background: #155eef; color: #ffffff; }
+        .meta { color: #667085; }
+    </style>
+</head>
+<body>
+<header th:replace="~{fragments/header :: globalHeader('community')}"></header>
+
+<main class="page">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div>
+            <h1>내 게시글 확인</h1>
+            <p class="meta">내가 작성한 게시글을 조회하고 수정 화면으로 이동합니다.</p>
+        </div>
+        <a class="btn" href="/community">커뮤니티</a>
+    </div>
+    <section class="panel">
+        <div id="myPostList">내 게시글을 불러오는 중입니다.</div>
+    </section>
+</main>
+
+<footer class="footer"><p>© 2026 MoneyMate. All rights reserved.</p></footer>
+
+<script th:inline="javascript">
+    const loggedIn = /*[[${loggedIn}]]*/ false;
+
+    document.addEventListener('DOMContentLoaded', loadMyPosts);
+
+    async function loadMyPosts() {
+        if (!loggedIn) {
+            document.getElementById('myPostList').innerHTML = '<p style="color:#b42318;">로그인 후 내 게시글을 조회할 수 있습니다.</p>';
+            return;
+        }
+
+        const response = await fetch('/community/my-posts?page=0&size=30', {credentials: 'same-origin'});
+        const body = await response.json().catch(() => null);
+        if (!response.ok) {
+            document.getElementById('myPostList').innerHTML = `<p style="color:#b42318;">${escapeHtml(body?.message || body?.error || '조회 실패')}</p>`;
+            return;
+        }
+
+        const posts = body.posts || [];
+        document.getElementById('myPostList').innerHTML = posts.length === 0
+            ? '<p class="meta">작성한 게시글이 없습니다.</p>'
+            : `
+                <table>
+                    <thead><tr><th>게시글 번호</th><th>게시글 제목</th><th>작성일</th><th>게시글 내용</th><th>수정</th></tr></thead>
+                    <tbody>
+                        ${posts.map(post => `
+                            <tr>
+                                <td>${post.postId}</td>
+                                <td><a href="/community/posts/${post.postId}/view">${escapeHtml(post.title)}${post.edited ? ' (수정됨)' : ''}</a></td>
+                                <td>${formatDate(post.createdAt)}${post.edited ? '<br><span class="meta">수정됨</span>' : ''}</td>
+                                <td>${escapeHtml(post.contentPreview || '')}</td>
+                                <td><button class="btn primary" onclick="location.href='/community/posts/${post.postId}/edit'">수정하기</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+    }
+
+    function formatDate(value) { return value ? String(value).replace('T', ' ').slice(0, 16) : '-'; }
+    function escapeHtml(value) { return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+</script>
+</body>
+</html>

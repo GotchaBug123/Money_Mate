@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate 관리자 - 고객문의 관리</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<script th:if="${message != null}" th:inline="javascript">
+    alert([[${message}]]);
+</script>
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
+            <a href="/admin/inquiries" class="active">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-top">
+            <div>
+                <h1>고객문의 관리</h1>
+                <p>사용자가 등록한 1:1 문의를 확인하고 답변할 수 있습니다.</p>
+            </div>
+        </section>
+
+        <section class="admin-table-card">
+            <div class="admin-table-header">
+                <h2>문의 목록</h2>
+                <span th:text="${#lists.size(inquiries)} + '건'">0건</span>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>회원</th>
+                    <th>유형</th>
+                    <th>제목</th>
+                    <th>상태</th>
+                    <th>등록일</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="inquiry : ${inquiries}">
+                    <td th:text="${inquiry.inquiryId}">1</td>
+                    <td>
+                        <span th:text="${inquiry.member.name}">홍길동</span><br>
+                        <small th:text="${inquiry.member.loginId}">test1</small>
+                    </td>
+                    <td th:text="${inquiry.category}">투자</td>
+                    <td>
+                        <strong th:text="${inquiry.title}">문의 제목</strong>
+                        <p class="table-sub-text" th:text="${inquiry.content}">문의 내용</p>
+                    </td>
+                    <td>
+                        <span class="status-badge"
+                              th:classappend="${inquiry.status == 'ANSWERED'} ? ' answered' : ''"
+                              th:text="${inquiry.status}">WAITING</span>
+                    </td>
+                    <td th:text="${#temporals.format(inquiry.createdAt, 'yyyy.MM.dd HH:mm')}">2026.05.28 18:00</td>
+                    <td>
+                        <a class="admin-action-btn" th:href="@{/admin/inquiries/{id}(id=${inquiry.inquiryId})}">상세보기</a>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(inquiries)}">
+                    <td colspan="7" class="empty-table">등록된 문의가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

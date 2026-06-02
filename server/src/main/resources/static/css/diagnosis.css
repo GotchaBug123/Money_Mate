@@ -1,0 +1,202 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Pretendard", sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+.diagnosis-page {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/*
+상단
+ */
+.top-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.score-card {
+    width: 350px;
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.score-card h2 {
+    margin-bottom: 30px;
+}
+
+.score-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0 auto 25px;
+
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.grade,
+.risk {
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+/*
+상세 카드
+ */
+.detail-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+
+    margin-bottom: 40px;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+
+    text-align: center;
+}
+
+.detail-card h3 {
+    margin-bottom: 20px;
+    color: #6b7280;
+}
+
+.value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #111827;
+}
+
+/*
+피드백
+ */
+.feedback-section {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.feedback-section h2 {
+    margin-bottom: 20px;
+}
+
+.feedback-section ul {
+    list-style: none;
+}
+
+.feedback-section li {
+    padding: 15px 0;
+    border-bottom: 1px solid #e5e7eb;
+
+    font-size: 18px;
+}
+
+/*
+반응형
+ */
+@media (max-width: 900px) {
+
+    .detail-section {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .detail-section {
+        grid-template-columns: 1fr;
+    }
+
+    .score-card {
+        width: 100%;
+    }
+}
+.next-step-area {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.next-btn {
+    padding: 16px 36px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #155EEF, #0047FF);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.25s;
+    box-shadow: 0 10px 25px rgba(21, 94, 239, 0.25);
+}
+
+.next-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
+}
+.next-step-area {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 36px;
+}
+
+.home-btn,
+.next-btn {
+    display: inline-block;
+    padding: 15px 26px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.home-btn {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.next-btn {
+    background: #155eef;
+    color: white;
+}
+
+.home-btn:hover,
+.next-btn:hover {
+    transform: translateY(-2px);
+}
+
+.home-btn:hover {
+    background: #d1d5db;
+}
+
+.next-btn:hover {
+    background: #0f46c7;
+}

@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: Moneymate
+
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/moneymate_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    username: moneymate_user
+    password: qwer1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  #    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: never
+
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+server:
+  port: 8080
+
+market:
+  asset-master:
+    enabled: true
+    csv-path: classpath:/data/kr_assets.csv
+
+

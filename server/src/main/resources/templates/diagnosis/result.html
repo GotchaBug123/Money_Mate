@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>재무 진단 결과</title>
+
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/diagnosis.css}">
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: globalHeader('asset')}"></header>
+
+<div class="diagnosis-page">
+
+  <div class="top-section">
+
+    <div class="score-card">
+      <h2>재무 건강 점수</h2>
+
+      <div class="score-circle">
+        <span th:text="${result.totalScore}">85</span>
+      </div>
+
+      <div class="grade">
+        등급 :
+        <span th:text="${result.grade}">A</span>
+      </div>
+
+      <div class="risk">
+        위험도 :
+        <span th:text="${result.riskLevel}">안정</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="detail-section">
+
+    <div class="detail-card">
+      <h3>소비율</h3>
+
+      <div class="value">
+        <span th:text="${#numbers.formatDecimal(result.expenseRate,1,1)}"></span>%
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>부채 비율</h3>
+
+      <div class="value">
+        <span th:text="${#numbers.formatDecimal(result.debtRate,1,1)}"></span>%
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>현금 유동성</h3>
+
+      <div class="value">
+        <span th:text="${result.liquidityMonths}"></span>개월
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>투자 가능 금액</h3>
+
+      <div class="value">
+        ₩
+        <span th:text="${#numbers.formatInteger(result.investableAmount,3,'COMMA')}"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="feedback-section">
+
+    <h2>재무 진단 피드백</h2>
+
+    <ul>
+      <li th:each="feedback : ${result.feedbacks}"
+          th:text="${feedback}">
+      </li>
+    </ul>
+
+  </div>
+  <div class="next-step-area">
+    <div class="next-step-area">
+      <a href="/home" class="home-btn">
+        홈으로 가기
+      </a>
+
+      <a href="/risk-survey" class="next-btn">
+      투자성향 분석 시작하기
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

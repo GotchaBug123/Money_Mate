@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 게시글 상세</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .page { max-width: 1080px; margin: 0 auto; padding: 34px 20px 70px; background: #f8fafc; min-height: calc(100vh - 78px); }
+        .panel { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+        .btn { border: 1px solid #d0d5dd; border-radius: 8px; background: #ffffff; padding: 10px 16px; font-weight: 700; cursor: pointer; }
+        .btn.primary { border-color: #155eef; background: #155eef; color: #ffffff; }
+        .btn.danger { border-color: #fecdca; color: #b42318; }
+        .meta { color: #667085; font-size: 14px; }
+        .post-card { border: 1px solid #eaecf0; border-radius: 8px; padding: 14px; margin-bottom: 10px; background: #ffffff; }
+        input { border: 1px solid #d0d5dd; border-radius: 6px; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: globalHeader('community')}"></header>
+
+<main class="page">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+        <div>
+            <h1>게시글 상세</h1>
+            <p class="meta">게시글을 선택하면 조회수 증가, 댓글, 좋아요를 확인할 수 있습니다.</p>
+        </div>
+        <a class="btn" href="/community">목록으로 돌아가기</a>
+    </div>
+
+    <section id="detailBox" class="panel">게시글 정보를 불러오는 중입니다.</section>
+    <section id="listBox" class="panel" style="display:none;">
+        <h2 style="margin-bottom:14px;">게시글 선택</h2>
+        <div id="postList"></div>
+    </section>
+</main>
+
+<footer class="footer"><p>© 2026 MoneyMate. All rights reserved.</p></footer>
+
+<script th:inline="javascript">
+    const loggedIn = /*[[${loggedIn}]]*/ false;
+    const pathPostId = /*[[${postId}]]*/ null;
+    const queryPostId = new URLSearchParams(location.search).get('postId');
+    const postId = pathPostId || queryPostId;
+    const commentMessage = /*[[${commentMessage}]]*/ null;
+    const commentError = /*[[${commentError}]]*/ null;
+    let currentPost = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (postId) {
+            loadDetail(postId);
+        } else {
+            document.getElementById('detailBox').innerHTML = '<p class="meta">상세 조회할 게시글을 아래 목록에서 선택해주세요.</p>';
+            loadPostSelector();
+        }
+    });
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {credentials: 'same-origin', ...options});
+        const text = await response.text();
+        const body = text ? JSON.parse(text) : null;
+        if (!response.ok) throw new Error(body?.message || body?.error || response.statusText);
+        return body;
+    }
+
+    async function loadPostSelector() {
+        document.getElementById('listBox').style.display = 'block';
+        const data = await api('/community/posts?page=0&size=10');
+        document.getElementById('postList').innerHTML = (data.posts || []).map(post => `
+            <article class="post-card">
+                <strong>${escapeHtml(post.title)}</strong>
+                <p class="meta">${escapeHtml(post.category || '-')} · 조회 ${post.viewCount}</p>
+                <button class="btn primary" type="button" onclick="location.href='/community/posts/view?postId=${post.postId}'">상세 보기</button>
+            </article>
+        `).join('') || '<p class="meta">게시글이 없습니다.</p>';
+    }
+
+    async function loadDetail(id) {
+        try {
+            currentPost = await api(`/community/posts/${id}`);
+            renderDetail(currentPost);
+        } catch (error) {
+            document.getElementById('detailBox').innerHTML = `<p style="color:#b42318;">${escapeHtml(error.message)}</p>`;
+        }
+    }
+
+    function renderDetail(post) {
+        const commentAlert = commentError
+            ? `<p style="color:#b42318; font-weight:700; margin-bottom:10px;">${escapeHtml(commentError)}</p>`
+            : commentMessage
+                    ? `<p style="color:#067647; font-weight:700; margin-bottom:10px;">${escapeHtml(commentMessage)}</p>`
+                    : '';
+        const attachments = (post.attachments || []).length === 0
+            ? '<p class="meta">첨부파일 없음</p>'
+            : `<ul>${post.attachments.map(file => `<li><a href="${escapeAttr(file.attachmentUrl)}" target="_blank">${escapeHtml(file.attachmentName || file.attachmentUrl)}</a></li>`).join('')}</ul>`;
+        const comments = (post.comments || []).length === 0
+            ? '<p class="meta">댓글이 없습니다.</p>'
+            : post.comments.map(comment => `
+                <div style="border-top:1px solid #eaecf0; padding:10px 0;">
+                    <strong>${escapeHtml(comment.authorName || '-')}</strong>
+                    <p class="meta">
+                        작성일 ${formatDate(comment.createdAt)}${comment.edited ? ' · 수정됨' : ''}
+                    </p>
+                    <p>${escapeHtml(comment.content)}</p>
+                    ${comment.owner ? `<button class="btn" onclick="editComment(${comment.commentId}, '${escapeJs(comment.content)}')">수정</button>
+                    <button class="btn danger" onclick="deleteComment(${comment.commentId})">삭제</button>` : ''}
+                </div>
+            `).join('');
+
+        document.getElementById('detailBox').innerHTML = `
+            <p class="meta">#${post.postId} · ${escapeHtml(post.category || '-')} · ${escapeHtml(post.themeName || '테마 없음')}</p>
+            <h1 style="margin:8px 0 10px;">${escapeHtml(post.title)}${post.edited ? ' <span class="meta">(수정됨)</span>' : ''}</h1>
+            <p class="meta">작성자 ${escapeHtml(post.authorName || '-')} · 작성일 ${formatDate(post.createdAt)}${post.edited ? ' · 수정됨' : ''} · 조회 ${post.viewCount} · 좋아요 ${post.likeCount}</p>
+            ${post.edited ? `<p class="meta">수정일 ${formatDate(post.updatedAt)}</p>` : ''}
+            <p class="meta" style="margin-top:6px;">종목 ${escapeHtml(post.stockName || '-')} ${post.stockSymbol ? '(' + escapeHtml(post.stockSymbol) + ')' : ''}</p>
+            <div style="white-space:pre-wrap; margin:18px 0; padding:16px; border:1px solid #eaecf0; border-radius:8px;">${escapeHtml(post.content)}</div>
+            <h3>첨부파일</h3>
+            ${attachments}
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin:18px 0;">
+                <button class="btn primary" onclick="toggleLike()">${post.liked ? '좋아요 취소' : '좋아요'}</button>
+                ${post.owner ? `<button class="btn" onclick="location.href='/community/posts/${post.postId}/edit'">수정하기</button>
+                <button class="btn danger" onclick="deletePost()">삭제</button>` : ''}
+            </div>
+            <h3>댓글</h3>
+            ${commentAlert}
+            <form action="/community/posts/${post.postId}/comments/view" method="post" style="display:flex; gap:8px; margin:10px 0;">
+                <input id="commentContent" name="content" type="text" placeholder="댓글 내용" style="flex:1;" required>
+                <button class="btn primary" type="submit">댓글 작성</button>
+            </form>
+            ${comments}
+        `;
+    }
+
+    async function createComment(event) {
+        event.preventDefault();
+        if (!loggedIn) return alert('로그인 후 댓글을 작성할 수 있습니다.');
+        const content = document.getElementById('commentContent').value.trim();
+        if (!content) return alert('댓글 내용을 입력해주세요.');
+        try {
+            await api(`/community/posts/${currentPost.postId}/comments`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content})
+            });
+            await loadDetail(currentPost.postId);
+        } catch (error) {
+            alert('댓글 저장 실패: ' + error.message);
+        }
+    }
+
+    async function toggleLike() {
+        if (!loggedIn) return alert('로그인 후 좋아요를 누를 수 있습니다.');
+        await api(`/community/posts/${currentPost.postId}/like`, {method: currentPost.liked ? 'DELETE' : 'POST'});
+        await loadDetail(currentPost.postId);
+    }
+
+    async function deletePost() {
+        if (!confirm('게시글을 삭제할까요?')) return;
+        await api(`/community/posts/${currentPost.postId}`, {method: 'DELETE'});
+        location.href = '/community';
+    }
+
+    async function editComment(commentId, content) {
+        const next = prompt('댓글 수정', content);
+        if (next === null) return;
+        await api(`/community/comments/${commentId}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({content: next})
+        });
+        await loadDetail(currentPost.postId);
+    }
+
+    async function deleteComment(commentId) {
+        if (!confirm('댓글을 삭제할까요?')) return;
+        await api(`/community/comments/${commentId}`, {method: 'DELETE'});
+        await loadDetail(currentPost.postId);
+    }
+
+    function formatDate(value) { return value ? String(value).replace('T', ' ').slice(0, 16) : '-'; }
+    function escapeHtml(value) { return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+    function escapeAttr(value) { return escapeHtml(value).replaceAll('`','&#096;'); }
+    function escapeJs(value) { return String(value ?? '').replaceAll('\\','\\\\').replaceAll("'", "\\'").replaceAll('\n','\\n').replaceAll('\r',''); }
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate 커뮤니티 관리</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .admin-table td.actions-cell { white-space: nowrap; }
+        .admin-action-form { display: inline; }
+        .admin-page-actions { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }
+        .admin-page-actions a, .admin-page-actions span {
+            display: inline-flex;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #dbe3ef;
+            color: #475569;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .admin-message {
+            margin-bottom: 18px;
+            background: #eef4ff;
+            color: #155eef;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community" class="active">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
+            <a href="/admin/inquiries">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-top">
+            <div>
+                <h1>커뮤니티 관리</h1>
+                <p>전체 커뮤니티 게시글을 확인하고 관리할 수 있습니다.</p>
+            </div>
+        </section>
+
+        <div th:if="${message}" class="admin-message" th:text="${message}"></div>
+
+        <section class="admin-table-card">
+            <div class="admin-table-header">
+                <div>
+                    <h2>게시글 목록</h2>
+                    <p class="table-sub-text">최신순으로 등록된 커뮤니티 게시글입니다.</p>
+                </div>
+                <span th:text="${postPage.totalElements} + '건'">0건</span>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>게시글 번호</th>
+                    <th>제목</th>
+                    <th>작성자 ID</th>
+                    <th>작성자</th>
+                    <th>카테고리</th>
+                    <th>테마</th>
+                    <th>작성일</th>
+                    <th>조회수</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="post : ${posts}">
+                    <td th:text="${post.postId}">1</td>
+                    <td>
+                        <strong th:text="${post.title}">게시글 제목</strong>
+                        <span th:if="${post.edited}" class="status-badge answered">수정됨</span>
+                        <p class="table-sub-text" th:text="${post.contentPreview}">게시글 내용 미리보기</p>
+                    </td>
+                    <td th:text="${post.authorId}">1</td>
+                    <td th:text="${post.authorName}">작성자</td>
+                    <td th:text="${post.category}">FREE</td>
+                    <td th:text="${post.themeName != null ? post.themeName : '-'}">테마</td>
+                    <td th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">2026-06-01 10:00</td>
+                    <td th:text="${post.viewCount}">0</td>
+                    <td class="actions-cell">
+                        <a class="admin-action-btn" th:href="@{/admin/community/posts/{postId}(postId=${post.postId})}">확인</a>
+                        <a class="admin-action-btn" th:href="@{/admin/community/posts/{postId}/edit(postId=${post.postId})}">수정</a>
+                        <form class="admin-action-form"
+                              th:action="@{/admin/community/posts/{postId}/delete(postId=${post.postId})}"
+                              method="post"
+                              onsubmit="return confirm('이 게시글을 삭제하시겠습니까?');">
+                            <button class="admin-delete-btn" type="submit">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(posts)}">
+                    <td class="empty-table" colspan="9">등록된 게시글이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="admin-page-actions">
+                <a th:if="${postPage.hasPrevious}"
+                   th:href="@{/admin/community(page=${postPage.page - 1}, size=${postPage.size})}">이전</a>
+                <span th:text="|${postPage.page + 1} / ${postPage.totalPages == 0 ? 1 : postPage.totalPages}|">1 / 1</span>
+                <a th:if="${postPage.hasNext}"
+                   th:href="@{/admin/community(page=${postPage.page + 1}, size=${postPage.size})}">다음</a>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

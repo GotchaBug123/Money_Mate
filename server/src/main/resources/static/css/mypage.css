@@ -1,0 +1,246 @@
+.mypage-main {
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 45%);
+    min-height: calc(100vh - 78px);
+    padding-bottom: 60px;
+}
+
+.mypage-hero {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 70px 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+.page-badge {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #eaf1ff;
+    color: #155eef;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.mypage-hero h1 {
+    font-size: 44px;
+    line-height: 1.25;
+    color: #111827;
+    margin-bottom: 18px;
+}
+
+.hero-desc {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #64748b;
+}
+
+.profile-summary-card {
+    width: 310px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    padding: 34px 28px;
+    box-shadow: 0 18px 45px rgba(21, 94, 239, 0.12);
+    text-align: center;
+}
+
+.profile-circle {
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #155eef, #60a5fa);
+    color: white;
+    font-size: 34px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-summary-card h3 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+.profile-summary-card p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 7px 14px;
+    background: #ecfdf5;
+    color: #059669;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.dashboard-grid {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 22px;
+}
+
+.info-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.large-card {
+    grid-row: span 2;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 26px;
+}
+
+.card-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: #155eef;
+    margin-bottom: 8px;
+}
+
+.info-card h2 {
+    font-size: 24px;
+    color: #111827;
+}
+
+.profile-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.profile-info-item span {
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.profile-info-item strong {
+    color: #111827;
+    font-size: 16px;
+}
+
+.small-blue-btn {
+    padding: 10px 16px;
+    background: #155eef;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.full-blue-btn,
+.full-outline-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 13px 0;
+    border-radius: 10px;
+    font-weight: 800;
+    margin-top: 20px;
+}
+
+.full-blue-btn {
+    background: #155eef;
+    color: white;
+}
+
+.full-outline-btn {
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    background: white;
+}
+
+.card-desc {
+    margin-top: 14px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.progress-circle {
+    width: 120px;
+    height: 120px;
+    margin: 24px auto 10px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at center, white 57%, transparent 58%),
+        conic-gradient(#155eef 0 35%, #e5e7eb 35% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-circle span {
+    font-size: 24px;
+    font-weight: 900;
+    color: #155eef;
+}
+
+.money-value {
+    font-size: 34px;
+    font-weight: 900;
+    color: #111827;
+    margin-top: 26px;
+}
+
+.mini-bars {
+    height: 90px;
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.mini-bars span {
+    flex: 1;
+    background: linear-gradient(180deg, #155eef, #93c5fd);
+    border-radius: 8px 8px 0 0;
+}
+
+.empty-state {
+    margin-top: 24px;
+    padding: 22px;
+    background: #f8fafc;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.empty-state strong {
+    color: #111827;
+    font-size: 22px;
+}
+
+.empty-state p {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 14px;
+}
