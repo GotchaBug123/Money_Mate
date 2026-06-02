@@ -3,6 +3,9 @@ package com.gotchabug.moneymate.controller.portfolio;
 import com.gotchabug.moneymate.dto.HoldingDto;
 import com.gotchabug.moneymate.entity.Member;
 import com.gotchabug.moneymate.service.HoldingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,13 +28,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/holding")
 @RequiredArgsConstructor
+@Tag(name = "Holding", description = "사용자 보유 종목 관리 API")
 public class HoldingController {
 
     private final HoldingService holdingService;
 
     /** 내 보유 종목 목록 조회 */
     @GetMapping
-    public List<HoldingDto> getHoldingList(HttpSession session) {
+    @Operation(summary = "내 보유 종목 목록 조회", description = "로그인 사용자의 보유 종목 목록을 조회합니다.")
+    public List<HoldingDto> getHoldingList(
+            @Parameter(hidden = true) HttpSession session
+    ) {
         return holdingService.getHoldingList(getLoginUser(session).getMemberId());
     }
 
@@ -47,8 +54,9 @@ public class HoldingController {
      * }
      */
     @PostMapping
+    @Operation(summary = "보유 종목 추가", description = "투자정보 화면에서 선택한 종목을 내 보유 종목 목록에 추가합니다.")
     public HoldingDto addHolding(@RequestBody Map<String, Object> body,
-                                 HttpSession session) {
+                                 @Parameter(hidden = true) HttpSession session) {
         String ticker    = requireString(body, "ticker");
         String assetName = requireString(body, "assetName");
         String market    = (String) body.get("market");  // nullable
@@ -69,8 +77,12 @@ public class HoldingController {
 
     /** 보유 종목 삭제 */
     @DeleteMapping("/{holdingId}")
-    public Map<String, String> removeHolding(@PathVariable Long holdingId,
-                                             HttpSession session) {
+    @Operation(summary = "보유 종목 삭제", description = "보유 종목 ID에 해당하는 항목을 삭제합니다.")
+    public Map<String, String> removeHolding(
+            @Parameter(description = "보유 종목 ID", example = "1")
+            @PathVariable Long holdingId,
+            @Parameter(hidden = true) HttpSession session
+    ) {
         holdingService.removeHolding(getLoginUser(session).getMemberId(), holdingId);
         return Map.of("message", "투자 종목에서 삭제되었습니다.");
     }
@@ -80,8 +92,12 @@ public class HoldingController {
      * GET /api/holding/check?ticker=005930
      */
     @GetMapping("/check")
-    public Map<String, Boolean> checkHolding(@RequestParam String ticker,
-                                             HttpSession session) {
+    @Operation(summary = "보유 종목 여부 확인", description = "티커 기준으로 이미 보유 종목에 등록되어 있는지 확인합니다.")
+    public Map<String, Boolean> checkHolding(
+            @Parameter(description = "종목 티커", example = "005930")
+            @RequestParam String ticker,
+            @Parameter(hidden = true) HttpSession session
+    ) {
         boolean holding = holdingService.isHolding(getLoginUser(session).getMemberId(), ticker);
         return Map.of("inHolding", holding);
     }

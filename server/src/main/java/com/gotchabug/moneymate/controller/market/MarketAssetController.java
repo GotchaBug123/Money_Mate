@@ -3,6 +3,7 @@ package com.gotchabug.moneymate.controller.market;
 import com.gotchabug.moneymate.dto.market.MarketAssetSearchResponse;
 import com.gotchabug.moneymate.service.MarketAssetSearchService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ public class MarketAssetController {
             description = "한글/숫자 키워드는 국내 종목 마스터에서 우선 검색하고, 영문 티커는 Yahoo Finance 검색 결과를 반환합니다."
     )
     public List<MarketAssetSearchResponse> searchAssets(
+            @Parameter(description = "검색 키워드. 예: 삼성전자, 005930, AAPL, SPY", example = "삼성전자")
             @RequestParam(defaultValue = "") String keyword
     ) {
         return marketAssetSearchService.searchAssets(keyword);

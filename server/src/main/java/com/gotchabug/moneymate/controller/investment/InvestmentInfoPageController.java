@@ -17,6 +17,7 @@ import java.util.List;
  * 투자정보 페이지 컨트롤러
  * URL: GET /investment-info
  */
+@io.swagger.v3.oas.annotations.Hidden
 @Controller
 @RequestMapping("/investment-info")
 @RequiredArgsConstructor

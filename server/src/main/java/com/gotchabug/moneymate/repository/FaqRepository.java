@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface FaqRepository extends JpaRepository<Faq, Long> {
 
+    List<Faq> findByActiveYnOrderByViewCountDesc(String activeYn);
+
     List<Faq> findTop10ByActiveYnOrderByViewCountDesc(String activeYn);
 
     List<Faq> findByCategoryAndActiveYnOrderByViewCountDesc(String category, String activeYn);

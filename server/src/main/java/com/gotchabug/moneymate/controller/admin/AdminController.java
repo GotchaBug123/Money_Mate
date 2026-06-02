@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+@io.swagger.v3.oas.annotations.Hidden
 @Controller
 @RequiredArgsConstructor
 public class AdminController {

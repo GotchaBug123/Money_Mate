@@ -47,7 +47,7 @@ public class CommunityComment extends BaseTimeEntity {
     private Member member;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String content;
 
     public void updateContent(String content) {

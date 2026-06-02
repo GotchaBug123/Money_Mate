@@ -60,7 +60,7 @@ public class CommunityPost extends BaseTimeEntity {
     private String title;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(name = "stock_symbol", length = 30)

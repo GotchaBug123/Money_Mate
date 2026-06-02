@@ -7,6 +7,8 @@ import com.gotchabug.moneymate.repository.AssetPriceRepository;
 import com.gotchabug.moneymate.repository.AssetRepository;
 import com.gotchabug.moneymate.service.InvestmentInfoService;
 import com.gotchabug.moneymate.service.StockDataService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Stock Data", description = "주식 데이터 동기화 및 투자정보 조회 API")
 public class StockDataController {
 
     private final StockDataService stockDataService;
@@ -26,16 +29,19 @@ public class StockDataController {
     private final InvestmentInfoService investmentInfoService;
 
     @GetMapping("/api/stock/sync")
+    @Operation(summary = "국내 주식 데이터 동기화", description = "주가와 수익률 데이터를 외부 데이터 소스에서 동기화합니다.")
     public String sync() {
         return stockDataService.syncAll();
     }
 
     @GetMapping("/api/stock/sync-overseas-top")
+    @Operation(summary = "해외 거래량 상위 종목 동기화", description = "해외 주식 거래량 상위 종목 데이터를 동기화합니다.")
     public String syncOverseasTop() {
         return stockDataService.syncOverseasTop100();
     }
 
     @GetMapping("/api/stock/sync-all")
+    @Operation(summary = "전체 주식 데이터 동기화", description = "국내 주식 데이터와 해외 거래량 상위 종목 데이터를 함께 동기화합니다.")
     public String syncAll() {
         String r1 = stockDataService.syncAll();
         String r2 = stockDataService.syncOverseasTop100();
@@ -56,12 +62,14 @@ public class StockDataController {
      *   - 10% 이상 비정상 종목은 자동 제외됨
      */
     @GetMapping("/api/stock/sync-dividend")
+    @Operation(summary = "배당 수익률 동기화", description = "Yahoo Finance 배당 수익률 데이터를 asset_indicator에 저장합니다.")
     public String syncDividend() {
         return stockDataService.syncDividendYields();
     }
     // ─────────────────────────────────────────────────────────
 
     @GetMapping("/api/test/sector")
+    @Operation(summary = "섹터 검색 테스트", description = "특정 섹터에 해당하는 자산과 가격 데이터 존재 여부를 확인합니다.")
     public String testSector() {
         List<Asset> assets = assetRepository.findBySectorContaining("반도체");
 
@@ -83,6 +91,7 @@ public class StockDataController {
     }
 
     @GetMapping("/api/dividend/top6")
+    @Operation(summary = "배당 상위 종목 조회", description = "국내, 해외, ETF 배당 상위 종목을 조회합니다.")
     public Map<String, Object> getDividendTop6() {
         List<AssetSummaryDto> korean   = investmentInfoService.getDividendTopKorean();
         List<AssetSummaryDto> overseas = investmentInfoService.getDividendTopOverseas();

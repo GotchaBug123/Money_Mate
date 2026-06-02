@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+@io.swagger.v3.oas.annotations.Hidden
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/community")

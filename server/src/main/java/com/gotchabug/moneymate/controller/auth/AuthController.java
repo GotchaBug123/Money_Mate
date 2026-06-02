@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+@io.swagger.v3.oas.annotations.Hidden
 @Controller
 @RequiredArgsConstructor
 public class AuthController {

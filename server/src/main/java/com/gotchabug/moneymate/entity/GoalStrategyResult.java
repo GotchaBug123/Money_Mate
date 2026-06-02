@@ -70,7 +70,7 @@ public class GoalStrategyResult extends BaseTimeEntity {
     private RebalanceCycle rebalanceCycle;
 
     @Lob
-    @Column(name = "selected_asset_summary", nullable = false)
+    @Column(name = "selected_asset_summary", nullable = false, columnDefinition = "LONGTEXT")
     private String selectedAssetSummary;
 
     @Column(name = "success_probability", nullable = false)

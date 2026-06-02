@@ -5,6 +5,7 @@ import com.gotchabug.moneymate.dto.financial.FinancialProfileResponse;
 import com.gotchabug.moneymate.entity.Member;
 import com.gotchabug.moneymate.service.FinancialProfileService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class FinancialProfileController {
     @Operation(summary = "내 재무정보 저장/수정", description = "로그인 사용자의 재무정보를 저장하거나 수정합니다.")
     public FinancialProfileResponse saveOrUpdateMyFinancialProfile(
             @Valid @RequestBody FinancialProfileRequest request,
+            @Parameter(hidden = true)
             HttpSession session
     ) {
 
@@ -51,6 +53,7 @@ public class FinancialProfileController {
     @GetMapping("/me")
     @Operation(summary = "내 재무정보 조회", description = "로그인 사용자의 재무정보를 조회합니다.")
     public FinancialProfileResponse getMyFinancialProfile(
+            @Parameter(hidden = true)
             HttpSession session
     ) {
 

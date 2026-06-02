@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
+@io.swagger.v3.oas.annotations.Hidden
 @Controller
 @RequiredArgsConstructor
 public class MyAssetPageController {

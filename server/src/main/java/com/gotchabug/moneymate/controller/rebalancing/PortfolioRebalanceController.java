@@ -5,6 +5,7 @@ import com.gotchabug.moneymate.dto.goal.GoalStrategyResponse;
 import com.gotchabug.moneymate.entity.Member;
 import com.gotchabug.moneymate.service.GoalStrategyService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -29,6 +30,7 @@ public class PortfolioRebalanceController {
     )
     public GoalStrategyResponse analyzePortfolioRebalance(
             @Valid @RequestBody GoalStrategyRequest request,
+            @Parameter(hidden = true)
             HttpSession session
     ) {
 

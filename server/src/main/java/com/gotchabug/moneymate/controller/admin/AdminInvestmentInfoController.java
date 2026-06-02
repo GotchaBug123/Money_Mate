@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@io.swagger.v3.oas.annotations.Hidden
 @Controller
 @RequiredArgsConstructor
 public class AdminInvestmentInfoController {
