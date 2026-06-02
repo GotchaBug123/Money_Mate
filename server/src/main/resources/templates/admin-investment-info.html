@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate 관리자 - 투자정보 관리</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info" class="active">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
+            <a href="/admin/inquiries">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-top">
+            <div>
+                <h1>투자정보 관리</h1>
+                <p>서비스에서 사용하는 자산 정보와 한국 종목 마스터를 확인합니다.</p>
+            </div>
+        </section>
+
+        <section class="admin-table-card">
+            <div class="admin-table-header">
+                <div>
+                    <h2>자산 정보</h2>
+                    <p class="table-sub-text">asset 테이블 기준 최근 50개 항목입니다.</p>
+                </div>
+                <span th:text="${assets != null ? #lists.size(assets) + '건' : '0건'}">0건</span>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>자산 ID</th>
+                    <th>티커</th>
+                    <th>자산명</th>
+                    <th>유형</th>
+                    <th>시장</th>
+                    <th>데이터 출처</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${assets == null or #lists.isEmpty(assets)}">
+                    <td colspan="6" class="empty-table">등록된 투자정보가 없습니다.</td>
+                </tr>
+                <tr th:each="asset : ${assets}">
+                    <td th:text="${asset.assetId}">1</td>
+                    <td th:text="${asset.ticker}">005930</td>
+                    <td th:text="${asset.assetName}">삼성전자</td>
+                    <td th:text="${asset.assetType}">STOCK</td>
+                    <td th:text="${asset.market}">KOSPI</td>
+                    <td th:text="${asset.dataSource}">YAHOO_FINANCE</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="admin-table-card admin-section-gap">
+            <div class="admin-table-header">
+                <div>
+                    <h2>한국 종목 마스터</h2>
+                    <p class="table-sub-text">asset_master 테이블 기준 최근 50개 항목입니다.</p>
+                </div>
+                <span th:text="${assetMasters != null ? #lists.size(assetMasters) + '건' : '0건'}">0건</span>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>종목코드</th>
+                    <th>Yahoo Symbol</th>
+                    <th>종목명</th>
+                    <th>시장</th>
+                    <th>유형</th>
+                    <th>국가</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${assetMasters == null or #lists.isEmpty(assetMasters)}">
+                    <td colspan="6" class="empty-table">등록된 투자정보가 없습니다.</td>
+                </tr>
+                <tr th:each="assetMaster : ${assetMasters}">
+                    <td th:text="${assetMaster.symbol}">005930</td>
+                    <td th:text="${assetMaster.yahooSymbol}">005930.KS</td>
+                    <td th:text="${assetMaster.assetName}">삼성전자</td>
+                    <td th:text="${assetMaster.market}">KOSPI</td>
+                    <td th:text="${assetMaster.assetType}">STOCK</td>
+                    <td th:text="${assetMaster.country}">KR</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

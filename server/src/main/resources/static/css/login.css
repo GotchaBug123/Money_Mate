@@ -43,7 +43,7 @@ body {
     border: 1px solid #ddd;
 }
 
-.login-btn {
+.login-box .login-btn {
     width: 100%;
     margin-top: 20px;
     padding: 12px;

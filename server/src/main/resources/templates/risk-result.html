@@ -1,0 +1,105 @@
+<!-- resources/templates/risk-result.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 투자성향 분석 결과</title>
+    <link rel="stylesheet" href="/css/risk-result.css">
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: globalHeader('')}"></header>
+
+<main class="result-page">
+
+    <section class="result-hero">
+        <p class="eyebrow">MoneyMate AI 분석 결과</p>
+        <h1 th:text="${result.resultType}">위험중립형</h1>
+        <p th:text="${result.description}">안정성과 수익성의 균형을 추구하는 투자자입니다.</p>
+    </section>
+
+    <section class="summary-grid">
+        <div class="summary-card dark">
+            <p>총 투자성향 점수</p>
+            <strong th:text="${result.totalScore}">40</strong>
+            <span>설문 응답 기반 종합 점수</span>
+        </div>
+
+        <div class="summary-card">
+            <p>위험회피도</p>
+            <strong th:text="${result.riskAvoidancePercent + '%'}">50.00%</strong>
+            <span th:text="${result.riskAvoidanceLabel}">보통</span>
+        </div>
+
+        <div class="summary-card">
+            <p>금융 관심도</p>
+            <strong th:text="${result.financialInterestPercent + '%'}">70.00%</strong>
+            <span th:text="${result.financialInterestLabel}">높음</span>
+        </div>
+    </section>
+
+    <section class="recommend-section">
+        <div class="section-title">
+            <p>AI 추천 카테고리</p>
+            <h2>투자성향 기반 추천 결과</h2>
+        </div>
+
+        <div class="recommend-grid">
+            <article class="recommend-card" th:each="card : ${result.recommendations}">
+                <div class="card-head">
+                    <span class="rank" th:text="'#' + ${card.rankNo}">#1</span>
+                    <h3 th:text="${card.categoryName}">미국ETF</h3>
+                </div>
+
+                <div class="score-row">
+                    <span>매칭 점수</span>
+                    <strong th:text="${card.matchingScore + '점'}">85점</strong>
+                </div>
+
+                <div class="score-bar">
+                    <div class="score-fill" th:style="'width:' + ${card.matchingScore} + '%'"></div>
+                </div>
+
+                <div class="detail-list">
+                    <div>
+                        <span>운용 레벨</span>
+                        <b th:text="${card.operationLevel}">8.5</b>
+                    </div>
+                    <div>
+                        <span>위험 유형</span>
+                        <b th:text="${card.riskType}">균형형</b>
+                    </div>
+                    <div>
+                        <span>최소 시작 금액</span>
+                        <b th:text="${card.minimumAmount}">100만원부터</b>
+                    </div>
+                    <div>
+                        <span>위험회피도</span>
+                        <b th:text="${card.riskAvoidancePercent + '%'}">50.00%</b>
+                    </div>
+                    <div>
+                        <span>금융 관심도</span>
+                        <b th:text="${card.financialInterestPercent + '%'}">70.00%</b>
+                    </div>
+                </div>
+
+                <p class="reason" th:text="${card.reason}">
+                    추천 이유가 표시됩니다.
+                </p>
+
+                <div class="tag-wrap">
+                    <span th:each="tag : ${card.tags}" th:text="${tag}">#분산투자</span>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <div class="actions">
+        <a href="/risk-survey">다시 분석하기</a>
+        <a href="/main" class="primary">홈으로 이동</a>
+    </div>
+
+</main>
+
+</body>
+</html>

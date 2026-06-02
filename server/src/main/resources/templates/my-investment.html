@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 내 투자 정보</title>
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/my-investment.css">
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: globalHeader('asset')}"></header>
+
+<main class="investment-page">
+
+    <!-- HERO -->
+    <section class="investment-hero">
+
+        <div class="hero-left">
+            <p class="hero-label">MY INVESTMENT</p>
+
+            <h1>
+                나의 투자 현황을<br>
+                한눈에 확인하세요
+            </h1>
+
+            <p class="hero-desc">
+                담아둔 투자 종목과 관심 종목의 수익률,
+                자산 현황, 시장 흐름을 실시간으로 확인할 수 있습니다.
+            </p>
+
+            <a href="/stock-search" class="hero-btn">
+                종목 검색하기
+            </a>
+        </div>
+
+        <div class="hero-right">
+
+            <div class="hero-card">
+                <span>총 투자금액</span>
+                <strong>₩ 12,450,000</strong>
+            </div>
+
+            <div class="hero-card">
+                <span>총 평가금액</span>
+                <strong>₩ 13,280,000</strong>
+            </div>
+
+            <div class="hero-card profit">
+                <span>총 수익률</span>
+                <strong>+6.67%</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- 수익률 차트 -->
+    <section class="chart-section">
+
+        <div class="section-title">
+            <div>
+                <p>Monthly Portfolio Return</p>
+                <h2>월별 종합 수익률</h2>
+            </div>
+
+            <span>최근 6개월 기준</span>
+        </div>
+
+        <div class="chart-box">
+
+            <div class="chart-item">
+                <div class="bar" style="height: 42%;"></div>
+                <strong>+2.1%</strong>
+                <span>1월</span>
+            </div>
+
+            <div class="chart-item">
+                <div class="bar" style="height: 58%;"></div>
+                <strong>+4.4%</strong>
+                <span>2월</span>
+            </div>
+
+            <div class="chart-item">
+                <div class="bar minus" style="height: 30%;"></div>
+                <strong>-1.3%</strong>
+                <span>3월</span>
+            </div>
+
+            <div class="chart-item">
+                <div class="bar" style="height: 74%;"></div>
+                <strong>+6.8%</strong>
+                <span>4월</span>
+            </div>
+
+            <div class="chart-item">
+                <div class="bar" style="height: 62%;"></div>
+                <strong>+5.1%</strong>
+                <span>5월</span>
+            </div>
+
+            <div class="chart-item">
+                <div class="bar" style="height: 88%;"></div>
+                <strong>+8.3%</strong>
+                <span>6월</span>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- 투자 종목 + 관심 종목 -->
+    <section class="investment-grid">
+
+        <!-- 투자 종목 -->
+        <div class="investment-card">
+
+            <div class="card-header">
+                <div>
+                    <p>My Holdings</p>
+                    <h2>투자 종목</h2>
+                </div>
+
+                <a href="#">전체보기</a>
+            </div>
+
+            <div class="stock-list">
+
+                <div class="stock-item" th:each="holding : ${holdings}">
+
+                    <div class="stock-left">
+
+                        <div class="stock-icon">
+                            <span th:text="${#strings.substring(holding.assetName,0,1)}">삼</span>
+                        </div>
+
+                        <div class="stock-info">
+                            <strong th:text="${holding.assetName}">
+                                삼성전자
+                            </strong>
+
+                            <span>
+                                <span th:text="${holding.ticker}">005930</span>
+                                ·
+                                <span th:text="${holding.market}">KOSPI</span>
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="stock-right">
+
+                        <strong
+                                th:text="${#numbers.formatInteger(holding.buyPrice, 0, 'COMMA')} + '원'">
+                            82,500원
+                        </strong>
+
+                        <span class="holding-count"
+                              th:text="'보유 ' + ${holding.quantity} + '주'">
+                            보유 3주
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="empty-box"
+                     th:if="${#lists.isEmpty(holdings)}">
+
+                    아직 투자한 종목이 없습니다.
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 관심 종목 -->
+        <div class="investment-card">
+
+            <div class="card-header">
+                <div>
+                    <p>My Watchlist</p>
+                    <h2>관심 종목</h2>
+                </div>
+
+                <a href="#">관리하기</a>
+            </div>
+
+            <div class="stock-list">
+
+                <div class="stock-item"
+                     th:each="item : ${watchlist}">
+
+                    <div class="stock-left">
+
+                        <div class="stock-icon watch">
+                            ♥
+                        </div>
+
+                        <div class="stock-info">
+
+                            <strong th:text="${item.assetName}">
+                                Apple
+                            </strong>
+
+                            <span>
+                                <span th:text="${item.ticker}">AAPL</span>
+                                ·
+                                <span th:text="${item.market}">NASDAQ</span>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <button class="watch-btn">
+                        관심중
+                    </button>
+
+                </div>
+
+                <div class="empty-box"
+                     th:if="${#lists.isEmpty(watchlist)}">
+
+                    아직 관심 종목이 없습니다.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>MoneyMate © 2026 All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 포트폴리오 리밸런싱 분석</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        body {
+            background: #f8fafc;
+            color: #101828;
+        }
+
+        .rebalance-main {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 30px 18px 0;
+        }
+
+        .page-heading {
+            margin: 0 0 18px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 6px;
+            font-size: 28px;
+            letter-spacing: 0;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .notice {
+            margin: 0 0 16px;
+            padding: 12px 14px;
+            border: 1px solid #c7d7fe;
+            border-radius: 8px;
+            background: #eff4ff;
+            color: #155eef;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .notice.warn {
+            color: #b42318;
+            border-color: #fecdca;
+            background: #fffbfa;
+        }
+
+        .analysis-layout {
+            display: grid;
+            grid-template-columns: 420px minmax(0, 1fr);
+            gap: 28px;
+            align-items: start;
+            min-height: 620px;
+        }
+
+        .input-panel,
+        .result-panel {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .panel-title {
+            margin: 0 0 18px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label,
+        .asset-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #101828;
+        }
+
+        .input,
+        .select,
+        .asset-row input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #101828;
+            font-size: 14px;
+        }
+
+        .input:focus,
+        .select:focus,
+        .asset-row input:focus {
+            outline: 2px solid #c7d7fe;
+            border-color: #155eef;
+        }
+
+        .period-grid,
+        .asset-search-bar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+        }
+
+        .period-grid {
+            grid-template-columns: minmax(0, 1fr) 120px;
+        }
+
+        .hint {
+            margin: 6px 0 0;
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .asset-search-results {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .asset-search-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 10px 12px;
+        }
+
+        .asset-search-item strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .asset-search-item span {
+            display: block;
+            margin-top: 3px;
+            color: #667085;
+            font-size: 12px;
+        }
+
+        .selected-assets {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .asset-row {
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            background: #f9fafb;
+            padding: 12px;
+        }
+
+        .asset-row-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .asset-row-title {
+            min-width: 0;
+        }
+
+        .asset-row-title strong {
+            display: block;
+            font-size: 15px;
+        }
+
+        .asset-row-title span {
+            display: block;
+            margin-top: 3px;
+            color: #667085;
+            font-size: 12px;
+        }
+
+        .asset-weight-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 96px;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .asset-weight-grid span {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .weight-status {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid #fedf89;
+            background: #fffaeb;
+            color: #b54708;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .weight-status.valid {
+            border-color: #abefc6;
+            background: #ecfdf3;
+            color: #067647;
+        }
+
+        .button {
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #344054;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .button.primary {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            border-color: #155eef;
+            background: #155eef;
+            color: #ffffff;
+        }
+
+        .button.small {
+            padding: 7px 10px;
+            font-size: 13px;
+        }
+
+        .button.danger {
+            color: #b42318;
+            border-color: #fecdca;
+            background: #fffbfa;
+        }
+
+        .graph-box {
+            height: 320px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667085;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .probability-box {
+            border: 1px solid #c7d7fe;
+            border-radius: 8px;
+            background: #eff4ff;
+            color: #155eef;
+            padding: 12px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            margin-bottom: 18px;
+        }
+
+        .achievement-box,
+        .support-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 14px;
+            margin-bottom: 18px;
+        }
+
+        .achievement-box h3,
+        .support-box h3 {
+            margin: 0 0 10px;
+            color: #101828;
+            font-size: 17px;
+        }
+
+        .achievement-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #475467;
+        }
+
+        .achievement-status {
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: #eff4ff;
+            color: #155eef;
+            font-weight: 800;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 18px;
+            align-items: center;
+        }
+
+        .result-item {
+            display: grid;
+            grid-template-columns: 108px minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .result-label {
+            text-align: right;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .result-value {
+            min-height: 34px;
+            padding: 10px 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 6px;
+            background: #ffffff;
+            box-sizing: border-box;
+            font-weight: 800;
+            color: #101828;
+        }
+
+        .result-item.wide {
+            grid-column: 1 / -1;
+            grid-template-columns: 108px minmax(0, 1fr);
+            width: calc(50% - 9px);
+        }
+
+        .support-box {
+            margin-top: 18px;
+        }
+
+        .asset-summary-row {
+            margin-bottom: 10px;
+        }
+
+        .asset-summary-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .bar-track {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #155eef;
+        }
+
+        .footer {
+            margin-top: 44px;
+            height: 92px;
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 900px) {
+            .analysis-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-item,
+            .result-item.wide {
+                width: 100%;
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: globalHeader('rebalancing')}"></header>
+
+<main class="rebalance-main">
+    <div class="page-heading">
+        <h1>포트폴리오 리밸런싱 분석</h1>
+        <p>종목을 검색해 포트폴리오를 구성하고 목표 금액 달성 가능성을 확인합니다.</p>
+    </div>
+
+    <p th:if="${!loggedIn}" class="notice warn">
+        로그인 후 포트폴리오 리밸런싱 분석을 실행할 수 있습니다.
+    </p>
+    <p th:if="${loggedIn}" class="notice" th:text="|${loginUserName}님, 포트폴리오 리밸런싱 분석을 시작해보세요.|">
+    </p>
+
+    <section class="analysis-layout">
+        <form id="rebalanceForm" class="input-panel">
+            <h2 class="panel-title">분석 조건</h2>
+            <input name="goalName" type="hidden" value="포트폴리오 리밸런싱 분석">
+            <input name="currentAmount" type="hidden" value="0">
+
+            <div class="field">
+                <label for="monthlyInvestment">투자 금액</label>
+                <input id="monthlyInvestment" name="monthlyInvestment" class="input" type="number" min="0" value="500000" required>
+                <p class="hint">화면의 투자 금액은 월 투자금으로 분석합니다.</p>
+            </div>
+
+            <div class="field">
+                <label for="investmentPeriodValue">투자 목표 기간</label>
+                <div class="period-grid">
+                    <input id="investmentPeriodValue" name="investmentPeriodValue" class="input" type="number" min="1" step="1" value="10" required>
+                    <select id="investmentPeriodUnit" class="select" required>
+                        <option value="YEARS" selected>년</option>
+                        <option value="MONTHS">개월</option>
+                    </select>
+                </div>
+                <p id="periodPreview" class="hint">선택 기간: 10년</p>
+            </div>
+
+            <div class="field">
+                <label for="targetAmount">목표 금액</label>
+                <input id="targetAmount" name="targetAmount" class="input" type="number" min="1000000" value="50000000" required>
+            </div>
+
+            <div class="field">
+                <label for="rebalanceCycle">리밸런싱 주기</label>
+                <select id="rebalanceCycle" name="rebalanceCycle" class="select" required>
+                    <option value="NONE">리밸런싱 없음</option>
+                    <option value="MONTHLY">매월</option>
+                    <option value="QUARTERLY" selected>분기별</option>
+                    <option value="HALF_YEARLY">반기별</option>
+                    <option value="YEARLY">매년</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <div class="asset-label">종목 검색</div>
+                <div class="asset-search-bar">
+                    <input id="assetSearchInput" class="input" type="text" placeholder="종목명 또는 티커 입력">
+                    <button id="assetSearchButton" class="button" type="button">검색</button>
+                </div>
+                <p class="hint">한국 주식은 종목명과 종목코드, 미국 주식과 ETF는 티커로 검색할 수 있습니다.</p>
+                <div id="assetSearchResults" class="asset-search-results"></div>
+            </div>
+
+            <div class="field">
+                <div class="asset-label">포트폴리오 구성</div>
+                <div id="assetRows" class="selected-assets"></div>
+                <div id="weightStatus" class="weight-status">선택한 자산 비중의 합은 100%여야 합니다.</div>
+            </div>
+
+            <button class="button primary" type="submit">리밸런싱 분석 실행</button>
+        </form>
+
+        <section class="result-panel">
+            <h2 class="panel-title">투자 전략 분석 결과</h2>
+            <div id="chartBox" class="graph-box">분석 실행 후 예상 자산 변화 그래프가 표시됩니다.</div>
+
+            <div id="successProbabilityBox" class="probability-box">달성 확률</div>
+
+            <div id="achievementBox" class="achievement-box">
+                <h3>목표 달성 분석</h3>
+                <p class="hint">분석 실행 후 목표 달성 가능성과 예상 달성 시점을 표시합니다.</p>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-label">최종금액</div>
+                    <div id="finalAmountValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">연평균 수익률</div>
+                    <div id="annualizedReturnValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">최대낙폭</div>
+                    <div id="maxDrawdownValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">최고 연 수익률</div>
+                    <div id="bestAnnualReturnValue" class="result-value">-</div>
+                </div>
+                <div class="result-item wide">
+                    <div class="result-label">최저 연 수익률</div>
+                    <div id="worstAnnualReturnValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">부족 금액</div>
+                    <div id="shortageAmountValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">추천 월 투자금</div>
+                    <div id="recommendedMonthlyInvestmentValue" class="result-value">-</div>
+                </div>
+            </div>
+
+            <div class="support-box">
+                <h3>자산 비중 분석</h3>
+                <div id="assetSummary">선택한 포트폴리오의 자산 비중이 표시됩니다.</div>
+            </div>
+        </section>
+    </section>
+</main>
+
+<footer class="footer">Footer 영역</footer>
+
+<script th:inline="javascript">
+    const loginState = {
+        loggedIn: /*[[${loggedIn}]]*/ false
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderAssetSearchResults([], '');
+        updatePeriodPreview();
+        updateWeightStatus();
+
+        document.getElementById('assetSearchButton')
+            .addEventListener('click', searchAssetKeyword);
+        document.getElementById('assetSearchInput')
+            .addEventListener('keydown', event => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    searchAssetKeyword();
+                }
+            });
+        document.getElementById('investmentPeriodValue')
+            .addEventListener('input', updatePeriodPreview);
+        document.getElementById('investmentPeriodUnit')
+            .addEventListener('change', updatePeriodPreview);
+        document.getElementById('rebalanceForm')
+            .addEventListener('submit', analyzePortfolioRebalance);
+    });
+
+    async function searchAssetKeyword() {
+        const input = document.getElementById('assetSearchInput');
+        const keyword = input.value.trim();
+
+        if (!keyword) {
+            renderAssetSearchResults([], '');
+            alert('검색할 종목명 또는 티커를 입력해주세요.');
+            return;
+        }
+
+        const resultBox = document.getElementById('assetSearchResults');
+        resultBox.innerHTML = '<p class="hint">종목을 검색하고 있습니다.</p>';
+
+        try {
+            const results = await searchAssets(keyword);
+            renderAssetSearchResults(results, keyword);
+        } catch (error) {
+            resultBox.innerHTML = `<p class="hint">${escapeHtml(error.message)}</p>`;
+        }
+    }
+
+    async function searchAssets(keyword) {
+        const response = await api(
+            `/api/market/assets/search?keyword=${encodeURIComponent(keyword)}`
+        );
+
+        if (!Array.isArray(response)) {
+            return [];
+        }
+
+        return response
+            .map(normalizeAsset)
+            .filter(asset => asset.symbol && asset.assetName);
+    }
+
+    function renderAssetSearchResults(results, keyword) {
+        const resultBox = document.getElementById('assetSearchResults');
+
+        if (!keyword) {
+            resultBox.innerHTML = '';
+            return;
+        }
+
+        if (!results || results.length === 0) {
+            resultBox.innerHTML = '<p class="hint">검색 결과가 없습니다.</p>';
+            return;
+        }
+
+        resultBox.innerHTML = results.map((asset, index) => `
+            <div class="asset-search-item">
+                <div>
+                    <strong>${escapeHtml(asset.assetName)} (${escapeHtml(asset.symbol)})</strong>
+                    <span>${escapeHtml(asset.market)} · ${escapeHtml(asset.assetType)} · ${escapeHtml(asset.country || '-')}</span>
+                </div>
+                <button class="button small" type="button" onclick="selectAssetFromSearch(${index})">추가</button>
+            </div>
+        `).join('');
+
+        window.latestAssetSearchResults = results;
+    }
+
+    function selectAssetFromSearch(index) {
+        const asset = (window.latestAssetSearchResults || [])[index];
+
+        if (!asset) {
+            return;
+        }
+
+        if (isAssetAlreadySelected(asset.symbol)) {
+            alert('이미 선택한 종목입니다.');
+            return;
+        }
+
+        addAssetRow(asset);
+        clearAssetSearchState();
+    }
+
+    function addAssetRow(asset) {
+        const normalizedAsset = normalizeAsset(asset);
+
+        if (!normalizedAsset.symbol || !normalizedAsset.assetName) {
+            alert('종목 정보가 올바르지 않습니다.');
+            return;
+        }
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'asset-row';
+        wrapper.innerHTML = `
+            <div class="asset-row-header">
+                <div class="asset-row-title">
+                    <strong>${escapeHtml(normalizedAsset.assetName)} (${escapeHtml(normalizedAsset.symbol)})</strong>
+                    <span>${escapeHtml(normalizedAsset.market)} · ${escapeHtml(normalizedAsset.assetType)}${normalizedAsset.yahooSymbol ? ` · ${escapeHtml(normalizedAsset.yahooSymbol)}` : ''}</span>
+                </div>
+                <button class="button small danger" type="button" onclick="removeAssetRow(this)">삭제</button>
+            </div>
+            <div class="asset-weight-grid">
+                <span>목표 비중(%)</span>
+                <input name="targetWeight" type="number" min="1" max="100" step="1" value="${formatWeightPercent(suggestNextWeightPercent())}" required>
+            </div>
+            <input name="symbol" type="hidden" value="${escapeAttr(normalizedAsset.symbol)}">
+            <input name="assetName" type="hidden" value="${escapeAttr(normalizedAsset.assetName)}">
+            <input name="assetType" type="hidden" value="${escapeAttr(normalizedAsset.assetType)}">
+            <input name="market" type="hidden" value="${escapeAttr(normalizedAsset.market)}">
+            <input name="expectedAnnualReturn" type="hidden" value="${normalizedAsset.expectedAnnualReturn}">
+            <input name="annualVolatility" type="hidden" value="${normalizedAsset.annualVolatility}">
+            <input name="theme" type="hidden" value="${escapeAttr(normalizedAsset.theme || '')}">
+        `;
+
+        wrapper.querySelector('[name="targetWeight"]')
+            .addEventListener('input', updateWeightStatus);
+        document.getElementById('assetRows').appendChild(wrapper);
+        updateWeightStatus();
+    }
+
+    function clearAssetSearchState() {
+        document.getElementById('assetSearchInput').value = '';
+        window.latestAssetSearchResults = [];
+        renderAssetSearchResults([], '');
+    }
+
+    function removeAssetRow(button) {
+        button.closest('.asset-row').remove();
+        updateWeightStatus();
+    }
+
+    function isAssetAlreadySelected(symbol) {
+        return Array.from(document.querySelectorAll('[name="symbol"]'))
+            .some(input => input.value === symbol);
+    }
+
+    function suggestNextWeightPercent() {
+        const assets = collectAssets(false);
+
+        if (assets.length === 0) {
+            return 100;
+        }
+
+        const currentSum = assets.reduce(
+            (sum, asset) => sum + numberValue(asset.targetWeight, 0),
+            0
+        );
+        const remaining = 1 - currentSum;
+
+        if (remaining > 0.0001) {
+            return Math.round(remaining * 100);
+        }
+
+        return 10;
+    }
+
+    function updateWeightStatus() {
+        const status = document.getElementById('weightStatus');
+        const sum = collectAssets(false).reduce(
+            (total, asset) => total + numberValue(asset.targetWeight, 0),
+            0
+        );
+        const valid = Math.abs(sum - 1.0) <= 0.0001;
+
+        status.classList.toggle('valid', valid);
+        status.textContent = collectAssets(false).length === 0
+            ? '종목을 검색해 포트폴리오에 추가해주세요.'
+            : `현재 비중 합계: ${(sum * 100).toFixed(2)}%`;
+    }
+
+    function updatePeriodPreview() {
+        const preview = document.getElementById('periodPreview');
+        preview.textContent = `선택 기간: ${getInvestmentPeriodLabel()}`;
+    }
+
+    function getApiInvestmentYears() {
+        const months = getApiInvestmentMonths();
+
+        return Math.max(1, Math.floor(months / 12));
+    }
+
+    function getApiInvestmentMonths() {
+        const value = Math.max(
+            1,
+            Math.floor(numberValue(document.getElementById('investmentPeriodValue').value, 1))
+        );
+        const unit = document.getElementById('investmentPeriodUnit').value;
+
+        return unit === 'MONTHS' ? value : value * 12;
+    }
+
+    function getInvestmentPeriodLabel() {
+        const value = Math.max(
+            1,
+            Math.floor(numberValue(document.getElementById('investmentPeriodValue').value, 1))
+        );
+        const unit = document.getElementById('investmentPeriodUnit').value;
+
+        return unit === 'MONTHS' ? formatDuration(value) : `${value}년`;
+    }
+
+    function getSelectedPeriodMonths() {
+        const value = Math.max(
+            1,
+            Math.floor(numberValue(document.getElementById('investmentPeriodValue').value, 1))
+        );
+        const unit = document.getElementById('investmentPeriodUnit').value;
+
+        return unit === 'MONTHS' ? value : value * 12;
+    }
+
+    async function analyzePortfolioRebalance(event) {
+        event.preventDefault();
+
+        if (!loginState.loggedIn) {
+            alert('로그인 후 리밸런싱 분석을 실행할 수 있습니다.');
+            return;
+        }
+
+        const form = event.target;
+        const selectedAssets = collectAssets(true);
+
+        if (selectedAssets.length === 0) {
+            alert('분석할 종목을 1개 이상 선택해주세요.');
+            return;
+        }
+
+        const weightSum = selectedAssets.reduce(
+            (sum, asset) => sum + asset.targetWeight,
+            0
+        );
+
+        if (Math.abs(weightSum - 1.0) > 0.0001) {
+            alert(`선택한 자산 비중의 합은 100%여야 합니다. 현재 합계: ${(weightSum * 100).toFixed(2)}%`);
+            return;
+        }
+
+        const payload = {
+            goalName: valueOrNull(form.goalName.value),
+            currentAmount: numberValue(form.currentAmount.value, 0),
+            monthlyInvestment: numberValue(form.monthlyInvestment.value),
+            targetAmount: numberValue(form.targetAmount.value),
+            investmentYears: getApiInvestmentYears(),
+            investmentMonths: getApiInvestmentMonths(),
+            rebalanceCycle: form.rebalanceCycle.value,
+            selectedAssets
+        };
+
+        try {
+            const response = await api('/api/portfolio/rebalance/analyze', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            renderResult(response);
+        } catch (error) {
+            alert('리밸런싱 분석에 실패했습니다: ' + error.message);
+        }
+    }
+
+    function collectAssets(requireValues) {
+        return Array.from(document.querySelectorAll('.asset-row')).map(row => ({
+            symbol: row.querySelector('[name="symbol"]').value.trim(),
+            assetName: row.querySelector('[name="assetName"]').value.trim(),
+            assetType: row.querySelector('[name="assetType"]').value.trim(),
+            market: row.querySelector('[name="market"]').value.trim(),
+            targetWeight: toWeightRatio(
+                row.querySelector('[name="targetWeight"]').value,
+                requireValues
+            ),
+            expectedAnnualReturn: numberValue(row.querySelector('[name="expectedAnnualReturn"]').value),
+            annualVolatility: numberValue(row.querySelector('[name="annualVolatility"]').value),
+            theme: valueOrNull(row.querySelector('[name="theme"]').value)
+        }));
+    }
+
+    function toWeightRatio(value, requireValues) {
+        const percent = numberValue(value, requireValues ? null : 0);
+
+        if (percent === null) {
+            return null;
+        }
+
+        return percent / 100;
+    }
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            credentials: 'same-origin',
+            ...options
+        });
+        const text = await response.text();
+        let body = null;
+
+        if (text) {
+            try {
+                body = JSON.parse(text);
+            } catch (error) {
+                body = text;
+            }
+        }
+
+        if (!response.ok) {
+            const message = typeof body === 'object' && body !== null
+                ? (body.message || body.error || JSON.stringify(body))
+                : (body || response.statusText);
+            throw new Error(message);
+        }
+
+        return body;
+    }
+
+    function renderResult(response) {
+        const needsConservativeReview =
+                Number(response.successProbability || 0) >= 100
+                && response.pessimisticTargetReached === false;
+        document.getElementById('successProbabilityBox').textContent =
+            needsConservativeReview
+                    ? `달성 확률 ${toPercentPoint(response.successProbability)} · 보수적 시나리오 점검 필요`
+                    : `달성 확률 ${toPercentPoint(response.successProbability)}`;
+        renderAchievementAnalysis(response);
+        document.getElementById('finalAmountValue').textContent =
+            toCurrency(response.finalAmount);
+        document.getElementById('annualizedReturnValue').textContent =
+            toPercentPoint(response.annualizedReturn);
+        document.getElementById('maxDrawdownValue').textContent =
+            toPercentPoint(response.maxDrawdown);
+        document.getElementById('bestAnnualReturnValue').textContent =
+            toPercentPoint(response.bestAnnualReturn);
+        document.getElementById('worstAnnualReturnValue').textContent =
+            toPercentPoint(response.worstAnnualReturn);
+        document.getElementById('shortageAmountValue').textContent =
+            toCurrency(response.shortageAmount);
+        document.getElementById('recommendedMonthlyInvestmentValue').textContent =
+            toCurrency(response.recommendedMonthlyInvestment);
+
+        renderAssetSummary(response.selectedAssets || []);
+        renderChart(response.chartData || []);
+    }
+
+    function renderAchievementAnalysis(response) {
+        const chartData = response.chartData || [];
+        const targetAmount = chartData.find(point => point.targetAmount)?.targetAmount
+                || numberValue(document.getElementById('targetAmount').value, 0);
+        const finalPoint = chartData[chartData.length - 1] || {};
+        const optimisticAmount = numberValue(
+                response.optimisticAmount,
+                finalPoint.optimisticAmount
+        );
+        const medianAmount = numberValue(
+                response.medianAmount,
+                finalPoint.medianAmount || response.finalAmount
+        );
+        const pessimisticAmount = numberValue(
+                response.pessimisticAmount,
+                finalPoint.pessimisticAmount
+        );
+        const shortageAmount = numberValue(
+                response.shortageAmount,
+                Math.max(0, targetAmount - medianAmount)
+        );
+        const pessimisticTargetReached =
+                response.pessimisticTargetReached ?? pessimisticAmount >= targetAmount;
+        const status = response.goalAchievementStatus
+                || evaluateGoalAchievementStatus(
+                        targetAmount,
+                        numberValue(response.averageFinalAmount, response.finalAmount),
+                        medianAmount,
+                        pessimisticAmount
+                );
+        const message = response.goalAchievementMessage
+                || evaluateGoalAchievementMessage(status);
+        const medianReachMonth = estimateReachMonth(chartData, 'medianAmount', targetAmount);
+        const optimisticReachMonth = estimateReachMonth(chartData, 'optimisticAmount', targetAmount);
+        const pessimisticReachMonth = estimateReachMonth(chartData, 'pessimisticAmount', targetAmount);
+        const probabilityNote = Number(response.successProbability || 0) >= 100
+                && !pessimisticTargetReached
+                ? '높은 확률이지만 보수적 시나리오 점검이 필요합니다.'
+                : '시장 변동에 따라 결과는 달라질 수 있습니다.';
+
+        document.getElementById('achievementBox').innerHTML = `
+            <h3>목표 달성 분석</h3>
+            <span class="achievement-status">${status}</span>
+            <p class="hint">${message}</p>
+            <ul>
+                <li>달성 확률: ${toPercentPoint(response.successProbability)}</li>
+                <li>중앙 시나리오 결과: ${toCurrency(medianAmount)} · ${formatReachMessage(medianReachMonth, chartData)}</li>
+                <li>낙관 시나리오 결과: ${toCurrency(optimisticAmount)} · ${formatReachMessage(optimisticReachMonth, chartData)}</li>
+                <li>비관 시나리오 결과: ${toCurrency(pessimisticAmount)} · ${formatReachMessage(pessimisticReachMonth, chartData)}</li>
+                <li>비관 시나리오 기준: ${pessimisticTargetReached ? '목표 금액 이상' : '목표 금액 미달 가능성 있음'}</li>
+                <li>부족 금액: ${toCurrency(shortageAmount)}</li>
+                <li>추천 월 투자금: ${toCurrency(response.recommendedMonthlyInvestment)}</li>
+                <li>예상 최종 금액: ${toCurrency(response.finalAmount)}</li>
+            </ul>
+            <p class="hint">${probabilityNote}</p>
+        `;
+    }
+
+    function evaluateGoalAchievementStatus(
+            targetAmount,
+            averageFinalAmount,
+            medianAmount,
+            pessimisticAmount
+    ) {
+        if (pessimisticAmount >= targetAmount) {
+            return '목표 달성 안정권';
+        }
+
+        if (medianAmount >= targetAmount) {
+            return '목표 달성 가능성 있음';
+        }
+
+        if (averageFinalAmount >= targetAmount) {
+            return '평균 기준 목표 근접';
+        }
+
+        return '목표 달성 가능성 낮음';
+    }
+
+    function evaluateGoalAchievementMessage(status) {
+        if (status === '목표 달성 안정권') {
+            return '비관 시나리오에서도 목표 금액을 초과하여 목표 달성 안정권입니다.';
+        }
+
+        if (status === '목표 달성 가능성 있음') {
+            return '중앙 시나리오에서는 목표를 달성하지만, 비관 시나리오에서는 목표 금액에 미달할 수 있습니다.';
+        }
+
+        if (status === '평균 기준 목표 근접') {
+            return '평균 결과는 목표에 근접하지만 중앙 시나리오 기준으로는 추가 투자가 필요합니다.';
+        }
+
+        return '현재 조건에서는 목표 달성 가능성이 낮아 월 투자금 또는 투자 기간 조정이 필요합니다.';
+    }
+
+    function estimateReachMonth(chartData, amountKey, targetAmount) {
+        if (!chartData || chartData.length === 0 || !targetAmount) {
+            return null;
+        }
+
+        for (let i = 0; i < chartData.length; i++) {
+            const point = chartData[i];
+            const amount = Number(point[amountKey] || 0);
+
+            if (amount < targetAmount) {
+                continue;
+            }
+
+            if (i === 0) {
+                return point.month;
+            }
+
+            const previousPoint = chartData[i - 1];
+            const previousAmount = Number(previousPoint[amountKey] || 0);
+
+            if (previousAmount >= targetAmount || amount === previousAmount) {
+                return point.month;
+            }
+
+            const progressRatio = (targetAmount - previousAmount)
+                    / (amount - previousAmount);
+
+            return Math.round(
+                    previousPoint.month
+                    + ((point.month - previousPoint.month) * progressRatio)
+            );
+        }
+
+        return null;
+    }
+
+    function formatReachMessage(reachMonth, chartData) {
+        if (reachMonth === null || reachMonth === undefined) {
+            return `${getInvestmentPeriodLabel()} 내 목표 미달성`;
+        }
+
+        if (reachMonth > getSelectedPeriodMonths()) {
+            return `${getInvestmentPeriodLabel()} 내 목표 미달성`;
+        }
+
+        const maxChartMonth = chartData.length === 0
+                ? null
+                : Math.max(...chartData.map(point => point.month));
+
+        if (maxChartMonth !== null && reachMonth > maxChartMonth) {
+            return `${getInvestmentPeriodLabel()} 내 목표 미달성`;
+        }
+
+        return `약 ${formatDuration(reachMonth)} 후 목표 달성`;
+    }
+
+    function formatDuration(totalMonths) {
+        const safeMonths = Math.max(0, Math.round(totalMonths));
+        const years = Math.floor(safeMonths / 12);
+        const months = safeMonths % 12;
+
+        if (years > 0 && months > 0) {
+            return `${years}년 ${months}개월`;
+        }
+
+        if (years > 0) {
+            return `${years}년`;
+        }
+
+        return `${months}개월`;
+    }
+
+    function renderAssetSummary(assets) {
+        const box = document.getElementById('assetSummary');
+
+        if (assets.length === 0) {
+            box.innerHTML = '선택한 포트폴리오가 없습니다.';
+            return;
+        }
+
+        box.innerHTML = assets.map(asset => `
+            <div class="asset-summary-row">
+                <div class="asset-summary-title">
+                    <strong>${escapeHtml(asset.assetName)} (${escapeHtml(asset.symbol)})</strong>
+                    <span>${toWeightPercent(asset.targetWeight)}</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: ${Math.min(100, Math.max(0, asset.targetWeight * 100))}%;"></div>
+                </div>
+                <p class="hint">${escapeHtml(asset.market)} · ${escapeHtml(asset.assetType)} · ${escapeHtml(asset.theme || '-')}</p>
+            </div>
+        `).join('');
+    }
+
+    function renderChart(chartData) {
+        const box = document.getElementById('chartBox');
+
+        if (chartData.length === 0) {
+            box.innerHTML = '차트 데이터가 없습니다.';
+            return;
+        }
+
+        const width = 680;
+        const height = 300;
+        const padding = 36;
+        const amounts = chartData.flatMap(point => [
+            point.optimisticAmount,
+            point.medianAmount,
+            point.pessimisticAmount,
+            point.targetAmount
+        ]);
+        const minAmount = Math.min(...amounts);
+        const maxAmount = Math.max(...amounts);
+        const monthMax = Math.max(...chartData.map(point => point.month));
+        const range = Math.max(1, maxAmount - minAmount);
+        const safeMonthMax = Math.max(1, monthMax);
+
+        const x = month => padding + ((month / safeMonthMax) * (width - padding * 2));
+        const y = amount => height - padding - ((amount - minAmount) / range) * (height - padding * 2);
+        const line = key => chartData
+            .map(point => `${x(point.month)},${y(point[key])}`)
+            .join(' ');
+
+        box.innerHTML = `
+            <svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}" role="img" aria-label="예상 자산 변화 그래프">
+                <rect x="0" y="0" width="${width}" height="${height}" fill="#f9fafb"></rect>
+                <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#d0d5dd"></line>
+                <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#d0d5dd"></line>
+                <polyline points="${line('optimisticAmount')}" fill="none" stroke="#12b76a" stroke-width="3"></polyline>
+                <polyline points="${line('medianAmount')}" fill="none" stroke="#155eef" stroke-width="3"></polyline>
+                <polyline points="${line('pessimisticAmount')}" fill="none" stroke="#f04438" stroke-width="3"></polyline>
+                <polyline points="${line('targetAmount')}" fill="none" stroke="#667085" stroke-width="2" stroke-dasharray="6 6"></polyline>
+                <text x="${padding}" y="22" fill="#155eef" font-size="12">중앙</text>
+                <text x="${padding + 46}" y="22" fill="#12b76a" font-size="12">낙관</text>
+                <text x="${padding + 92}" y="22" fill="#f04438" font-size="12">비관</text>
+                <text x="${padding + 138}" y="22" fill="#667085" font-size="12">목표</text>
+            </svg>
+        `;
+    }
+
+    function normalizeAsset(asset = {}) {
+        const assetType = String(asset.assetType || asset.quoteType || 'STOCK').toUpperCase();
+        const market = String(asset.market || asset.exchange || 'GLOBAL').toUpperCase();
+
+        return {
+            symbol: String(asset.symbol || '').trim(),
+            yahooSymbol: String(asset.yahooSymbol || asset.symbol || '').trim(),
+            assetName: String(asset.assetName || asset.shortname || asset.longname || asset.symbol || '').trim(),
+            assetType,
+            market,
+            country: asset.country || inferCountry(market),
+            expectedAnnualReturn: numberValue(
+                    asset.expectedAnnualReturn,
+                    defaultExpectedAnnualReturn(assetType)
+            ),
+            annualVolatility: numberValue(
+                    asset.annualVolatility,
+                    defaultAnnualVolatility(assetType)
+            ),
+            theme: asset.theme || ''
+        };
+    }
+
+    function inferCountry(market) {
+        const normalized = String(market || '').toUpperCase();
+
+        if (normalized === 'KR'
+                || normalized === 'KOSPI'
+                || normalized === 'KOSDAQ') {
+            return 'KR';
+        }
+
+        if (normalized === 'US'
+                || normalized.includes('NASDAQ')
+                || normalized.includes('NYSE')) {
+            return 'US';
+        }
+
+        return 'GLOBAL';
+    }
+
+    function defaultExpectedAnnualReturn(assetType) {
+        return assetType === 'ETF' ? 0.07 : 0.08;
+    }
+
+    function defaultAnnualVolatility(assetType) {
+        return assetType === 'ETF' ? 0.18 : 0.25;
+    }
+
+    function numberValue(value, fallback = null) {
+        if (value === null || value === undefined || String(value).trim() === '') {
+            return fallback;
+        }
+
+        const number = Number(value);
+        return Number.isFinite(number) ? number : fallback;
+    }
+
+    function valueOrNull(value) {
+        return value && value.trim() !== '' ? value.trim() : null;
+    }
+
+    function formatWeightPercent(value) {
+        return String(Math.max(1, Math.min(100, Math.round(Number(value || 0)))));
+    }
+
+    function toCurrency(value) {
+        return `${Math.round(Number(value || 0)).toLocaleString('ko-KR')}원`;
+    }
+
+    function toPercentPoint(value) {
+        return `${Number(value || 0).toFixed(1)}%`;
+    }
+
+    function toWeightPercent(value) {
+        return `${(Number(value || 0) * 100).toFixed(1)}%`;
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value).replaceAll('`', '&#096;');
+    }
+</script>
+
+</body>
+</html>
