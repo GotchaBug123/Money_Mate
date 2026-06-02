@@ -31,6 +31,9 @@ public class GoalStrategyRequest {
     @Min(value = 1, message = "투자 기간은 최소 1년 이상이어야 합니다.")
     private Integer investmentYears;
 
+    @Min(value = 1, message = "투자 기간은 최소 1개월 이상이어야 합니다.")
+    private Integer investmentMonths;
+
     @NotNull(message = "리밸런싱 주기는 필수입니다.")
     private RebalanceCycle rebalanceCycle;
 
@@ -39,6 +42,10 @@ public class GoalStrategyRequest {
     private List<SelectedAssetRequest> selectedAssets;
 
     public int totalInvestmentMonths() {
+        if (investmentMonths != null) {
+            return investmentMonths;
+        }
+
         return safeInvestmentYears() * 12;
     }
 

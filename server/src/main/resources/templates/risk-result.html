@@ -8,19 +8,7 @@
 </head>
 <body>
 
-<header class="header">
-    <div class="header-inner">
-        <a href="/main" class="logo">MoneyMate</a>
-        <nav class="nav">
-            <a href="/financial-profile">MY 자산</a>
-            <a href="#">포트폴리오</a>
-            <a href="#">대시보드</a>
-            <a href="/risk-survey" class="active">투자성향 분석</a>
-            <a href="#">고객센터</a>
-        </nav>
-        <a href="/mypage" class="mypage-btn">마이페이지</a>
-    </div>
-</header>
+<header th:replace="~{fragments/header :: globalHeader('')}"></header>
 
 <main class="result-page">
 

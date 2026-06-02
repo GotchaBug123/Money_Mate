@@ -61,6 +61,12 @@ a {
     color: #155eef;
 }
 
+.nav a.active,
+.nav-link.active {
+    color: #155eef;
+    font-weight: 800;
+}
+
 .nav-dropdown {
     position: relative;
     height: 78px;
@@ -159,6 +165,13 @@ a {
 .mypage-btn:hover {
     background-color: #0f4ad8;
     border-color: #0f4ad8;
+}
+
+.login-btn.active,
+.mypage-btn.active {
+    border-color: #155eef;
+    color: #155eef;
+    background-color: #eef4ff;
 }
 
 .primary-btn {

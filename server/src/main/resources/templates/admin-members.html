@@ -6,24 +6,21 @@
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-
 <div class="admin-layout">
-
     <aside class="admin-sidebar">
-        <div class="admin-logo">MoneyMate Admin</div>
-
+        <a href="/" class="admin-logo">MoneyMate</a>
         <nav class="admin-menu">
-            <a href="/admin">대시보드</a>
+            <a href="/admin">관리자 홈</a>
             <a href="/admin/members" class="active">회원정보 관리</a>
-            <a href="#">투자정보 관리</a>
-            <a href="#">공지사항 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
             <a href="/admin/inquiries">고객문의 관리</a>
             <a href="/logout">로그아웃</a>
         </nav>
     </aside>
 
     <main class="admin-main">
-
         <section class="admin-top">
             <div>
                 <h1>회원정보 관리</h1>
@@ -53,9 +50,7 @@
 
                 <tbody>
                 <tr th:if="${members == null or #lists.isEmpty(members)}">
-                    <td colspan="8" class="empty-table">
-                        등록된 회원이 없습니다.
-                    </td>
+                    <td colspan="8" class="empty-table">등록된 회원이 없습니다.</td>
                 </tr>
 
                 <tr th:each="member : ${members}" th:if="${member != null}">
@@ -66,37 +61,24 @@
                     <td>
                         <span class="role-badge"
                               th:classappend="${member.role == 'ADMIN'} ? ' admin' : ''"
-                              th:text="${member.role}">
-                            USER
-                        </span>
+                              th:text="${member.role}">USER</span>
                     </td>
                     <td th:text="${member.signupStatus}">ACTIVE</td>
-                    <td th:text="${member.createdAt != null ? #temporals.format(member.createdAt, 'yyyy.MM.dd') : '-'}">
-                        2026.05.28
-                    </td>
+                    <td th:text="${member.createdAt != null ? #temporals.format(member.createdAt, 'yyyy.MM.dd') : '-'}">2026.05.28</td>
                     <td>
-                        <a class="admin-edit-btn"
-                           th:href="@{/admin/members/{id}/edit(id=${member.memberId})}">
-                            수정
-                        </a>
-
+                        <a class="admin-edit-btn" th:href="@{/admin/members/{id}/edit(id=${member.memberId})}">수정</a>
                         <form th:action="@{/admin/members/{id}/delete(id=${member.memberId})}"
                               method="post"
                               style="display:inline;"
                               onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                            <button type="submit" class="admin-delete-btn">
-                                삭제
-                            </button>
+                            <button type="submit" class="admin-delete-btn">삭제</button>
                         </form>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </section>
-
     </main>
-
 </div>
-
 </body>
 </html>

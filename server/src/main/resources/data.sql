@@ -1,3 +1,17 @@
+INSERT INTO member (login_id, email, name, birth_date, signup_status, role)
+VALUES ('masteradmin', 'masteradmin@moneymate.com', '최고관리자', NULL, 'ACTIVE', 'ADMIN'),
+       ('test1', 'test1@test.com', '홍길동', '1995-01-01', 'ACTIVE', 'USER');
+
+INSERT INTO member_auth (member_id, password_hash, last_login_at, login_fail_count, account_locked_yn)
+SELECT member_id, 'admin1234', NULL, 0, 'N'
+FROM member
+WHERE login_id = 'masteradmin';
+
+INSERT INTO member_auth (member_id, password_hash, last_login_at, login_fail_count, account_locked_yn)
+SELECT member_id, '1234', NULL, 0, 'N'
+FROM member
+WHERE login_id = 'test1';
+
 INSERT INTO spending_category (category_name, parent_category, essential_yn)
 VALUES ('월세', '주거', 'Y'),
        ('보험', '고정지출', 'Y'),

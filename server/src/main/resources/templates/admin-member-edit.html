@@ -6,24 +6,21 @@
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-
 <div class="admin-layout">
-
     <aside class="admin-sidebar">
-        <div class="admin-logo">MoneyMate Admin</div>
-
+        <a href="/" class="admin-logo">MoneyMate</a>
         <nav class="admin-menu">
-            <a href="/admin">대시보드</a>
+            <a href="/admin">관리자 홈</a>
             <a href="/admin/members" class="active">회원정보 관리</a>
-            <a href="#">투자정보 관리</a>
-            <a href="#">공지사항 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
             <a href="/admin/inquiries">고객문의 관리</a>
             <a href="/logout">로그아웃</a>
         </nav>
     </aside>
 
     <main class="admin-main">
-
         <section class="admin-top">
             <div>
                 <h1>회원 정보 수정</h1>
@@ -32,9 +29,7 @@
         </section>
 
         <section class="admin-form-card">
-
             <form th:action="@{/admin/members/{id}/edit(id=${member.memberId})}" method="post">
-
                 <label>아이디</label>
                 <input type="text" th:value="${member.loginId}" readonly>
 
@@ -61,14 +56,9 @@
                     <a href="/admin/members" class="admin-cancel-btn">취소</a>
                     <button type="submit" class="admin-submit-btn">수정 완료</button>
                 </div>
-
             </form>
-
         </section>
-
     </main>
-
 </div>
-
 </body>
 </html>

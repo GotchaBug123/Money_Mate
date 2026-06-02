@@ -12,7 +12,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -28,8 +28,12 @@ spring:
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs
   swagger-ui:
     enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
 
 server:
   port: 8080
@@ -37,7 +41,6 @@ server:
 market:
   asset-master:
     enabled: true
-    kospi-zip-path: C:/Users/minta/Downloads/kospi_code.mst.zip
-    kosdaq-zip-path: C:/Users/minta/Downloads/kosdaq_code.mst.zip
+    csv-path: classpath:/data/kr_assets.csv
 
 

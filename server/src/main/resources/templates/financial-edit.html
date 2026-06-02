@@ -9,29 +9,7 @@
 </head>
 <body>
 
-<header class="header">
-    <div class="header-inner">
-        <a href="/main" class="logo">MoneyMate</a>
-
-        <nav class="nav">
-            <div class="nav-dropdown">
-                <a href="/my-asset" class="nav-link active">MY 자산</a>
-
-                <div class="dropdown-menu">
-                    <a href="/my-asset/financial">내 재무 정보</a>
-                    <a href="/my-investment">내 투자 정보</a>
-                </div>
-            </div>
-
-            <a href="#">포트폴리오</a>
-            <a href="#">대시보드</a>
-            <a href="#">투자정보</a>
-            <a href="#">고객센터</a>
-        </nav>
-
-        <a href="/mypage" class="mypage-btn">마이페이지</a>
-    </div>
-</header>
+<header th:replace="~{fragments/header :: globalHeader('asset')}"></header>
 
 <main class="edit-page">
 

@@ -52,9 +52,25 @@ public class GoalStrategyService {
                 createAssetSummary(request.getSelectedAssets())
         );
 
+        GoalAchievement goalAchievement = evaluateGoalAchievement(
+                request,
+                summary
+        );
+        long recommendedMonthlyInvestment =
+                calculateRecommendedMonthlyInvestment(request, summary);
+
         return GoalStrategyResponse.builder()
                 .successProbability(summary.successProbability())
+                .goalAchievementStatus(goalAchievement.status())
+                .goalAchievementMessage(goalAchievement.message())
+                .pessimisticTargetReached(goalAchievement.pessimisticTargetReached())
                 .finalAmount(summary.finalAmount())
+                .averageFinalAmount(summary.averageFinalAmount())
+                .optimisticAmount(summary.optimisticAmount())
+                .medianAmount(summary.medianAmount())
+                .pessimisticAmount(summary.pessimisticAmount())
+                .shortageAmount(summary.shortageAmount())
+                .recommendedMonthlyInvestment(recommendedMonthlyInvestment)
                 .annualizedReturn(summary.annualizedReturn())
                 .maxDrawdown(summary.maxDrawdown())
                 .bestAnnualReturn(summary.bestAnnualReturn())
@@ -336,7 +352,8 @@ public class GoalStrategyService {
 
         double annualizedReturn = Math.pow(
                 1.0 + cumulativeReturn,
-                1.0 / Math.max(1, request.safeInvestmentYears())
+                1.0 / Math.max(1.0 / 12.0,
+                        request.totalInvestmentMonths() / 12.0)
         ) - 1.0;
 
         return roundOne(annualizedReturn * 100.0);
@@ -492,6 +509,63 @@ public class GoalStrategyService {
                 .toList();
     }
 
+    private GoalAchievement evaluateGoalAchievement(
+            GoalStrategyRequest request,
+            SimulationSummary summary
+    ) {
+
+        long targetAmount = request.getTargetAmount();
+
+        if (summary.pessimisticAmount() >= targetAmount) {
+            return new GoalAchievement(
+                    "목표 달성 안정권",
+                    "비관 시나리오에서도 목표 금액을 초과하여 목표 달성 안정권입니다.",
+                    true
+            );
+        }
+
+        if (summary.medianAmount() >= targetAmount) {
+            return new GoalAchievement(
+                    "목표 달성 가능성 있음",
+                    "중앙 시나리오에서는 목표를 달성하지만, 비관 시나리오에서는 목표 금액에 미달할 수 있습니다.",
+                    false
+            );
+        }
+
+        if (summary.averageFinalAmount() >= targetAmount) {
+            return new GoalAchievement(
+                    "평균 기준 목표 근접",
+                    "평균 결과는 목표에 근접하지만 중앙 시나리오 기준으로는 추가 투자가 필요합니다.",
+                    false
+            );
+        }
+
+        return new GoalAchievement(
+                "목표 달성 가능성 낮음",
+                "현재 조건에서는 목표 달성 가능성이 낮아 월 투자금 또는 투자 기간 조정이 필요합니다.",
+                false
+        );
+    }
+
+    private long calculateRecommendedMonthlyInvestment(
+            GoalStrategyRequest request,
+            SimulationSummary summary
+    ) {
+
+        if (summary.pessimisticAmount() >= request.getTargetAmount()) {
+            return request.safeMonthlyInvestment();
+        }
+
+        int totalMonths = Math.max(1, request.totalInvestmentMonths());
+        long conservativeShortage = Math.max(
+                0L,
+                request.getTargetAmount() - summary.pessimisticAmount()
+        );
+
+        return request.safeMonthlyInvestment()
+                + (long) Math.ceil((double) conservativeShortage / totalMonths);
+    }
+
     private GoalStrategyResult saveStrategyResult(
             Member member,
             GoalStrategyRequest request,
@@ -529,7 +603,7 @@ public class GoalStrategyService {
         seed = mix(seed, request.safeCurrentAmount());
         seed = mix(seed, request.safeMonthlyInvestment());
         seed = mix(seed, request.getTargetAmount());
-        seed = mix(seed, request.safeInvestmentYears());
+        seed = mix(seed, request.totalInvestmentMonths());
         seed = mix(seed, safeHash(request.getRebalanceCycle().name()));
 
         for (SelectedAssetRequest asset : request.getSelectedAssets()) {
@@ -583,6 +657,13 @@ public class GoalStrategyService {
             double maxDrawdown,
             double bestAnnualReturn,
             double worstAnnualReturn
+    ) {
+    }
+
+    private record GoalAchievement(
+            String status,
+            String message,
+            boolean pessimisticTargetReached
     ) {
     }
 }

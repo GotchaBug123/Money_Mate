@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>MoneyMate - 회원가입</title>
+    <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/join.css">
 </head>
 <body>
+
+<header th:replace="~{fragments/header :: globalHeader('')}"></header>
 
 <div class="join-page">
     <div class="join-box">

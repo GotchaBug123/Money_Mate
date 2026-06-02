@@ -11,7 +11,25 @@ public class GoalStrategyResponse {
 
     private Double successProbability;
 
+    private String goalAchievementStatus;
+
+    private String goalAchievementMessage;
+
+    private Boolean pessimisticTargetReached;
+
     private Long finalAmount;
+
+    private Long averageFinalAmount;
+
+    private Long optimisticAmount;
+
+    private Long medianAmount;
+
+    private Long pessimisticAmount;
+
+    private Long shortageAmount;
+
+    private Long recommendedMonthlyInvestment;
 
     private Double annualizedReturn;
 

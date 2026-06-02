@@ -398,25 +398,7 @@
 </head>
 <body>
 
-<header class="header">
-    <div class="header-inner">
-        <a href="/" class="logo">MoneyMate</a>
-
-        <nav class="nav">
-            <a href="/my-asset">MY 자산</a>
-            <a href="#">포트폴리오</a>
-            <a href="/rebalancing">리밸런싱</a>
-            <a href="#">투자정보</a>
-            <a href="/community">커뮤니티</a>
-        </nav>
-
-        <div class="header-buttons">
-            <a th:if="${!loggedIn}" href="/login" class="login-btn">로그인</a>
-            <a th:if="${loggedIn}" href="/mypage" class="login-btn">마이페이지</a>
-            <a th:if="${loggedIn}" href="/logout" class="login-btn">로그아웃</a>
-        </div>
-    </div>
-</header>
+<header th:replace="~{fragments/header :: globalHeader('rebalancing')}"></header>
 
 <main class="rebalance-main">
     <div class="page-heading">
@@ -520,6 +502,14 @@
                 <div class="result-item wide">
                     <div class="result-label">최저 연 수익률</div>
                     <div id="worstAnnualReturnValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">부족 금액</div>
+                    <div id="shortageAmountValue" class="result-value">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">추천 월 투자금</div>
+                    <div id="recommendedMonthlyInvestmentValue" class="result-value">-</div>
                 </div>
             </div>
 
@@ -634,6 +624,7 @@
         }
 
         addAssetRow(asset);
+        clearAssetSearchState();
     }
 
     function addAssetRow(asset) {
@@ -655,8 +646,8 @@
                 <button class="button small danger" type="button" onclick="removeAssetRow(this)">삭제</button>
             </div>
             <div class="asset-weight-grid">
-                <span>목표 비중</span>
-                <input name="targetWeight" type="number" min="0.0001" max="1" step="0.0001" value="${formatWeight(suggestNextWeight())}" required>
+                <span>목표 비중(%)</span>
+                <input name="targetWeight" type="number" min="1" max="100" step="1" value="${formatWeightPercent(suggestNextWeightPercent())}" required>
             </div>
             <input name="symbol" type="hidden" value="${escapeAttr(normalizedAsset.symbol)}">
             <input name="assetName" type="hidden" value="${escapeAttr(normalizedAsset.assetName)}">
@@ -673,6 +664,12 @@
         updateWeightStatus();
     }
 
+    function clearAssetSearchState() {
+        document.getElementById('assetSearchInput').value = '';
+        window.latestAssetSearchResults = [];
+        renderAssetSearchResults([], '');
+    }
+
     function removeAssetRow(button) {
         button.closest('.asset-row').remove();
         updateWeightStatus();
@@ -683,11 +680,11 @@
             .some(input => input.value === symbol);
     }
 
-    function suggestNextWeight() {
+    function suggestNextWeightPercent() {
         const assets = collectAssets(false);
 
         if (assets.length === 0) {
-            return 1;
+            return 100;
         }
 
         const currentSum = assets.reduce(
@@ -697,10 +694,10 @@
         const remaining = 1 - currentSum;
 
         if (remaining > 0.0001) {
-            return remaining;
+            return Math.round(remaining * 100);
         }
 
-        return 0.1;
+        return 10;
     }
 
     function updateWeightStatus() {
@@ -723,17 +720,19 @@
     }
 
     function getApiInvestmentYears() {
+        const months = getApiInvestmentMonths();
+
+        return Math.max(1, Math.floor(months / 12));
+    }
+
+    function getApiInvestmentMonths() {
         const value = Math.max(
             1,
             Math.floor(numberValue(document.getElementById('investmentPeriodValue').value, 1))
         );
         const unit = document.getElementById('investmentPeriodUnit').value;
 
-        if (unit === 'MONTHS') {
-            return Math.max(1, Math.ceil(value / 12));
-        }
-
-        return value;
+        return unit === 'MONTHS' ? value : value * 12;
     }
 
     function getInvestmentPeriodLabel() {
@@ -743,7 +742,7 @@
         );
         const unit = document.getElementById('investmentPeriodUnit').value;
 
-        return unit === 'MONTHS' ? `${value}개월` : `${value}년`;
+        return unit === 'MONTHS' ? formatDuration(value) : `${value}년`;
     }
 
     function getSelectedPeriodMonths() {
@@ -788,6 +787,7 @@
             monthlyInvestment: numberValue(form.monthlyInvestment.value),
             targetAmount: numberValue(form.targetAmount.value),
             investmentYears: getApiInvestmentYears(),
+            investmentMonths: getApiInvestmentMonths(),
             rebalanceCycle: form.rebalanceCycle.value,
             selectedAssets
         };
@@ -810,14 +810,24 @@
             assetName: row.querySelector('[name="assetName"]').value.trim(),
             assetType: row.querySelector('[name="assetType"]').value.trim(),
             market: row.querySelector('[name="market"]').value.trim(),
-            targetWeight: numberValue(
+            targetWeight: toWeightRatio(
                 row.querySelector('[name="targetWeight"]').value,
-                requireValues ? null : 0
+                requireValues
             ),
             expectedAnnualReturn: numberValue(row.querySelector('[name="expectedAnnualReturn"]').value),
             annualVolatility: numberValue(row.querySelector('[name="annualVolatility"]').value),
             theme: valueOrNull(row.querySelector('[name="theme"]').value)
         }));
+    }
+
+    function toWeightRatio(value, requireValues) {
+        const percent = numberValue(value, requireValues ? null : 0);
+
+        if (percent === null) {
+            return null;
+        }
+
+        return percent / 100;
     }
 
     async function api(url, options = {}) {
@@ -847,8 +857,13 @@
     }
 
     function renderResult(response) {
+        const needsConservativeReview =
+                Number(response.successProbability || 0) >= 100
+                && response.pessimisticTargetReached === false;
         document.getElementById('successProbabilityBox').textContent =
-            `달성 확률 ${toPercentPoint(response.successProbability)}`;
+            needsConservativeReview
+                    ? `달성 확률 ${toPercentPoint(response.successProbability)} · 보수적 시나리오 점검 필요`
+                    : `달성 확률 ${toPercentPoint(response.successProbability)}`;
         renderAchievementAnalysis(response);
         document.getElementById('finalAmountValue').textContent =
             toCurrency(response.finalAmount);
@@ -860,6 +875,10 @@
             toPercentPoint(response.bestAnnualReturn);
         document.getElementById('worstAnnualReturnValue').textContent =
             toPercentPoint(response.worstAnnualReturn);
+        document.getElementById('shortageAmountValue').textContent =
+            toCurrency(response.shortageAmount);
+        document.getElementById('recommendedMonthlyInvestmentValue').textContent =
+            toCurrency(response.recommendedMonthlyInvestment);
 
         renderAssetSummary(response.selectedAssets || []);
         renderChart(response.chartData || []);
@@ -869,27 +888,95 @@
         const chartData = response.chartData || [];
         const targetAmount = chartData.find(point => point.targetAmount)?.targetAmount
                 || numberValue(document.getElementById('targetAmount').value, 0);
-        const successProbability = Number(response.successProbability || 0);
-        const status = successProbability >= 70
-                ? '목표 달성 가능성이 높습니다'
-                : successProbability >= 40
-                        ? '목표 달성 가능성은 있으나 비중 조정이 필요합니다'
-                        : '목표 달성 가능성이 낮습니다';
+        const finalPoint = chartData[chartData.length - 1] || {};
+        const optimisticAmount = numberValue(
+                response.optimisticAmount,
+                finalPoint.optimisticAmount
+        );
+        const medianAmount = numberValue(
+                response.medianAmount,
+                finalPoint.medianAmount || response.finalAmount
+        );
+        const pessimisticAmount = numberValue(
+                response.pessimisticAmount,
+                finalPoint.pessimisticAmount
+        );
+        const shortageAmount = numberValue(
+                response.shortageAmount,
+                Math.max(0, targetAmount - medianAmount)
+        );
+        const pessimisticTargetReached =
+                response.pessimisticTargetReached ?? pessimisticAmount >= targetAmount;
+        const status = response.goalAchievementStatus
+                || evaluateGoalAchievementStatus(
+                        targetAmount,
+                        numberValue(response.averageFinalAmount, response.finalAmount),
+                        medianAmount,
+                        pessimisticAmount
+                );
+        const message = response.goalAchievementMessage
+                || evaluateGoalAchievementMessage(status);
         const medianReachMonth = estimateReachMonth(chartData, 'medianAmount', targetAmount);
         const optimisticReachMonth = estimateReachMonth(chartData, 'optimisticAmount', targetAmount);
         const pessimisticReachMonth = estimateReachMonth(chartData, 'pessimisticAmount', targetAmount);
+        const probabilityNote = Number(response.successProbability || 0) >= 100
+                && !pessimisticTargetReached
+                ? '높은 확률이지만 보수적 시나리오 점검이 필요합니다.'
+                : '시장 변동에 따라 결과는 달라질 수 있습니다.';
 
         document.getElementById('achievementBox').innerHTML = `
             <h3>목표 달성 분석</h3>
             <span class="achievement-status">${status}</span>
+            <p class="hint">${message}</p>
             <ul>
                 <li>달성 확률: ${toPercentPoint(response.successProbability)}</li>
-                <li>중앙 시나리오: ${formatReachMessage(medianReachMonth, chartData)}</li>
-                <li>낙관 시나리오: ${formatReachMessage(optimisticReachMonth, chartData)}</li>
-                <li>비관 시나리오: ${formatReachMessage(pessimisticReachMonth, chartData)}</li>
+                <li>중앙 시나리오 결과: ${toCurrency(medianAmount)} · ${formatReachMessage(medianReachMonth, chartData)}</li>
+                <li>낙관 시나리오 결과: ${toCurrency(optimisticAmount)} · ${formatReachMessage(optimisticReachMonth, chartData)}</li>
+                <li>비관 시나리오 결과: ${toCurrency(pessimisticAmount)} · ${formatReachMessage(pessimisticReachMonth, chartData)}</li>
+                <li>비관 시나리오 기준: ${pessimisticTargetReached ? '목표 금액 이상' : '목표 금액 미달 가능성 있음'}</li>
+                <li>부족 금액: ${toCurrency(shortageAmount)}</li>
+                <li>추천 월 투자금: ${toCurrency(response.recommendedMonthlyInvestment)}</li>
                 <li>예상 최종 금액: ${toCurrency(response.finalAmount)}</li>
             </ul>
+            <p class="hint">${probabilityNote}</p>
         `;
+    }
+
+    function evaluateGoalAchievementStatus(
+            targetAmount,
+            averageFinalAmount,
+            medianAmount,
+            pessimisticAmount
+    ) {
+        if (pessimisticAmount >= targetAmount) {
+            return '목표 달성 안정권';
+        }
+
+        if (medianAmount >= targetAmount) {
+            return '목표 달성 가능성 있음';
+        }
+
+        if (averageFinalAmount >= targetAmount) {
+            return '평균 기준 목표 근접';
+        }
+
+        return '목표 달성 가능성 낮음';
+    }
+
+    function evaluateGoalAchievementMessage(status) {
+        if (status === '목표 달성 안정권') {
+            return '비관 시나리오에서도 목표 금액을 초과하여 목표 달성 안정권입니다.';
+        }
+
+        if (status === '목표 달성 가능성 있음') {
+            return '중앙 시나리오에서는 목표를 달성하지만, 비관 시나리오에서는 목표 금액에 미달할 수 있습니다.';
+        }
+
+        if (status === '평균 기준 목표 근접') {
+            return '평균 결과는 목표에 근접하지만 중앙 시나리오 기준으로는 추가 투자가 필요합니다.';
+        }
+
+        return '현재 조건에서는 목표 달성 가능성이 낮아 월 투자금 또는 투자 기간 조정이 필요합니다.';
     }
 
     function estimateReachMonth(chartData, amountKey, targetAmount) {
@@ -1094,8 +1181,8 @@
         return value && value.trim() !== '' ? value.trim() : null;
     }
 
-    function formatWeight(value) {
-        return Number(value || 0).toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+    function formatWeightPercent(value) {
+        return String(Math.max(1, Math.min(100, Math.round(Number(value || 0)))));
     }
 
     function toCurrency(value) {

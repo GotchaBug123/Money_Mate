@@ -17,10 +17,10 @@ public class MyInvestmentService {
     private final WatchlistRepository watchlistRepository;
 
     public List<InvestmentHolding> getMyHoldings(Long memberId) {
-        return investmentHoldingRepository.findByMember_MemberId(memberId);
+        return investmentHoldingRepository.findAllByMember_MemberIdOrderByCreatedAtDesc(memberId);
     }
 
     public List<Watchlist> getMyWatchlist(Long memberId) {
-        return watchlistRepository.findByMember_MemberId(memberId);
+        return watchlistRepository.findAllByMember_MemberIdOrderByCreatedAtDesc(memberId);
     }
 }

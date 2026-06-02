@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,24 +11,7 @@
 </head>
 <body>
 
-<header class="header">
-    <div class="header-inner">
-        <a href="/" class="logo">MoneyMate</a>
-
-        <nav class="nav">
-            <a href="/my-asset">MY 자산</a>
-            <a href="#">포트폴리오</a>
-            <a href="/rebalancing">리밸런싱</a>
-            <a href="#">투자정보</a>
-            <a href="/community">커뮤니티</a>
-        </nav>
-
-        <div class="header-buttons">
-            <a href="/mypage" class="login-btn">마이페이지</a>
-            <a href="/logout" class="login-btn">로그아웃</a>
-        </div>
-    </div>
-</header>
+<header th:replace="~{fragments/header :: globalHeader('asset')}"></header>
 
 <main class="asset-main">
 
@@ -56,7 +42,7 @@
             <h2 th:text="${#numbers.formatInteger(profile.investableAmount, 3, 'COMMA')} + '원'">
                 0원
             </h2>
-            <span>월 수입 - 고정 지출 - 변동 지출</span>
+            <span>월 수입 - 월 고정 지출 - 월 변동 지출</span>
         </div>
 
         <div class="asset-card">
@@ -91,11 +77,113 @@
 
     </section>
 
+    <!-- ★ 투자 종목 + 관심 종목 좌우 2열 레이아웃 -->
+    <div class="stock-two-col">
+
+        <!-- 왼쪽: 투자 종목 (장바구니) -->
+        <div class="stock-col">
+            <div class="stock-col-header">
+                <p class="page-badge">CART</p>
+                <h2>투자 종목</h2>
+                <p>투자정보 화면에서 담은 종목을 확인할 수 있습니다.</p>
+            </div>
+
+            <div class="stock-box">
+                <div th:if="${holdings == null or #lists.isEmpty(holdings)}" class="stock-empty">
+                    <p>아직 담긴 종목이 없습니다.</p>
+                </div>
+                <div th:if="${holdings != null and !#lists.isEmpty(holdings)}" class="cart-asset-table-wrap">
+                    <table class="cart-asset-table">
+                        <thead>
+                        <tr>
+                            <th>종목명</th>
+                            <th>티커</th>
+                            <th>시장</th>
+                            <th>수량</th>
+                            <th>매수가</th>
+                            <th>매수일</th>
+                            <th>삭제</th>
+                        </tr>
+                        </thead>
+                        <tbody id="cartTbody">
+                        <tr th:each="item : ${holdings}" th:id="'cart-row-' + ${item.holdingId}">
+                            <td th:text="${item.assetName}">삼성전자</td>
+                            <td th:text="${item.ticker}">005930</td>
+                            <td th:text="${item.market}">KOSPI</td>
+                            <td th:text="${item.quantity}">1</td>
+                            <td th:text="${item.buyPrice}">저장가</td>
+                            <td th:text="${#temporals.format(item.buyDate, 'yyyy-MM-dd')}">2026-05-28</td>
+                            <td>
+                                <button class="del-btn"
+                                        th:onclick="'removeCart(' + ${item.holdingId} + ')'">✕</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 투자 종목 하단 버튼 -->
+            <div class="stock-col-btns">
+                <button class="stock-action-btn buy-btn">주식 사기</button>
+                <button class="stock-action-btn sell-btn">주식 팔기</button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 관심 종목 -->
+        <div class="stock-col">
+            <div class="stock-col-header">
+                <p class="page-badge" style="color:#f59e0b;">WATCHLIST</p>
+                <h2>관심 종목</h2>
+                <p>투자정보 화면에서 ★ 버튼으로 등록한 종목입니다.</p>
+            </div>
+
+            <div class="stock-box">
+                <div th:if="${watchlistItems == null or #lists.isEmpty(watchlistItems)}" class="stock-empty">
+                    <p>아직 관심 종목이 없습니다.</p>
+                </div>
+                <div th:if="${watchlistItems != null and !#lists.isEmpty(watchlistItems)}" class="cart-asset-table-wrap">
+                    <table class="cart-asset-table">
+                        <thead>
+                        <tr>
+                            <th>종목명</th>
+                            <th>티커</th>
+                            <th>시장</th>
+                            <th>등록 날짜</th>
+                            <th>삭제</th>
+                        </tr>
+                        </thead>
+                        <tbody id="interestTbody">
+                        <tr th:each="item : ${watchlistItems}" th:id="'watch-row-' + ${item.watchlistId}">
+                            <td th:text="${item.assetName}">삼성전자</td>
+                            <td th:text="${item.ticker}">005930</td>
+                            <td th:text="${item.market}">KOSPI</td>
+                            <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd')}">2026-05-28</td>
+                            <td>
+                                <button class="del-btn"
+                                        th:onclick="'removeWatch(' + ${item.watchlistId} + ')'">✕</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 관심 종목 하단 버튼 -->
+            <div class="stock-col-btns">
+                <a href="/investment-info" class="stock-action-btn watch-btn">관심 종목 담기</a>
+            </div>
+        </div>
+
+    </div>
+    <!-- /stock-two-col -->
+
+    <!-- JS 외부 파일 분리 -->
+    <script src="/js/my-asset.js"></script>
+
+    <footer class="footer">
+        <p>© 2026 MoneyMate. All rights reserved.</p>
+    </footer>
 </main>
-
-<footer class="footer">
-    <p>© 2026 MoneyMate. All rights reserved.</p>
-</footer>
-
 </body>
 </html>

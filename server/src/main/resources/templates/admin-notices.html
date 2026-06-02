@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate 관리자 - 공지사항 관리</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices" class="active">공지사항 관리</a>
+            <a href="/admin/inquiries">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-top">
+            <div>
+                <h1>공지사항 관리</h1>
+                <p>공지사항 관리 기능은 화면 경로만 먼저 연결된 상태입니다.</p>
+            </div>
+        </section>
+
+        <section class="admin-table-card">
+            <div class="admin-table-header">
+                <h2>공지사항 목록</h2>
+                <span th:text="${notices != null ? #lists.size(notices) + '건' : '0건'}">0건</span>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성일</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${notices == null or #lists.isEmpty(notices)}">
+                    <td colspan="4" class="empty-table">등록된 공지사항이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

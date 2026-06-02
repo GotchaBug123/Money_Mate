@@ -6,24 +6,21 @@
     <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-
 <div class="admin-layout">
-
     <aside class="admin-sidebar">
-        <div class="admin-logo">MoneyMate Admin</div>
-
+        <a href="/" class="admin-logo">MoneyMate</a>
         <nav class="admin-menu">
-            <a href="/admin">대시보드</a>
+            <a href="/admin">관리자 홈</a>
             <a href="/admin/members">회원정보 관리</a>
-            <a href="#">투자정보 관리</a>
-            <a href="#">공지사항 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
             <a href="/admin/inquiries" class="active">고객문의 관리</a>
             <a href="/logout">로그아웃</a>
         </nav>
     </aside>
 
     <main class="admin-main">
-
         <section class="admin-top">
             <div>
                 <h1>문의 상세보기</h1>
@@ -32,18 +29,12 @@
         </section>
 
         <section class="admin-detail-card">
-
             <div class="detail-header">
                 <div>
                     <span class="status-badge"
                           th:classappend="${inquiry.status == 'ANSWERED'} ? ' answered' : ''"
-                          th:text="${inquiry.status}">
-                        WAITING
-                    </span>
-
-                    <h2 th:text="${inquiry.title}">
-                        문의 제목
-                    </h2>
+                          th:text="${inquiry.status}">WAITING</span>
+                    <h2 th:text="${inquiry.title}">문의 제목</h2>
                 </div>
 
                 <a href="/admin/inquiries" class="admin-action-btn">목록으로</a>
@@ -54,67 +45,41 @@
                     <span>문의번호</span>
                     <strong th:text="${inquiry.inquiryId}">1</strong>
                 </div>
-
                 <div>
                     <span>문의유형</span>
                     <strong th:text="${inquiry.category}">투자</strong>
                 </div>
-
                 <div>
                     <span>작성자</span>
                     <strong th:text="${inquiry.member.name}">홍길동</strong>
                 </div>
-
                 <div>
                     <span>작성일</span>
-                    <strong th:text="${#temporals.format(inquiry.createdAt, 'yyyy.MM.dd HH:mm')}">
-                        2026.05.28 18:00
-                    </strong>
+                    <strong th:text="${#temporals.format(inquiry.createdAt, 'yyyy.MM.dd HH:mm')}">2026.05.28 18:00</strong>
                 </div>
             </div>
 
             <div class="detail-content-box">
                 <h3>문의 내용</h3>
-                <p th:text="${inquiry.content}">
-                    문의 내용입니다.
-                </p>
+                <p th:text="${inquiry.content}">문의 내용입니다.</p>
             </div>
 
-            <div class="detail-content-box answer"
-                 th:if="${inquiry.answer != null}">
+            <div class="detail-content-box answer" th:if="${inquiry.answer != null}">
                 <h3>등록된 답변</h3>
-                <p th:text="${inquiry.answer}">
-                    답변 내용입니다.
-                </p>
-
+                <p th:text="${inquiry.answer}">답변 내용입니다.</p>
                 <small th:if="${inquiry.answeredAt != null}"
-                       th:text="${#temporals.format(inquiry.answeredAt, 'yyyy.MM.dd HH:mm')}">
-                    2026.05.28 19:00
-                </small>
+                       th:text="${#temporals.format(inquiry.answeredAt, 'yyyy.MM.dd HH:mm')}">2026.05.28 19:00</small>
             </div>
 
             <form class="answer-form"
                   th:action="@{/admin/inquiries/{id}/answer(id=${inquiry.inquiryId})}"
                   method="post">
-
                 <label>관리자 답변</label>
-
-                <textarea name="answer"
-                          placeholder="고객에게 전달할 답변을 입력하세요."
-                          required
-                          th:text="${inquiry.answer}">
-                </textarea>
-
-                <button type="submit" class="admin-submit-btn">
-                    답변 등록하기
-                </button>
+                <textarea name="answer" placeholder="고객에게 전달할 답변을 입력하세요." required th:text="${inquiry.answer}"></textarea>
+                <button type="submit" class="admin-submit-btn">답변 등록하기</button>
             </form>
-
         </section>
-
     </main>
-
 </div>
-
 </body>
 </html>
