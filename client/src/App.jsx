@@ -15,6 +15,10 @@ import FindPassword from './pages/Members/FindPassword';
 import ResetPassword from './pages/Members/ResetPassword';
 
 import CustomerService from './pages/Service/CustomerService';
+import Notice from "./pages/Service/Notice.jsx";
+import FAQ from './pages/Service/FAQ';
+import StockGuide from './pages/Service/StockGuide';
+import CustomerFeedback from './pages/Service/CustomerFeedback';
 import InquiryWrite from './pages/Service/InquiryWrite';
 import InquiryList from './pages/Service/InquiryList';
 
@@ -36,6 +40,9 @@ import PortfolioDirect from './pages/Portfolio/PortfolioDirect/PortfolioDirect';
 import Rebalancing from './pages/Rebalancing/Rebalancing';
 import InvestmentInformation from './pages/InvestmentInformation/InvestmentInformation';
 import UserCommunityPage from './pages/Community/UserCommunityPage';
+
+import Terms from "./pages/Terms/Terms.jsx";
+import Privacy from "./pages/Terms/Privacy.jsx";
 
 import './styles/common.css';
 import './App.css';
@@ -59,6 +66,10 @@ function AppContent() {
                     <Route path="/find-pw" element={<FindPassword/>}/>
                     <Route path="/reset-pw" element={<ResetPassword/>}/>
                     <Route path="/customer-service" element={<CustomerService/>}/>
+                    <Route path="/notice" element={<Notice/>}/>
+                    <Route path="/faq" element={<FAQ/>}/>
+                    <Route path="/stock-guide" element={<StockGuide/>}/>
+                    <Route path="/customer-feedback" element={<CustomerFeedback/>}/>
                     <Route path="/inquiry-write" element={<InquiryWrite/>}/>
                     <Route path="/inquiry-list" element={<InquiryList/>}/>
                     <Route path="/asset" element={<MyAsset/>}/>
@@ -75,6 +86,8 @@ function AppContent() {
                     <Route path="/investment-information" element={<InvestmentInformation/>}/>
                     <Route path="/community" element={<UserCommunityPage/>}/>
                     <Route path="/admin" element={<AdminPage/>}/>
+                    <Route path="/terms" element={<Terms/>}/>
+                    <Route path="/privacy" element={<Privacy/>}/>
                 </Routes>
             </main>
 

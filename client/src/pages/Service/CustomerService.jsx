@@ -12,7 +12,7 @@ function CustomerService() {
                 {/* 1. 공지사항 (전체 너비) */}
                 <div
                     className={`${styles.card} ${styles.notice}`}
-                    onClick={() => alert('공지사항 페이지로 이동합니다.')}
+                    onClick={() => navigate('/notice')}
                 >
                     공지사항
                 </div>
@@ -20,7 +20,7 @@ function CustomerService() {
                 {/* 2. 자주하는 질문 (전체 너비, 약간 더 높게) */}
                 <div
                     className={`${styles.card} ${styles.faq}`}
-                    onClick={() => alert('FAQ 페이지로 이동합니다.')}
+                    onClick={() => navigate('/faq')}
                 >
                     자주하는 질문(FAQ) 8개
                 </div>
@@ -29,13 +29,13 @@ function CustomerService() {
                 <div className={styles.splitRow}>
                     <div
                         className={`${styles.card} ${styles.splitCard}`}
-                        onClick={() => alert('주식 준비 가이드로 이동합니다.')}
+                        onClick={() => navigate('/stock-guide')}
                     >
                         주식 준비 step 5단계
                     </div>
                     <div
                         className={`${styles.card} ${styles.splitCard}`}
-                        onClick={() => alert('고객의 소리 페이지로 이동합니다.')}
+                        onClick={() => navigate('/customer-feedback')}
                     >
                         고객의 소리
                     </div>
