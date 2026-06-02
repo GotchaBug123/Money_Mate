@@ -38,16 +38,17 @@ function MyPage() {
                     <div className={styles.infoContent}>
                         <p>이름: {userInfo.name}</p>
                         <p>이메일: {userInfo.email}</p>
-                        {/* 여기에 나중에 <input> 태그들을 넣어서 폼을 만들면 됩니다. */}
+                        {/* 여기에 나중에 <input> 태그들을 넣어서 폼을 만들 예정입니다 */}
+                        <p style={{color: 'var(--color-text-muted)', marginTop: '20px'}}>폼 입력 영역 개발 예정...</p>
                     </div>
                 </div>
 
                 {/* 오른쪽: 프로필 및 진단 정보 영역 */}
                 <div className={styles.rightPanel}>
 
-                    {/* 우측 상단 프로필 박스 */}
+                    {/* 우측 상단 프로필 카드 */}
                     <div className={styles.profileCard}>
-                        <h3 className={styles.profileTitle}>프로필</h3>
+                        <h3 className={styles.profileTitle}>{userInfo.name}님의 등급</h3>
                         <p className={styles.profileTier}>
                             {userInfo.tier} 등급
                         </p>

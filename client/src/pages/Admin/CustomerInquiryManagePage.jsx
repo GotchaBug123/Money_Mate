@@ -1,12 +1,7 @@
 import React, {useState} from 'react';
+import styles from './CustomerInquiryManagePage.module.css'; // 💡 모듈 CSS 적용
 
-import './customerInquiryManage.css';
-
-function CustomerInquiryManagePage({
-                                       inquiries,
-                                       onAnswerInquiry,
-                                       onDeleteInquiry,
-                                   }) {
+function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}) {
     const [mode, setMode] = useState('list');
     const [searchType, setSearchType] = useState('all');
     const [searchInput, setSearchInput] = useState('');
@@ -26,9 +21,7 @@ function CustomerInquiryManagePage({
     });
 
     const filteredInquiries = inquiries.filter((inquiry) => {
-        if (!searchKeyword) {
-            return true;
-        }
+        if (!searchKeyword) return true;
 
         const inquiryNo = inquiry.inquiryNo.toLowerCase();
         const title = inquiry.title.toLowerCase();
@@ -37,25 +30,12 @@ function CustomerInquiryManagePage({
         const email = inquiry.email.toLowerCase();
         const status = inquiry.status.toLowerCase();
 
-        if (searchType === 'inquiryNo') {
-            return inquiryNo.includes(searchKeyword);
-        }
-
-        if (searchType === 'title') {
-            return title.includes(searchKeyword);
-        }
-
-        if (searchType === 'writer') {
-            return (
-                writerId.includes(searchKeyword) ||
-                writerName.includes(searchKeyword) ||
-                email.includes(searchKeyword)
-            );
-        }
-
-        if (searchType === 'status') {
-            return status.includes(searchKeyword);
-        }
+        if (searchType === 'inquiryNo') return inquiryNo.includes(searchKeyword);
+        if (searchType === 'title') return title.includes(searchKeyword);
+        if (searchType === 'writerId') return writerId.includes(searchKeyword);
+        if (searchType === 'writerName') return writerName.includes(searchKeyword);
+        if (searchType === 'email') return email.includes(searchKeyword);
+        if (searchType === 'status') return status.includes(searchKeyword);
 
         return (
             inquiryNo.includes(searchKeyword) ||
@@ -67,286 +47,168 @@ function CustomerInquiryManagePage({
         );
     });
 
-    const waitingCount = inquiries.filter((inquiry) => inquiry.status === '답변 전').length;
-    const completeCount = inquiries.filter((inquiry) => inquiry.status === '답변 완료').length;
-    const deletedCount = inquiries.filter((inquiry) => inquiry.status === '삭제 조치').length;
+    // 💡 요약 통계 계산
+    const totalCount = inquiries.length;
+    const waitingCount = inquiries.filter(inq => inq.status === '대기' || inq.status === '답변 대기').length;
+    const completedCount = inquiries.filter(inq => inq.status === '답변 완료').length;
+    const deletedCount = inquiries.filter(inq => inq.status === '삭제 조치').length;
 
+    // 💡 핸들러
     const handleSearchSubmit = (event) => {
         event.preventDefault();
         setSearchKeyword(searchInput.trim().toLowerCase());
     };
 
+    const handleSearchReset = () => {
+        setSearchType('all');
+        setSearchInput('');
+        setSearchKeyword('');
+    };
+
     const handleOpenInquiry = (inquiry) => {
-        setAnswerForm({
-            ...inquiry,
-            attachmentUrl: inquiry.attachmentUrl || '',
-        });
+        setAnswerForm({...inquiry});
         setMode('answer');
     };
 
-    const handleAnswerChange = (event) => {
-        const {value} = event.target;
-
-        setAnswerForm((prevForm) => ({
-            ...prevForm,
-            answer: value,
-        }));
-    };
-
-    const handleSubmitAnswer = (event) => {
-        event.preventDefault();
-
-        if (!answerForm.answer.trim()) {
-            alert('답변 내용을 입력해주세요.');
-            return;
-        }
-
-        onAnswerInquiry(answerForm);
+    const handleCloseInquiry = () => {
+        setAnswerForm({
+            inquiryNo: '', title: '', writerId: '', writerName: '', email: '',
+            createdAt: '', status: '', content: '', attachmentName: '', attachmentUrl: '', answer: '',
+        });
         setMode('list');
     };
 
-    if (mode === 'answer') {
-        return (
-            <main className="admin-content-main inquiry-content-main">
-                <section className="inquiry-answer-page">
-                    <div className="inquiry-page-header">
-                        <div>
-                            <span className="admin-section-label">Inquiry Answer</span>
-                            <h2>문의 답변 작성</h2>
-                            <p>회원 문의 내용을 확인하고 관리자 답변을 등록합니다.</p>
-                        </div>
+    const handleAnswerChange = (event) => {
+        setAnswerForm((prev) => ({...prev, answer: event.target.value}));
+    };
 
-                        <button
-                            type="button"
-                            className="inquiry-back-button"
-                            onClick={() => setMode('list')}
-                        >
-                            목록으로
-                        </button>
-                    </div>
+    const handleAnswerSubmit = (event) => {
+        event.preventDefault();
+        if (onAnswerInquiry) {
+            onAnswerInquiry({...answerForm, status: '답변 완료'});
+        }
+        alert('답변이 등록되었습니다.');
+        setMode('list');
+    };
 
-                    <form className="inquiry-answer-form" onSubmit={handleSubmitAnswer}>
-                        <div className="inquiry-top-fields">
-                            <div className="inquiry-form-field">
-                                <label>회원 ID</label>
-                                <input
-                                    type="text"
-                                    value={answerForm.writerId}
-                                    readOnly
-                                />
-                            </div>
+    const handleDeleteClick = (inquiryNo) => {
+        const isConfirm = window.confirm('정말 이 문의를 삭제(숨김 조치)하시겠습니까?');
+        if (isConfirm) {
+            if (onDeleteInquiry) onDeleteInquiry(inquiryNo);
+            alert('문의가 삭제 조치되었습니다.');
+        }
+    };
 
-                            <div className="inquiry-form-field">
-                                <label>회원 이름</label>
-                                <input
-                                    type="text"
-                                    value={answerForm.writerName}
-                                    readOnly
-                                />
-                            </div>
-                        </div>
-
-                        {answerForm.email && (
-                            <div className="inquiry-form-field wide">
-                                <label>이메일</label>
-                                <input
-                                    type="text"
-                                    value={answerForm.email}
-                                    readOnly
-                                />
-                            </div>
-                        )}
-
-                        <div className="inquiry-form-field wide">
-                            <label>문의 제목</label>
-                            <input
-                                type="text"
-                                value={answerForm.title}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="inquiry-form-field wide content-field">
-                            <label>문의 내용</label>
-                            <textarea
-                                value={answerForm.content}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="inquiry-form-field wide">
-                            <label>첨부파일</label>
-
-                            <div className="file-view-box">
-                                <input
-                                    type="text"
-                                    value={answerForm.attachmentName || '첨부파일 없음'}
-                                    readOnly
-                                />
-
-                                {answerForm.attachmentName && (
-                                    <a
-                                        className={
-                                            answerForm.attachmentUrl
-                                                ? 'file-open-button'
-                                                : 'file-open-button disabled'
-                                        }
-                                        href={answerForm.attachmentUrl || undefined}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        onClick={(event) => {
-                                            if (!answerForm.attachmentUrl) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    >
-                                        파일 확인
-                                    </a>
-                                )}
-                            </div>
-
-                            {answerForm.attachmentName && !answerForm.attachmentUrl && (
-                                <p className="file-help-text">
-                                    현재는 파일명만 확인 가능합니다. 실제 파일 열기는 백엔드 파일 URL 연결 후 가능합니다.
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="inquiry-form-field wide content-field">
-                            <label>답변 내용</label>
-                            <textarea
-                                value={answerForm.answer}
-                                onChange={handleAnswerChange}
-                                placeholder="관리자 답변 내용을 입력하세요."
-                            />
-                        </div>
-
-                        <div className="inquiry-answer-buttons">
-                            <button type="button" onClick={() => setMode('list')}>
-                                취소
-                            </button>
-                            <button type="submit">
-                                저장
-                            </button>
-                        </div>
-                    </form>
-                </section>
-            </main>
-        );
-    }
+    // 상태에 따른 배지 스타일 결정
+    const getStatusBadge = (status) => {
+        if (status.includes('대기')) return styles.statusPending;
+        if (status.includes('완료')) return styles.statusCompleted;
+        if (status.includes('삭제')) return styles.statusDeleted;
+        return '';
+    };
 
     return (
-        <main className="admin-content-main inquiry-content-main">
-            <section className="inquiry-manage-page">
-                <div className="inquiry-page-header">
-                    <div>
-                        <span className="admin-section-label">Customer Inquiry</span>
-                        <h2>고객문의관리</h2>
-                        <p>고객 문의를 확인하고 답변 등록 또는 삭제 조치를 처리합니다.</p>
-                    </div>
+        <main className={styles.container}>
 
-                    <div className="inquiry-summary-grid">
-                        <article>
-                            <span>전체 문의</span>
-                            <strong>{inquiries.length}</strong>
-                        </article>
-
-                        <article className="waiting">
-                            <span>답변 대기</span>
-                            <strong>{waitingCount}</strong>
-                        </article>
-
-                        <article>
-                            <span>답변 완료</span>
-                            <strong>{completeCount}</strong>
-                        </article>
-
-                        <article>
-                            <span>삭제 조치</span>
-                            <strong>{deletedCount}</strong>
-                        </article>
-                    </div>
+            {/* 상단 헤더 영역 */}
+            <div className={styles.header}>
+                <div>
+                    <h2 className={styles.title}>고객 문의 관리</h2>
+                    <p className={styles.desc}>고객의 문의 사항을 확인하고 답변을 등록 및 관리할 수 있습니다.</p>
                 </div>
+            </div>
 
-                <div className="inquiry-toolbar">
-                    <div>
-                        <h3>문의 목록</h3>
-                        <span>총 {filteredInquiries.length}개의 문의가 조회되었습니다.</span>
+            {/* 통계 요약 그리드 */}
+            <div className={styles.summaryGrid}>
+                <article className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>전체 문의</span>
+                    <span className={`${styles.summaryValue} ${styles.textPrimary}`}>{totalCount}건</span>
+                </article>
+                <article className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>답변 대기</span>
+                    <span className={`${styles.summaryValue} ${styles.textWarning}`}>{waitingCount}건</span>
+                </article>
+                <article className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>답변 완료</span>
+                    <span className={`${styles.summaryValue} ${styles.textSuccess}`}>{completedCount}건</span>
+                </article>
+                <article className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>삭제 조치</span>
+                    <span className={`${styles.summaryValue} ${styles.textError}`}>{deletedCount}건</span>
+                </article>
+            </div>
+
+            {/* 리스트 모드 */}
+            {mode === 'list' && (
+                <>
+                    <div className={styles.toolbar}>
+                        <form className={styles.searchBox} onSubmit={handleSearchSubmit}>
+                            <select
+                                className={styles.select}
+                                value={searchType}
+                                onChange={(e) => setSearchType(e.target.value)}
+                            >
+                                <option value="all">전체</option>
+                                <option value="inquiryNo">문의 번호</option>
+                                <option value="title">제목</option>
+                                <option value="writerName">작성자</option>
+                                <option value="email">이메일</option>
+                                <option value="status">상태</option>
+                            </select>
+
+                            <input
+                                type="text"
+                                className={styles.input}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                placeholder="검색어를 입력하세요"
+                            />
+                            <button type="submit" className={styles.primaryBtn}>검색</button>
+                            <button type="button" className={styles.secondaryBtn} onClick={handleSearchReset}>초기화
+                            </button>
+                        </form>
                     </div>
 
-                    <form className="inquiry-search-box" onSubmit={handleSearchSubmit}>
-                        <select
-                            className="inquiry-search-select"
-                            value={searchType}
-                            onChange={(event) => setSearchType(event.target.value)}
-                        >
-                            <option value="all">전체</option>
-                            <option value="inquiryNo">문의 번호</option>
-                            <option value="title">문의 제목</option>
-                            <option value="writer">작성자</option>
-                            <option value="status">상태</option>
-                        </select>
+                    <div className={styles.tableWrapper}>
+                        <div className={styles.tableHead}>
+                            <span>번호</span>
+                            <span>작성자</span>
+                            <span>제목</span>
+                            <span>작성일</span>
+                            <span>상태</span>
+                            <span>관리</span>
+                        </div>
 
-                        <input
-                            type="text"
-                            value={searchInput}
-                            onChange={(event) => setSearchInput(event.target.value)}
-                            placeholder="검색어 입력"
-                        />
-
-                        <button type="submit">
-                            검색
-                        </button>
-                    </form>
-                </div>
-
-                <div className="inquiry-list-box">
-                    <div className="inquiry-table-header">
-                        <span>문의 번호</span>
-                        <span>문의 제목</span>
-                        <span>작성자</span>
-                        <span>작성일</span>
-                        <span>상태</span>
-                        <span>관리</span>
-                    </div>
-
-                    <div className="inquiry-table-body">
                         {filteredInquiries.length > 0 ? (
                             filteredInquiries.map((inquiry) => (
-                                <div className="inquiry-row" key={inquiry.inquiryNo}>
+                                <div className={styles.tableRow} key={inquiry.inquiryNo}>
                                     <span>{inquiry.inquiryNo}</span>
-                                    <span>{inquiry.title}</span>
                                     <span>
-                                        {inquiry.writerName}
-                                        {inquiry.email ? ' / 비회원' : ''}
+                                        {inquiry.writerName}<br/>
+                                        <small style={{color: 'var(--color-text-muted)'}}>({inquiry.writerId})</small>
+                                    </span>
+                                    <span
+                                        className={styles.colTitle}
+                                        onClick={() => handleOpenInquiry(inquiry)}
+                                    >
+                                        {inquiry.title}
                                     </span>
                                     <span>{inquiry.createdAt}</span>
-                                    <span
-                                        className={
-                                            inquiry.status === '답변 완료'
-                                                ? 'status-complete'
-                                                : inquiry.status === '삭제 조치'
-                                                    ? 'status-deleted'
-                                                    : 'status-waiting'
-                                        }
-                                    >
-                                        {inquiry.status}
+                                    <span>
+                                        <span className={`${styles.statusBadge} ${getStatusBadge(inquiry.status)}`}>
+                                            {inquiry.status}
+                                        </span>
                                     </span>
-
-                                    <div className="inquiry-actions">
+                                    <div className={styles.actionGroup}>
                                         <button
-                                            type="button"
-                                            className="check-button"
+                                            className={styles.actionBtn}
                                             onClick={() => handleOpenInquiry(inquiry)}
-                                            disabled={inquiry.status === '삭제 조치'}
                                         >
-                                            확인
+                                            상세/답변
                                         </button>
-
                                         <button
-                                            type="button"
-                                            className="delete-button"
-                                            onClick={() => onDeleteInquiry(inquiry.inquiryNo)}
+                                            className={styles.dangerBtn}
+                                            onClick={() => handleDeleteClick(inquiry.inquiryNo)}
                                             disabled={inquiry.status === '삭제 조치'}
                                         >
                                             삭제
@@ -355,13 +217,85 @@ function CustomerInquiryManagePage({
                                 </div>
                             ))
                         ) : (
-                            <div className="empty-inquiry-list">
-                                검색 결과가 없습니다.
+                            <div style={{padding: '60px', textAlign: 'center', color: 'var(--color-text-muted)'}}>
+                                문의 내역이 없습니다.
                             </div>
                         )}
                     </div>
+                </>
+            )}
+
+            {/* 답변/상세 모드 */}
+            {mode === 'answer' && (
+                <div className={styles.tableWrapper} style={{padding: '32px'}}>
+                    <div className={styles.header} style={{marginBottom: '24px'}}>
+                        <h2 className={styles.title}>문의 상세 및 답변 등록</h2>
+                    </div>
+
+                    <div className={styles.detailGrid}>
+                        <div className={styles.detailField}>
+                            <span className={styles.detailLabel}>문의 번호</span>
+                            <span className={styles.detailValue}>{answerForm.inquiryNo}</span>
+                        </div>
+                        <div className={styles.detailField}>
+                            <span className={styles.detailLabel}>작성일</span>
+                            <span className={styles.detailValue}>{answerForm.createdAt}</span>
+                        </div>
+                        <div className={styles.detailField}>
+                            <span className={styles.detailLabel}>작성자 (ID)</span>
+                            <span className={styles.detailValue}>{answerForm.writerName} ({answerForm.writerId})</span>
+                        </div>
+                        <div className={styles.detailField}>
+                            <span className={styles.detailLabel}>이메일</span>
+                            <span className={styles.detailValue}>{answerForm.email}</span>
+                        </div>
+                        <div className={`${styles.detailField} ${styles.full}`}>
+                            <span className={styles.detailLabel}>문의 제목</span>
+                            <span className={styles.detailValue} style={{fontSize: '18px'}}>{answerForm.title}</span>
+                        </div>
+                        <div className={`${styles.detailField} ${styles.full}`}>
+                            <span className={styles.detailLabel}>문의 내용</span>
+                            <div className={styles.detailValue} style={{
+                                padding: '16px',
+                                background: '#fff',
+                                border: '1px solid var(--color-border)',
+                                borderRadius: '8px',
+                                minHeight: '100px',
+                                whiteSpace: 'pre-wrap'
+                            }}>
+                                {answerForm.content}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleAnswerSubmit}>
+                        <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>관리자 답변</label>
+                            <textarea
+                                name="answer"
+                                value={answerForm.answer || ''}
+                                onChange={handleAnswerChange}
+                                placeholder="고객에게 안내할 답변 내용을 입력해주세요."
+                                className={styles.textarea}
+                                required
+                                readOnly={answerForm.status === '삭제 조치'}
+                            />
+                        </div>
+
+                        <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px'}}>
+                            <button type="button" className={styles.secondaryBtn} onClick={handleCloseInquiry}>
+                                취소 / 목록으로
+                            </button>
+                            {answerForm.status !== '삭제 조치' && (
+                                <button type="submit" className={styles.primaryBtn}>
+                                    답변 등록/수정
+                                </button>
+                            )}
+                        </div>
+                    </form>
                 </div>
-            </section>
+            )}
+
         </main>
     );
 }

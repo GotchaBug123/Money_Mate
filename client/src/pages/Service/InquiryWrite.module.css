@@ -3,12 +3,13 @@
 /* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 40px 24px 90px;
 }
 
+/* 💡 글쓰기 폼에 가장 최적화된 800px 레이아웃 유지 */
 .container {
     width: 100%;
     max-width: 800px;
@@ -19,16 +20,17 @@
 
 /* 메인 폼 카드 */
 .card {
-    background: #fff;
-    border-radius: 20px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     padding: 48px 40px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
 }
 
 .title {
     font-size: 24px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     text-align: center;
     margin: 0 0 32px 0;
 }
@@ -37,7 +39,7 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
 }
 
 .inputGroup {
@@ -48,30 +50,31 @@
 
 .label {
     font-size: 13px;
-    font-weight: 600;
-    color: #1a1a2e;
+    font-weight: 700;
+    color: var(--color-text-main);
 }
 
 /* 공통 입력창 스타일 */
 .input {
     width: 100%;
     padding: 14px 16px;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 10px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
     font-size: 14px;
-    color: #1a1a2e;
+    color: var(--color-text-main);
+    background: var(--color-bg-page);
     outline: none;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     box-sizing: border-box;
-    background-color: #fff;
 }
 
 .input:focus {
-    border-color: #1B5ED9;
+    border-color: var(--color-primary);
+    background: var(--color-bg-card);
 }
 
 .input::placeholder {
-    color: #bbb;
+    color: var(--color-text-light);
 }
 
 /* Select 특화 스타일 */
@@ -84,48 +87,68 @@
 .textarea {
     min-height: 240px;
     resize: vertical;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-family: inherit; /* 폰트 통일 */
 }
 
 /* 파일 첨부 영역 스타일 (모던한 점선 박스) */
 .fileWrapper {
-    border: 1.5px dashed #e8eaf0;
-    border-radius: 10px;
+    border: 1.5px dashed var(--color-border);
+    border-radius: var(--radius-md);
     padding: 24px;
-    background-color: #f8f9fb;
+    background: var(--color-bg-input);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .fileWrapper:hover {
-    border-color: #1B5ED9;
-    background-color: #EAF2FC;
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
 }
 
 .fileInput {
     font-size: 14px;
-    color: #888;
+    color: var(--color-text-sub);
     cursor: pointer;
+}
+
+/* 파일 업로드 버튼(기본 UI) 커스텀 */
+.fileInput::file-selector-button {
+    padding: 8px 16px;
+    margin-right: 16px;
+    background: var(--color-bg-card);
+    color: var(--color-text-main);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fileInput::file-selector-button:hover {
+    background: var(--color-bg-input);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 /* 문의 등록 버튼 */
 .submitBtn {
-    width: 100%;
     margin-top: 16px;
     padding: 16px;
-    background: #1B5ED9;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .submitBtn:hover {
-    background: #1449b0;
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
 }

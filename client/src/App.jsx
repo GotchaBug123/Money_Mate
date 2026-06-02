@@ -37,6 +37,7 @@ import Rebalancing from './pages/Rebalancing/Rebalancing';
 import InvestmentInformation from './pages/InvestmentInformation/InvestmentInformation';
 import UserCommunityPage from './pages/Community/UserCommunityPage';
 
+import './styles/common.css';
 import './App.css';
 
 function AppContent() {
@@ -77,7 +78,8 @@ function AppContent() {
                 </Routes>
             </main>
 
-            {!isAdminPage && <Footer/>}
+            {/*{!isAdminPage && <Footer/>}*/}
+            <Footer/>
         </div>
     );
 }

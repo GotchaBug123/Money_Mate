@@ -3,7 +3,7 @@
 /* 전체 레이아웃 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     justify-content: center;
     padding: 40px 24px;
@@ -11,7 +11,7 @@
 
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 900px; /* 💡 이 화면은 900px이 가독성에 딱 좋습니다. */
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -21,10 +21,10 @@
 .backLink {
     align-self: flex-start;
     padding: 10px 20px;
-    background: #fff;
-    color: #555;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 10px;
+    background: var(--color-bg-card);
+    color: var(--color-text-sub);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -32,16 +32,16 @@
 }
 
 .backLink:hover {
-    background: #f8f9fb;
-    color: #1a1a2e;
+    background: var(--color-bg-input);
+    color: var(--color-text-main);
 }
 
 /* 상단 수익률 카드 */
 .topCard {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
     padding: 24px 32px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
     display: flex;
     justify-content: flex-start;
     gap: 60px;
@@ -57,10 +57,10 @@
 .returnMonth {
     font-size: 12px;
     font-weight: 700;
-    color: #1B5ED9;
-    background: #EAF2FC;
+    color: var(--color-primary);
+    background: var(--color-primary-light);
     padding: 4px 10px;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     align-self: flex-start;
     margin-bottom: 4px;
 }
@@ -68,7 +68,7 @@
 .returnLabel {
     font-size: 13px;
     font-weight: 600;
-    color: #888;
+    color: var(--color-text-muted);
 }
 
 .returnValue {
@@ -76,19 +76,18 @@
     font-weight: 800;
 }
 
-/* 동적 색상 제어 (팀원들의 포트폴리오 스타일 통일) */
 .pos {
-    color: #1A7A45;
+    color: var(--color-success);
 }
 
 .neg {
-    color: #C0392B;
+    color: var(--color-error);
 }
 
 /* 차트 영역 (점선 플레이스홀더 디자인) */
 .chartCard {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
     padding: 32px;
     min-height: 240px;
     display: flex;
@@ -96,8 +95,8 @@
     justify-content: center;
     font-size: 15px;
     font-weight: 600;
-    color: #bbb;
-    border: 2px dashed #e8eaf0;
+    color: var(--color-text-light);
+    border: 2px dashed var(--color-border);
 }
 
 /* 하단 종목 리스트 2분할 */
@@ -114,10 +113,10 @@
 }
 
 .listBox {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
     padding: 24px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -127,7 +126,7 @@
 .listTitle {
     font-size: 16px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     margin: 0 0 8px 0;
 }
 
@@ -136,8 +135,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 14px 16px;
-    background: #f8f9fb;
-    border-radius: 12px;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-md);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -149,7 +148,7 @@
 .itemName {
     font-size: 14px;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--color-text-main);
 }
 
 .itemRight {
@@ -160,7 +159,7 @@
 
 .itemQuantity {
     font-size: 13px;
-    color: #888;
+    color: var(--color-text-muted);
     font-weight: 500;
 }
 
@@ -180,10 +179,10 @@
 .primaryBtn {
     flex: 1;
     padding: 14px 0;
-    background: #1B5ED9;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -191,17 +190,17 @@
 }
 
 .primaryBtn:hover {
-    background: #1449b0;
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
 }
 
 .secondaryBtn {
     flex: 1;
     padding: 14px 0;
-    background: #fff;
-    color: #1B5ED9;
-    border: 1.5px solid #1B5ED9;
-    border-radius: 10px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -209,11 +208,11 @@
 }
 
 .secondaryBtn:hover {
-    background: #E8F0FE;
+    background: var(--color-primary-light);
 }
 
 /* -------------------------------------
- * 모달 (팝업) 스타일 (팀원 UI 차용)
+ * 모달 (팝업) 스타일
  * ------------------------------------- */
 .modalOverlay {
     position: fixed;
@@ -226,8 +225,8 @@
 }
 
 .modalContent {
-    background: #fff;
-    border-radius: 20px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
     padding: 32px;
     width: 100%;
     max-width: 400px;
@@ -246,7 +245,7 @@
 .modalTitle {
     font-size: 18px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     margin: 0;
 }
 
@@ -254,40 +253,40 @@
     background: none;
     border: none;
     font-size: 20px;
-    color: #bbb;
+    color: var(--color-text-light);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .modalCloseBtn:hover {
-    color: #333;
+    color: var(--color-text-sub);
 }
 
 .searchPlaceholderBtn {
     padding: 24px;
-    background: #f8f9fb;
-    border: 2px dashed #e8eaf0;
-    border-radius: 12px;
+    background: var(--color-bg-input);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
     font-size: 15px;
     font-weight: 600;
-    color: #888;
+    color: var(--color-text-muted);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .searchPlaceholderBtn:hover {
-    background: #EAF2FC;
-    border-color: #1B5ED9;
-    color: #1B5ED9;
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 .modalBottomRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f8f9fb;
+    background: var(--color-bg-input);
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 .qtyControl {
@@ -299,32 +298,32 @@
 .qtyInput {
     width: 60px;
     padding: 8px 12px;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 8px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
     text-align: right;
     font-size: 15px;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     outline: none;
     transition: border-color 0.2s;
 }
 
 .qtyInput:focus {
-    border-color: #1B5ED9;
+    border-color: var(--color-primary);
 }
 
 .unitText {
     font-size: 14px;
     font-weight: 700;
-    color: #555;
+    color: var(--color-text-sub);
 }
 
 .buyBtn {
     padding: 12px 24px;
-    background: #1B5ED9;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -332,5 +331,5 @@
 }
 
 .buyBtn:hover {
-    background: #1449b0;
+    background: var(--color-primary-hover);
 }

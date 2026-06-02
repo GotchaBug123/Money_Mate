@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import styles from './FinancialDiagnosis.module.css';
 
 const fields = [
@@ -48,13 +48,13 @@ const FinancialInput = () => {
 
     const handleChange = (key) => (e) => {
         const val = e.target.value.replace(/[^0-9]/g, '');
-        setForm((prev) => ({ ...prev, [key]: val }));
+        setForm((prev) => ({...prev, [key]: val}));
     };
 
     const isValid = Object.values(form).every((v) => v !== '');
 
     const handleSubmit = () => {
-        if (isValid) navigate('/financial/result', { state: form });
+        if (isValid) navigate('/financial/result', {state: {result: form}});
     };
 
     return (
@@ -62,20 +62,20 @@ const FinancialInput = () => {
             {/* 페이지 헤더 */}
             <div className={styles.pageHeader}>
                 <div className={styles.headerIllust}>
-                    <span style={{ fontSize: 52 }}>📋</span>
+                    <span style={{fontSize: 40}}>📋</span>
                 </div>
                 <div className={styles.headerText}>
                     <h1 className={styles.headerTitle}>
                         <span className={styles.headerHighlight}>재무진단</span>을 위한 정보를 입력해주세요
                     </h1>
                     <p className={styles.headerDesc}>
-                        정확한 재무진단을 위해 현재 상황을 자세히 입력해주세요.<br />
+                        정확한 재무진단을 위해 현재 상황을 자세히 입력해주세요.<br/>
                         입력하신 정보는 <strong>안전하게 보호되며</strong>, 맞춤형 투자 전략 수립에 활용됩니다.
                     </p>
                 </div>
             </div>
 
-            {/* 폼 */}
+            {/* 폼 컨테이너 */}
             <div className={styles.formContainer}>
                 {fields.map((f) => (
                     <div key={f.key} className={styles.fieldRow}>
@@ -106,7 +106,8 @@ const FinancialInput = () => {
                 <div className={styles.securityBanner}>
                     <span className={styles.securityIcon}>🔒</span>
                     <div>
-                        <p className={styles.securityTitle}>입력하신 정보는 암호화되어 <span className={styles.securityHighlight}>안전하게 보호됩니다.</span></p>
+                        <p className={styles.securityTitle}>입력하신 정보는 암호화되어 <span className={styles.securityHighlight}>안전하게 보호됩니다.</span>
+                        </p>
                         <p className={styles.securityDesc}>개인정보는 재무진단 및 맞춤형 투자 전략 수립 목적 외에는 사용되지 않습니다.</p>
                     </div>
                 </div>

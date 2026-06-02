@@ -1,6 +1,6 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import styles from './CustomerService.module.css'; // 💡 올바른 모듈 CSS 불러오기 방식
+import styles from './CustomerService.module.css';
 
 function CustomerService() {
     const navigate = useNavigate();

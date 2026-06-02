@@ -48,7 +48,7 @@ function InquiryWrite() {
                             <input
                                 type="text"
                                 name="title"
-                                placeholder="문의 제목을 입력해주세요"
+                                placeholder="문의 제목을 입력해주세요."
                                 value={formData.title}
                                 onChange={handleChange}
                                 className={styles.input}
@@ -64,7 +64,7 @@ function InquiryWrite() {
                                 onChange={handleChange}
                                 className={`${styles.input} ${styles.select}`}
                             >
-                                <option value="" disabled>문의 유형 선택</option>
+                                <option value="">문의 유형을 선택해주세요</option>
                                 <option value="account">계정/로그인 문의</option>
                                 <option value="service">서비스 이용 문의</option>
                                 <option value="error">오류 신고</option>

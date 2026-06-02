@@ -3,7 +3,7 @@
 /* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     justify-content: center;
     padding: 40px 24px;
@@ -11,7 +11,7 @@
 
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 900px; /* 💡 정보가 적당히 있는 화면은 900px로 안정감 있게 유지 */
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -25,10 +25,10 @@
 
 .topNavLink {
     padding: 10px 20px;
-    background: #fff;
-    color: #555;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 10px;
+    background: var(--color-bg-card);
+    color: var(--color-text-sub);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -36,25 +36,25 @@
 }
 
 .topNavLink:hover {
-    background: #f8f9fb;
-    color: #1a1a2e;
+    background: var(--color-bg-input);
+    color: var(--color-text-main);
 }
 
 /* 페이지 타이틀 */
 .pageTitle {
     font-size: 24px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     text-align: center;
     margin: 0 0 8px 0;
 }
 
 /* 1. 재무 평가 점수 카드 */
 .scoreCard {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
     padding: 32px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -64,20 +64,20 @@
 
 .scoreLabel {
     font-size: 15px;
-    color: #888;
+    color: var(--color-text-muted);
     font-weight: 600;
 }
 
 .scoreValue {
     font-size: 36px;
     font-weight: 800;
-    color: #1B5ED9;
+    color: var(--color-primary);
 }
 
 /* 2. 차트 영역 (점선 플레이스홀더 디자인) */
 .chartCard {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
     padding: 32px;
     min-height: 280px;
     display: flex;
@@ -85,8 +85,8 @@
     justify-content: center;
     font-size: 15px;
     font-weight: 600;
-    color: #bbb;
-    border: 2px dashed #e8eaf0;
+    color: var(--color-text-light);
+    border: 2px dashed var(--color-border);
 }
 
 /* 3. 필터 버튼 그룹 */
@@ -98,9 +98,9 @@
 
 .filterBtn {
     padding: 10px 20px;
-    background: #fff;
-    color: #555;
-    border: 1.5px solid #e8eaf0;
+    background: var(--color-bg-card);
+    color: var(--color-text-sub);
+    border: 1.5px solid var(--color-border);
     border-radius: 20px;
     font-size: 14px;
     font-weight: 600;
@@ -109,17 +109,17 @@
 }
 
 .filterBtn:hover {
-    background: #EAF2FC;
-    border-color: #1B5ED9;
-    color: #1B5ED9;
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 /* 4. 하단 재무 요약 정보 카드 */
 .summaryCard {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
     padding: 40px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     gap: 32px;
@@ -132,19 +132,19 @@
     align-items: center;
     gap: 12px;
     padding-bottom: 32px;
-    border-bottom: 1.5px solid #f0f0f0;
+    border-bottom: 1.5px solid var(--color-border-light);
 }
 
 .investableLabel {
     font-size: 16px;
     font-weight: 600;
-    color: #888;
+    color: var(--color-text-muted);
 }
 
 .investableValue {
     font-size: 32px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
 }
 
 /* 4개 항목 2단 Grid */
@@ -160,8 +160,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    background: #f8f9fb;
-    border-radius: 12px;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-md);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -172,12 +172,12 @@
 
 .gridLabel {
     font-size: 14px;
-    color: #555;
+    color: var(--color-text-sub);
     font-weight: 600;
 }
 
 .gridValue {
     font-size: 15px;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--color-text-main);
 }

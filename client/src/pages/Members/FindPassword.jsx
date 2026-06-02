@@ -50,8 +50,8 @@ function FindPassword() {
                             type="text"
                             value={id}
                             onChange={(e) => setId(e.target.value)}
+                            placeholder="아이디 입력"
                             className={styles.input}
-                            placeholder="아이디를 입력해주세요"
                             disabled={isVerified}
                         />
                     </div>
@@ -63,8 +63,8 @@ function FindPassword() {
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className={styles.input}
                             placeholder="010-0000-0000"
+                            className={styles.input}
                             disabled={isVerified}
                         />
                     </div>

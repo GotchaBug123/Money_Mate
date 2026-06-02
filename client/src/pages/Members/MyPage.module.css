@@ -1,9 +1,9 @@
-/* src/pages/MyPage.module.css */
+/* src/pages/Members/MyPage.module.css */
 
 /* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     justify-content: center;
     padding: 40px 24px;
@@ -11,35 +11,36 @@
 
 .container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1000px; /* 💡 2단 레이아웃 마이페이지에 최적화된 1000px 너비 유지! */
     display: flex;
     gap: 24px;
 }
 
-/* 왼쪽: 회원 정보 수정 패널 */
+/* ─── 왼쪽: 회원 정보 수정 패널 ─── */
 .leftPanel {
     flex: 1;
-    background: #fff;
-    border-radius: 20px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     padding: 40px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
     min-height: 500px;
 }
 
 .sectionTitle {
     font-size: 22px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     margin: 0 0 24px 0;
 }
 
 .infoContent {
-    color: #555;
+    color: var(--color-text-sub);
     font-size: 15px;
     line-height: 1.8;
 }
 
-/* 오른쪽: 프로필 및 진단 정보 영역 */
+/* ─── 오른쪽: 프로필 및 진단 정보 영역 ─── */
 .rightPanel {
     flex: 1;
     display: flex;
@@ -50,24 +51,25 @@
 /* 우측 상단 프로필 카드 */
 .profileCard {
     align-self: flex-end;
-    min-width: 200px;
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    min-width: 220px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px 32px;
+    box-shadow: var(--shadow-card);
     text-align: center;
 }
 
 .profileTitle {
     font-size: 13px;
-    font-weight: 600;
-    color: #888;
+    font-weight: 700;
+    color: var(--color-text-muted);
     margin: 0 0 8px 0;
 }
 
 .profileTier {
-    color: #1B5ED9;
-    font-weight: 800;
+    color: var(--color-primary);
+    font-weight: 900;
     font-size: 24px;
     margin: 0;
 }
@@ -81,49 +83,63 @@
 }
 
 .financeCard {
-    background: #fff;
-    border-radius: 16px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
     padding: 24px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    gap: 12px;
+    box-shadow: var(--shadow-card);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .financeCard:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-primary);
 }
 
 .financeTitle {
     font-size: 14px;
-    font-weight: 600;
-    color: #888;
-    margin: 0 0 12px 0;
-}
-
-/* 수치 텍스트 공통 및 사이즈별 스타일 */
-.financeValue {
-    font-weight: 800;
-    color: #1a1a2e;
+    font-weight: 700;
+    color: var(--color-text-sub);
     margin: 0;
 }
 
+.financeValue {
+    margin: 0;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+/* 텍스트 크기 및 색상 유틸리티 */
 .large {
     font-size: 28px;
 }
 
 .medium {
-    font-size: 24px;
+    font-size: 22px;
 }
 
 .small {
-    font-size: 20px;
+    font-size: 18px;
 }
 
-/* 특정 텍스트 색상 강조용 (메인 컬러) */
 .primary {
-    color: #1B5ED9;
+    color: var(--color-primary);
+}
+
+/* 반응형 모바일 처리 */
+@media (max-width: 800px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .profileCard {
+        align-self: stretch;
+    }
 }

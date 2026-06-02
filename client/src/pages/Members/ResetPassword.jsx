@@ -38,17 +38,17 @@ function ResetPassword() {
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.card}>
-                <h2 className={styles.title}>새 비밀번호 재설정</h2>
+                <h2 className={styles.title}>비밀번호 재설정</h2>
 
                 {/* 새 비밀번호 입력 */}
                 <div className={styles.inputGroup}>
-                    <label className={styles.label}>새 비밀번호 입력</label>
+                    <label className={styles.label}>새 비밀번호</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className={styles.input}
-                        placeholder="새 비밀번호를 입력해주세요"
+                        placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                     />
                     {/* 조건 검증 상태창 (모던 테마 & 아이콘 추가) */}
                     <div

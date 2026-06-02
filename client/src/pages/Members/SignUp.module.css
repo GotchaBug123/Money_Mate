@@ -1,30 +1,30 @@
-/* src/pages/SignUp.module.css */
+/* src/pages/Members/SignUp.module.css */
 
 /* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 60px 20px;
 }
 
-/* 메인 카드 */
+/* 메인 카드 (입력 폼이므로 500px 집중형 레이아웃 유지) */
 .card {
     width: 100%;
     max-width: 500px;
-    background: #fff;
-    border-radius: 20px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
     padding: 48px 40px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
 }
 
 /* 타이틀 */
 .title {
     font-size: 24px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     text-align: center;
     margin: 0 0 32px 0;
 }
@@ -51,32 +51,34 @@
 
 .label {
     font-size: 13px;
-    font-weight: 600;
-    color: #1a1a2e;
+    font-weight: 700;
+    color: var(--color-text-main);
 }
 
-/* 입력 필드 기본 */
+/* 입력 필드 공통 */
 .input {
     width: 100%;
     padding: 14px 16px;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 10px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
     font-size: 14px;
-    color: #1a1a2e;
+    color: var(--color-text-main);
+    background: var(--color-bg-page);
     outline: none;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     box-sizing: border-box;
 }
 
 .input:focus {
-    border-color: #1B5ED9;
+    border-color: var(--color-primary);
+    background: var(--color-bg-card);
 }
 
 .input::placeholder {
-    color: #bbb;
+    color: var(--color-text-light);
 }
 
-/* 인풋 + 우측 버튼 조합 행 */
+/* 버튼이 포함된 입력행 (가로 배치) */
 .actionRow {
     display: flex;
     gap: 8px;
@@ -84,10 +86,10 @@
 
 .actionBtn {
     padding: 0 20px;
-    background: #f8f9fb;
-    color: #1B5ED9;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 10px;
+    background: var(--color-bg-input);
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -96,15 +98,15 @@
 }
 
 .actionBtn:hover {
-    background: #E8F0FE;
-    border-color: #1B5ED9;
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
 }
 
-/* 조건 검증 상태창 (모던 뱃지 스타일) */
+/* 💡 조건 검증 상태창 (모던 뱃지 스타일 & 글로벌 변수 적용) */
 .statusBox {
     margin-top: 4px;
     padding: 12px 16px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 13px;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -114,30 +116,30 @@
 }
 
 .statusSuccess {
-    background: #EDFAF4;
-    color: #1A7A45;
-    border: 1.5px solid #1A7A45;
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1.5px solid var(--color-success);
 }
 
 .statusWarning {
-    background: #FAEEDA;
-    color: #B47D0C;
-    border: 1.5px solid #B47D0C;
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border: 1.5px solid var(--color-warning);
 }
 
 .statusError {
-    background: #FFF0EE;
-    color: #C0392B;
-    border: 1.5px solid #C0392B;
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border: 1.5px solid var(--color-error);
 }
 
 /* 약관 동의 영역 */
 .termsBox {
     margin-top: 12px;
     padding: 16px;
-    background: #f8f9fb;
-    border-radius: 10px;
-    border: 1.5px solid #e8eaf0;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--color-border);
     display: flex;
     justify-content: center;
 }
@@ -149,13 +151,13 @@
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
-    color: #1a1a2e;
+    color: var(--color-text-main);
 }
 
 .termsCheckbox {
-    width: 18px;
-    height: 18px;
-    accent-color: #1B5ED9;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
     cursor: pointer;
 }
 
@@ -164,10 +166,10 @@
     width: 100%;
     margin-top: 12px;
     padding: 16px;
-    background: #1B5ED9;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
@@ -175,6 +177,6 @@
 }
 
 .submitBtn:hover {
-    background: #1449b0;
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
 }

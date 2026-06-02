@@ -3,12 +3,13 @@
 /* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     justify-content: center;
     padding: 40px 24px;
 }
 
+/* 💡 리스트 화면에 최적화된 900px 너비 적용 */
 .container {
     width: 100%;
     max-width: 900px;
@@ -20,16 +21,17 @@
 .title {
     font-size: 24px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     text-align: center;
     margin: 0;
 }
 
-/* 상단 요약 통계 카드 (팀원들 스타일 차용) */
+/* 상단 요약 통계 카드 */
 .summaryCard {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
     display: flex;
     overflow: hidden;
 }
@@ -38,7 +40,7 @@
     flex: 1;
     padding: 24px;
     text-align: center;
-    border-right: 1.5px solid #f0f0f0;
+    border-right: 1.5px solid var(--color-border-light);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -51,75 +53,62 @@
 .statLabel {
     font-size: 14px;
     font-weight: 600;
-    color: #888;
+    color: var(--color-text-muted);
 }
 
 .statValue {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
 }
 
-/* 통계 텍스트 강조 색상 */
-.textWarning {
-    color: #B47D0C;
+.statHighlight {
+    color: var(--color-primary);
 }
 
-.textSuccess {
-    color: #1A7A45;
+/* 문의 목록 영역 (모던한 리스트 카드 디자인) */
+.listCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: var(--shadow-card);
 }
 
-/* 테이블 영역 카드 */
-.tableCard {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
+.listTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0 0 16px 0;
+}
+
+/* 테이블 레이아웃 */
+.tableWrap {
+    width: 100%;
+    overflow-x: auto;
 }
 
 .table {
     width: 100%;
+    min-width: 600px;
     border-collapse: collapse;
+    border-top: 1.5px solid var(--color-border);
 }
 
 .th {
-    padding: 18px 16px;
-    background: #f8f9fb;
+    background: var(--color-bg-input);
+    color: var(--color-text-sub);
     font-size: 14px;
     font-weight: 700;
-    color: #555;
-    text-align: center;
-    border-bottom: 1.5px solid #e8eaf0;
-}
-
-/* 열 너비 지정 */
-.colId {
-    width: 10%;
-}
-
-.colType {
-    width: 20%;
-}
-
-.colTitle {
-    width: 40%;
-    text-align: left;
-}
-
-.colDate {
-    width: 15%;
-}
-
-.colStatus {
-    width: 15%;
+    padding: 16px;
+    border-bottom: 1.5px solid var(--color-border);
 }
 
 .td {
-    padding: 18px 16px;
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border-light);
     font-size: 14px;
-    color: #1a1a2e;
-    text-align: center;
-    border-bottom: 1px solid #f0f0f0;
+    color: var(--color-text-main);
     vertical-align: middle;
 }
 
@@ -130,16 +119,16 @@
 
 .tdTitle {
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .tdTitle:hover {
-    color: #1B5ED9;
+    color: var(--color-primary);
 }
 
-/* 💡 동적 상태 배지(Badge) 스타일 */
+/* 💡 동적 상태 배지(Badge) 스타일 (글로벌 변수 적용) */
 .statusBadge {
     display: inline-block;
     padding: 6px 12px;
@@ -148,23 +137,25 @@
     font-weight: 700;
 }
 
+/* 답변완료 (초록색) */
 .statusCompleted {
-    background: #EDFAF4;
-    color: #1A7A45;
+    background: var(--color-success-bg);
+    color: var(--color-success);
 }
 
+/* 답변대기 (노란색) */
 .statusPending {
-    background: #FAEEDA;
-    color: #B47D0C;
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
 }
 
 /* 빈 상태 */
 .emptyRow {
     padding: 60px 20px;
     text-align: center;
-    color: #bbb;
+    color: var(--color-text-muted);
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* 하단 영역 (페이지네이션 및 버튼) */
@@ -172,38 +163,65 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin-top: 24px;
 }
 
 .pagination {
-    padding: 10px 24px;
-    background: #fff;
-    border: 1.5px solid #e8eaf0;
-    border-radius: 12px;
+    background: var(--color-bg-card);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 20px;
     font-size: 14px;
     font-weight: 700;
-    color: #555;
+    color: var(--color-text-sub);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
 }
 
 .pagination:hover {
-    background: #f8f9fb;
+    background: var(--color-bg-input);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 .writeBtn {
-    padding: 14px 32px;
-    background: #1B5ED9;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 12px;
-    font-size: 15px;
+    border-radius: var(--radius-md);
+    padding: 12px 24px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .writeBtn:hover {
-    background: #1449b0;
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
+}
+
+/* 모바일 반응형 처리 */
+@media (max-width: 600px) {
+    .summaryCard {
+        flex-direction: column;
+    }
+
+    .statItem {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .statItem:last-child {
+        border-bottom: none;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .writeBtn {
+        width: 100%;
+    }
 }

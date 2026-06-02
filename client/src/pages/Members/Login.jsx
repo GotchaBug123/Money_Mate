@@ -12,8 +12,13 @@ function Login() {
         // 💡 백엔드 연동 전 하드코딩 테스트 (아이디: test, 비밀번호: 1234)
         if (id === 'test' && password === '1234') {
             localStorage.setItem('isLoggedIn', 'true');
-            alert('로그인 성공! 마이페이지로 이동합니다.');
-            window.location.href = '/mypage'; // 상태를 헤더에 반영하기 위해 이동
+            alert('로그인 성공! 메인페이지로 이동합니다.');
+            window.location.href = '/'; // 상태를 헤더에 반영하기 위해 이동
+        } else if (id === 'admin' && password === '1234') {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('role', 'admin');
+            alert('관리자 로그인 성공!');
+            window.location.href = '/admin';
         } else {
             alert('아이디 또는 비밀번호가 일치하지 않습니다.\n(테스트 계정: test / 1234)');
         }
@@ -60,9 +65,11 @@ function Login() {
                     <Link to="/find-id" className={styles.linkBtn}>
                         아이디 찾기
                     </Link>
+                    <div className={styles.divider}/>
                     <Link to="/find-pw" className={styles.linkBtn}>
                         비밀번호 찾기
                     </Link>
+                    <div className={styles.divider}/>
                     <Link to="/signup" className={styles.linkBtn}>
                         회원가입
                     </Link>

@@ -39,8 +39,8 @@ function FindId() {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            placeholder="이름 입력"
                             className={styles.input}
-                            placeholder="이름을 입력해주세요"
                         />
                     </div>
 
@@ -51,12 +51,12 @@ function FindId() {
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className={styles.input}
                             placeholder="010-0000-0000"
+                            className={styles.input}
                         />
                     </div>
 
-                    {/* 인증번호 입력 및 확인 버튼 */}
+                    {/* 인증번호 입력 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>인증번호</label>
                         <div className={styles.verifyRow}>
@@ -88,6 +88,8 @@ function FindId() {
                     <Link to="/find-pw" className={styles.linkBtn}>
                         비밀번호 찾기
                     </Link>
+                    <div className={styles.divider}/>
+                    {/* 💡 버튼 사이 구분선 추가 */}
                     <Link to="/signup" className={styles.linkBtn}>
                         회원가입
                     </Link>

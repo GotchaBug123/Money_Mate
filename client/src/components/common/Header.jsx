@@ -1,13 +1,14 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+import styles from './Header.module.css';
 import moneymateLogo from '../../assets/moneymate_logo.png';
 
 function Header({
-    menuItems,
-    rightButtons,
-    logoTo = '/',
-    logoOnClick,
-}) {
+                    menuItems,
+                    rightButtons,
+                    logoTo = '/',
+                    logoOnClick,
+                }) {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
     const handleLogout = () => {
@@ -27,101 +28,52 @@ function Header({
 
     const finalMenuItems = menuItems || defaultMenuItems;
 
-    const btnStyle = {
-        padding: '8px 16px',
-        borderRadius: '4px',
-        textDecoration: 'none',
-        fontSize: '14px',
-        fontWeight: '500',
-        cursor: 'pointer'
-    };
-
-    const navButtonStyle = {
-        border: 'none',
-        backgroundColor: 'transparent',
-        padding: 0,
-        fontSize: 'inherit',
-        fontWeight: '500',
-        cursor: 'pointer'
-    };
-
+    // 우측 버튼 렌더링 로직
     const renderRightButtons = () => {
+        // 1. 외부에서 커스텀 버튼을 주입한 경우
         if (rightButtons) {
             return rightButtons.map((button) => {
+                const btnClass = button.primary
+                    ? `${styles.actionBtn} ${styles.primaryBtn}`
+                    : `${styles.actionBtn} ${styles.secondaryBtn}`;
+
                 if (button.to) {
                     return (
-                        <Link
-                            key={button.label}
-                            to={button.to}
-                            style={{
-                                ...btnStyle,
-                                backgroundColor: button.primary ? 'var(--primary-color)' : 'white',
-                                color: button.primary ? 'white' : 'var(--text-main)',
-                                border: button.primary ? 'none' : '1px solid var(--border-color)'
-                            }}
-                        >
+                        <Link key={button.label} to={button.to} className={btnClass}>
                             {button.label}
                         </Link>
                     );
                 }
 
                 return (
-                    <button
-                        key={button.label}
-                        type="button"
-                        onClick={button.onClick}
-                        style={{
-                            ...btnStyle,
-                            backgroundColor: button.primary ? 'var(--primary-color)' : 'white',
-                            color: button.primary ? 'white' : 'var(--text-main)',
-                            border: button.primary ? 'none' : '1px solid var(--border-color)'
-                        }}
-                    >
+                    <button key={button.label} type="button" onClick={button.onClick} className={btnClass}>
                         {button.label}
                     </button>
                 );
             });
         }
 
+        // 2. 로그인 상태인 경우
         if (isLoggedIn) {
             return (
                 <>
-                    <Link to="/mypage" style={{
-                        ...btnStyle,
-                        backgroundColor: 'var(--bg-color)',
-                        color: 'var(--text-main)',
-                        border: '1px solid var(--border-color)'
-                    }}>
+                    <Link to="/mypage" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         내 정보
                     </Link>
-                    <button onClick={handleLogout} style={{
-                        ...btnStyle,
-                        backgroundColor: 'white',
-                        color: 'var(--text-main)',
-                        border: '1px solid var(--border-color)'
-                    }}>
+                    <button onClick={handleLogout} className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         로그아웃
                     </button>
                 </>
             );
         }
 
+        // 3. 로그아웃 상태인 경우 (기본)
         return (
             <>
-                <Link to="/login" style={{
-                    ...btnStyle,
-                    backgroundColor: 'white',
-                    color: 'var(--text-main)',
-                    border: '1px solid var(--border-color)'
-                }}>
+                <Link to="/login" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                     로그인
                 </Link>
-                <Link to="/signup" style={{
-                    ...btnStyle,
-                    backgroundColor: 'var(--primary-color)',
-                    color: 'white',
-                    border: 'none'
-                }}>
+                <Link to="/signup" className={`${styles.actionBtn} ${styles.primaryBtn}`}>
                     회원가입
                 </Link>
             </>
@@ -129,34 +81,24 @@ function Header({
     };
 
     return (
-        <header style={{
-            backgroundColor: 'white',
-            borderBottom: '1px solid var(--border-color)',
-            position: 'sticky', // 스크롤을 내려도 원래 자리에 끈적하게(sticky) 붙어있으라는 뜻
-            top: 0,             // 브라우저 최상단(0px)에 붙입니다
-            zIndex: 1000
-        }}>
-            <div className="container"
-                 style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px'}}>
+        <header className={styles.headerWrapper}>
+            <div className={styles.container}>
 
-                <div style={{display: 'flex', gap: '32px', alignItems: 'center'}}>
-                    <Link
-                        to={logoTo}
-                        onClick={logoOnClick}
-                        style={{display: 'flex', alignItems: 'center'}}
-                    >
+                {/* 왼쪽: 로고 및 내비게이션 메뉴 */}
+                <div className={styles.leftSection}>
+                    <Link to={logoTo} onClick={logoOnClick} className={styles.logoLink}>
                         <img
                             src={moneymateLogo}
                             alt="MoneyMate 로고"
-                            style={{height: '32px', objectFit: 'contain', display: 'block'}}
+                            className={styles.logoImg}
                         />
                     </Link>
 
-                    <nav style={{display: 'flex', gap: '20px', fontWeight: '500'}}>
+                    <nav className={styles.nav}>
                         {finalMenuItems.map((item) => {
                             if (item.to) {
                                 return (
-                                    <Link key={item.label} to={item.to}>
+                                    <Link key={item.label} to={item.to} className={styles.navItem}>
                                         {item.label}
                                     </Link>
                                 );
@@ -167,7 +109,7 @@ function Header({
                                     key={item.label}
                                     type="button"
                                     onClick={item.onClick}
-                                    style={navButtonStyle}
+                                    className={styles.navItem}
                                 >
                                     {item.label}
                                 </button>
@@ -176,8 +118,8 @@ function Header({
                     </nav>
                 </div>
 
-                {/* 💡 로그인 상태에 따른 우측 버튼 분기 처리 */}
-                <div style={{display: 'flex', gap: '12px'}}>
+                {/* 오른쪽: 로그인/회원가입 등 액션 버튼 */}
+                <div className={styles.rightSection}>
                     {renderRightButtons()}
                 </div>
 

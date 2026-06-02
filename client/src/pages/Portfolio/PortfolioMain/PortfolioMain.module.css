@@ -1,99 +1,297 @@
-.pageWrapper { padding: 28px; background: #f4f6fb; min-height: 100vh; display: flex; flex-direction: column; gap: 28px; }
+/* src/pages/Portfolio/PortfolioMain.module.css */
 
-/* 섹션 */
-.section { display: flex; flex-direction: column; gap: 16px; }
-.secHead { display: flex; align-items: flex-start; gap: 12px; }
-.secIconWrap { width: 32px; height: 32px; border-radius: 8px; background: #EAF2FC; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-.secIcon { font-size: 16px; }
-.secTitle { font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; }
-.secDesc { font-size: 13px; color: #999; margin: 0; line-height: 1.6; }
-.divider { height: 1px; background: #e8ecf2; }
-.loadingText { font-size: 13px; color: #aaa; }
-
-/* 카드 행 */
-.cardRow { display: flex; gap: 16px; flex-wrap: wrap; }
-
-/* 포트폴리오 카드 - 가로 직사각형 */
-.card {
-    background: #fff;
-    border: 1px solid #e8ecf2;
-    border-radius: 16px;
-    width: 600px;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
-    position: relative;
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px 90px;
 }
-.card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); border-color: #d4e3f5; }
-.cardInner { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
 
-/* 드롭다운 */
-.menuWrap { position: absolute; top: 14px; right: 14px; }
-.menuBtn { width: 30px; height: 30px; border-radius: 50%; background: none; border: none; cursor: pointer; font-size: 16px; color: #bbb; opacity: 0; transition: opacity .15s; letter-spacing: -1px; }
-.card:hover .menuBtn { opacity: 1; }
-.menuBtn:hover { background: #f5f5f5; color: #555; }
-.dropdown { position: absolute; top: 34px; right: 0; background: #fff; border: 1px solid #eef0f4; border-radius: 10px; overflow: hidden; width: 116px; box-shadow: 0 4px 16px rgba(0,0,0,.1); z-index: 20; }
-.dropItem { display: flex; align-items: center; padding: 9px 14px; font-size: 12px; color: #555; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
-.dropItem:hover { background: #f8f9fb; color: #1a1a2e; }
-.dropDanger { color: #a32d2d; }
-.dropDanger:hover { background: #fff5f5 !important; color: #a32d2d !important; }
-.dropSep { height: 1px; background: #f0f0f0; margin: 2px 0; }
+/* 💡 카드들이 여러 개 나열되는 대시보드 화면이므로 1200px로 넓게! */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
 
-.cardName { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0; padding-right: 28px; }
-.cardDate { font-size: 11px; color: #ccc; margin: 0; }
+/* ─── 섹션 공통 ─── */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
 
-/* 수익 지표 */
-.cardStats { display: flex; background: #f8f9fb; border-radius: 10px; overflow: hidden; }
-.statBox { flex: 1; padding: 10px 8px; text-align: center; border-right: 1px solid #eef0f4; }
-.statBox:last-child { border-right: none; }
-.statLabel { font-size: 10px; color: #aaa; margin: 0 0 3px; }
-.statVal { font-size: 14px; font-weight: 700; color: #1a1a2e; margin: 0; }
-.pos { color: #1A7A45 !important; }
+.secHead {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
 
-/* 칩 */
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { padding: 4px 10px; font-size: 11px; font-weight: 500; border-radius: 20px; }
+.secIconWrap {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
 
-/* 카드 하단 */
-.cardFoot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f2f5; padding-top: 10px; }
-.footPeriod { font-size: 12px; color: #888; }
-.footArrow { font-size: 18px; color: #bbb; }
+.secIcon {
+    font-size: 20px;
+}
 
-/* CTA 카드 (자동생성) */
-.ctaCard {
-    background: #fff;
-    border: 1.5px dashed #d0dce8;
-    border-radius: 16px;
-    width: 300px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 10px; padding: 32px 24px; cursor: pointer;
-    transition: border-color .15s, background .15s;
+.secTitle {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0 0 6px;
+}
+
+.secDesc {
+    font-size: 14px;
+    color: var(--color-text-sub);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.divider {
+    height: 1px;
+    background: var(--color-border-light);
+    margin: 8px 0;
+}
+
+.loadingText {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    padding: 20px 0;
     text-align: center;
 }
-.ctaCard:hover { border-color: #185FA5; background: #f4f8ff; }
-.ctaIllust { font-size: 40px; opacity: .7; }
-.ctaTitle { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0; }
-.ctaDesc { font-size: 12px; color: #888; line-height: 1.6; margin: 0; }
+
+/* ─── 카드 행렬 (Grid) ─── */
+.cardRow {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* ─── 포트폴리오 카드 ─── */
+.card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    width: 360px; /* 카드 크기 적당히 확대 */
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-primary);
+}
+
+/* 삭제 버튼 */
+.delBtn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    border: none;
+    background: none;
+    color: var(--color-text-light);
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.delBtn:hover {
+    color: var(--color-error);
+}
+
+/* 카드 상단 정보 */
+.cardType {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 0 0 8px;
+    letter-spacing: 0.04em;
+}
+
+.cardTitle {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0 0 6px;
+    line-height: 1.3;
+}
+
+.cardDate {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* 통계 2단 그리드 */
+.statGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: var(--color-bg-input);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+}
+
+.statCol {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.statLabel {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+}
+
+.statVal {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+.pos {
+    color: var(--color-success);
+}
+
+.neg {
+    color: var(--color-error);
+}
+
+/* 종목 칩(배지) 영역 */
+.stockChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 하단 버튼 및 요약 */
+.ctaBox {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-top: 1.5px solid var(--color-border-light);
+    padding-top: 24px;
+}
+
+.ctaRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ctaLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+}
+
+.ctaVal {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
 .ctaBtn {
-    padding: 12px 24px; background: #185FA5; color: #fff; border: none;
-    border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
-    margin-top: 4px; transition: background .15s; width: 100%;
+    padding: 16px 24px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    width: 100%;
 }
-.ctaBtn:hover { background: #0C447C; }
 
-/* 추가 카드 */
+.ctaBtn:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* ─── 추가 카드 (Add Card) ─── */
 .addCard {
-    background: #fff; border: 1.5px dashed #d0dce8; border-radius: 16px;
-    width: 280px; min-height: 100px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-    cursor: pointer; transition: border-color .15s, background .15s;
+    background: var(--color-bg-page);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-xl);
+    width: 360px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
 }
-.addCard:hover { border-color: #185FA5; background: #f4f8ff; }
-.addIconWrap { width: 40px; height: 40px; border-radius: 50%; background: #EAF2FC; display: flex; align-items: center; justify-content: center; }
-.addPlus { font-size: 20px; color: #185FA5; }
-.addLabel { font-size: 13px; color: #555; font-weight: 500; }
-.addCard:hover .addLabel { color: #185FA5; }
 
-/* 빈 상태 */
-.emptyCard { width: 280px; height: 120px; background: #f8f9fb; border: 1px solid #eef0f4; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-.emptyText { font-size: 13px; color: #aaa; }
-.emptyBtn { padding: 7px 16px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.addCard:hover {
+    border-color: var(--color-primary);
+    background: var(--color-bg-input);
+}
+
+.addIconWrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-bg-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.addCard:hover .addIconWrap {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.addPlus {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--color-text-muted);
+    transition: color 0.2s;
+}
+
+.addCard:hover .addPlus {
+    color: var(--color-primary);
+}
+
+.addLabel {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-sub);
+}

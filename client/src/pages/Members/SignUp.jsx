@@ -46,10 +46,11 @@ function SignUp() {
             return;
         }
         if (!formData.agreeTerms) {
-            alert('이용약관에 동의해 주세요.');
+            alert('이용약관 및 개인정보 처리방침에 동의해 주세요.');
             return;
         }
 
+        // 회원가입 성공 시 완료 페이지로 이름 전달하며 이동
         navigate('/signup-complete', {state: {userName: formData.name}});
     };
 
@@ -73,7 +74,11 @@ function SignUp() {
                                 placeholder="아이디 입력"
                                 required
                             />
-                            <button type="button" onClick={handleCheckId} className={styles.actionBtn}>
+                            <button
+                                type="button"
+                                onClick={handleCheckId}
+                                className={styles.actionBtn}
+                            >
                                 중복확인
                             </button>
                         </div>
@@ -91,7 +96,6 @@ function SignUp() {
                             placeholder="비밀번호 입력"
                             required
                         />
-                        {/* 비밀번호 기준 안내 (조건부 모던 배지 적용) */}
                         <div
                             className={`${styles.statusBox} ${isPasswordValid ? styles.statusSuccess : styles.statusWarning}`}>
                             {isPasswordValid ? '✓ 사용 가능한 비밀번호입니다.' : '! 영문, 숫자, 특수문자 포함 8자 이상'}
@@ -110,7 +114,6 @@ function SignUp() {
                             placeholder="비밀번호 재입력"
                             required
                         />
-                        {/* 비밀번호 일치 확인 안내 */}
                         {formData.passwordConfirm && (
                             <div
                                 className={`${styles.statusBox} ${formData.password === formData.passwordConfirm ? styles.statusSuccess : styles.statusError}`}>
@@ -119,7 +122,7 @@ function SignUp() {
                         )}
                     </div>
 
-                    {/* 이름 & 생년월일 (2단 그리드 배치) */}
+                    {/* 이름 & 생년월일 (2단 레이아웃) */}
                     <div className={styles.halfRow}>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>이름</label>
@@ -159,24 +162,14 @@ function SignUp() {
                                 placeholder="010-0000-0000"
                                 required
                             />
-                            <button type="button" onClick={handleSendAuthCode} className={styles.actionBtn}>
+                            <button
+                                type="button"
+                                onClick={handleSendAuthCode}
+                                className={styles.actionBtn}
+                            >
                                 인증받기
                             </button>
                         </div>
-                    </div>
-
-                    {/* 인증번호 */}
-                    <div className={styles.inputGroup}>
-                        <label className={styles.label}>인증번호</label>
-                        <input
-                            type="text"
-                            name="verificationCode"
-                            value={formData.verificationCode}
-                            onChange={handleChange}
-                            className={styles.input}
-                            placeholder="인증번호 6자리 입력"
-                            required
-                        />
                     </div>
 
                     {/* 이메일 */}

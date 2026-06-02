@@ -1,23 +1,23 @@
-/* src/pages/SignUpComplete.module.css */
+/* src/pages/Members/SignUpComplete.module.css */
 
 /* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: #f4f6fb;
+    background: var(--color-bg-page);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
 }
 
-/* 메인 카드 (다른 인증 페이지들과 너비 통일) */
+/* 메인 카드 (다른 인증 페이지들과 너비 통일, 440px 집중형 유지) */
 .card {
     width: 100%;
     max-width: 440px;
-    background: #fff;
-    border-radius: 20px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
     padding: 60px 40px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-card);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -44,35 +44,35 @@
     }
 }
 
-/* 환영 메시지 타이틀 */
+/* 타이틀 영역 */
 .title {
     font-size: 28px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--color-text-main);
     line-height: 1.4;
-    margin: 0;
+    margin: 0 0 12px 0;
 }
 
 .highlight {
-    color: #1B5ED9;
+    color: var(--color-primary);
 }
 
-/* 서브 설명 */
+/* 설명 텍스트 */
 .desc {
     font-size: 15px;
-    color: #888;
+    color: var(--color-text-sub);
     margin: 0;
+    line-height: 1.6;
 }
 
-/* 완료 버튼 */
+/* 완료 및 이동 버튼 */
 .submitBtn {
     width: 100%;
-    margin-top: 8px;
     padding: 16px;
-    background: #1B5ED9;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
@@ -80,6 +80,6 @@
 }
 
 .submitBtn:hover {
-    background: #1449b0;
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
 }

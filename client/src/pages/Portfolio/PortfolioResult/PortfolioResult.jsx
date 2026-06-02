@@ -1,65 +1,61 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import {useNavigate, useLocation} from 'react-router-dom';
 import styles from './PortfolioResult.module.css';
 
 const MOCK_SIMULATE = (investAmount, goalAmount) => {
     const invest = Number(investAmount) || 1000;
-    const goal   = Number(goalAmount)   || 1500;
-    const rate   = Math.min(98, Math.round((invest / goal) * 85 + Math.random() * 10));
+    const goal = Number(goalAmount) || 1500;
+    const rate = Math.min(98, Math.round((invest / goal) * 85 + Math.random() * 10));
     return {
-        remainingDays:   842,
+        remainingDays: 842,
         achievementRate: rate,
-        finalAmount:     Math.round(invest * 1.43),
-        avgReturnRate:   12.4,
-        maxDrawdown:     -18.2,
+        finalAmount: Math.round(invest * 1.43),
+        avgReturnRate: 12.4,
+        maxDrawdown: -18.2,
         minAnnualReturn: -8.5,
         maxAnnualReturn: 34.7,
     };
 };
 
+// 💡 SVG 내부의 색상들도 모두 글로벌 CSS 변수로 치환 완료!
 const IllustSVG = () => (
     <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" className={styles.illustSvg}>
-        <defs>
-            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#e8f0fe" />
-                <stop offset="100%" stopColor="#c7d9ff" />
-            </linearGradient>
-        </defs>
-        <circle cx="100" cy="110" r="90" fill="url(#bgGrad)" opacity="0.5" />
-        <rect x="30"  y="130" width="28" height="55"  rx="6" fill="#7fa7f0" opacity="0.8" />
-        <rect x="66"  y="100" width="28" height="85"  rx="6" fill="#4a7fe8" opacity="0.9" />
-        <rect x="102" y="75"  width="28" height="110" rx="6" fill="#1B5ED9" />
-        <rect x="138" y="55"  width="28" height="130" rx="6" fill="#1449b0" />
+        <circle cx="100" cy="110" r="90" fill="var(--color-primary-light)" opacity="0.5"/>
+        <rect x="30" y="130" width="28" height="55" rx="6" fill="var(--color-primary)" opacity="0.4"/>
+        <rect x="66" y="100" width="28" height="85" rx="6" fill="var(--color-primary)" opacity="0.7"/>
+        <rect x="102" y="75" width="28" height="110" rx="6" fill="var(--color-primary)"/>
+        <rect x="138" y="55" width="28" height="130" rx="6" fill="var(--color-primary-hover)"/>
         <polyline
             points="38,125 74,95 110,70 148,50"
-            fill="none" stroke="#1A7A45" strokeWidth="3"
+            fill="none" stroke="var(--color-success)" strokeWidth="3"
             strokeLinecap="round" strokeLinejoin="round"
         />
-        <circle cx="148" cy="50" r="5" fill="#1A7A45" />
-        <circle cx="100" cy="40" r="18" fill="none" stroke="#1B5ED9" strokeWidth="3" opacity="0.5" />
-        <circle cx="100" cy="40" r="11" fill="none" stroke="#1B5ED9" strokeWidth="2.5" opacity="0.7" />
-        <circle cx="100" cy="40" r="5"  fill="#1B5ED9" />
-        <line x1="108" y1="32" x2="118" y2="22" stroke="#1B5ED9" strokeWidth="2.5" strokeLinecap="round" />
-        <line x1="114" y1="22" x2="118" y2="22" stroke="#1B5ED9" strokeWidth="2.5" strokeLinecap="round" />
-        <line x1="118" y1="22" x2="118" y2="26" stroke="#1B5ED9" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="148" cy="50" r="5" fill="var(--color-success)"/>
+        <circle cx="100" cy="40" r="18" fill="none" stroke="var(--color-primary)" strokeWidth="3" opacity="0.5"/>
+        <circle cx="100" cy="40" r="11" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" opacity="0.7"/>
+        <circle cx="100" cy="40" r="5" fill="var(--color-primary)"/>
+        <line x1="108" y1="32" x2="118" y2="22" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="114" y1="22" x2="118" y2="22" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="118" y1="22" x2="118" y2="26" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
 );
 
-const BarChart = ({ data }) => {
+const BarChart = ({data}) => {
     const maxAbs = Math.max(...data.map((d) => Math.abs(d.value)));
     return (
         <div className={styles.barChart}>
             {data.map((d, i) => (
                 <div key={i} className={styles.barRow}>
+                    {/* 💡 인라인 스타일 색상도 글로벌 변수로 교체 */}
                     <span
                         className={styles.barDot}
-                        style={{ background: d.value < 0 ? '#C0392B' : '#1A7A45' }}
+                        style={{background: d.value < 0 ? 'var(--color-error)' : 'var(--color-success)'}}
                     />
                     <span className={styles.barLabel}>{d.label}</span>
                     <div className={styles.barTrack}>
                         <div
                             className={`${styles.barFill} ${d.value < 0 ? styles.barNeg : styles.barPos}`}
-                            style={{ width: `${(Math.abs(d.value) / maxAbs) * 100}%` }}
+                            style={{width: `${(Math.abs(d.value) / maxAbs) * 100}%`}}
                         />
                     </div>
                     <span className={`${styles.barValue} ${d.value < 0 ? styles.neg : styles.pos}`}>
@@ -109,10 +105,10 @@ const PortfolioResult = () => {
         : 0;
 
     const barData = [
-        { label: '연평균 수익률', value: avgReturnRate },
-        { label: '최고 연수익률', value: maxAnnualReturn },
-        { label: '최저 연수익률', value: minAnnualReturn },
-        { label: '최대 낙폭',     value: maxDrawdown },
+        {label: '연평균 수익률', value: avgReturnRate},
+        {label: '최고 연수익률', value: maxAnnualReturn},
+        {label: '최저 연수익률', value: minAnnualReturn},
+        {label: '최대 낙폭', value: maxDrawdown},
     ];
 
     return (
@@ -126,15 +122,19 @@ const PortfolioResult = () => {
                         <div className={styles.topCard}>
                             <div className={styles.cardLabelRow}>
                                 <div className={`${styles.cardIcon} ${styles.iconBlue}`}>
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
                                     </svg>
                                 </div>
                                 <p className={styles.cardLabel}>남은 목표 기간</p>
                             </div>
                             <div className={styles.gaugeRow}>
                                 <div className={styles.gaugeTrack}>
-                                    <div className={styles.gaugeFill} style={{ width: `${progressRate}%` }} />
+                                    <div className={styles.gaugeFill} style={{width: `${progressRate}%`}}/>
                                 </div>
                                 <span className={styles.gaugeValue}>{remainingDays.toLocaleString()}일 남음</span>
                             </div>
@@ -147,7 +147,8 @@ const PortfolioResult = () => {
                         <div className={styles.topCard}>
                             <div className={styles.cardLabelRow}>
                                 <div className={`${styles.cardIcon} ${styles.iconGreen}`}>
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                                     </svg>
                                 </div>
@@ -155,18 +156,19 @@ const PortfolioResult = () => {
                             </div>
                             <div className={styles.gaugeRow}>
                                 <div className={styles.gaugeTrack}>
-                                    <div className={styles.gaugeFillGreen} style={{ width: `${achievementRate}%` }} />
+                                    <div className={styles.gaugeFillGreen} style={{width: `${achievementRate}%`}}/>
                                 </div>
                                 <span className={styles.gaugeValueGreen}>{achievementRate}%</span>
                             </div>
                             <p className={styles.cardMeta}>
-                                투자금 {Number(investAmount).toLocaleString()}{currency} → 목표 {Number(goalAmount).toLocaleString()}{currency}
+                                투자금 {Number(investAmount).toLocaleString()}{currency} →
+                                목표 {Number(goalAmount).toLocaleString()}{currency}
                             </p>
                         </div>
                     </div>
 
                     <div className={styles.illustWrap}>
-                        <IllustSVG />
+                        <IllustSVG/>
                     </div>
                 </div>
 
@@ -178,8 +180,11 @@ const PortfolioResult = () => {
                             {finalAmount.toLocaleString()}<span className={styles.statUnit}>{currency}</span>
                         </p>
                         <div className={`${styles.statIcon} ${styles.iconWallet}`}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 3H8L4 7h16l-4-4z"/><circle cx="17" cy="13" r="1" fill="currentColor"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                                <path d="M16 3H8L4 7h16l-4-4z"/>
+                                <circle cx="17" cy="13" r="1.5" fill="currentColor"/>
                             </svg>
                         </div>
                     </div>
@@ -187,8 +192,10 @@ const PortfolioResult = () => {
                         <p className={styles.statLabel}>연평균 수익률</p>
                         <p className={`${styles.statValue} ${styles.pos}`}>+{avgReturnRate}%</p>
                         <div className={`${styles.statIcon} ${styles.iconPos}`}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                                <polyline points="17 6 23 6 23 12"/>
                             </svg>
                         </div>
                     </div>
@@ -196,8 +203,10 @@ const PortfolioResult = () => {
                         <p className={styles.statLabel}>최대 낙폭</p>
                         <p className={`${styles.statValue} ${styles.neg}`}>{maxDrawdown}%</p>
                         <div className={`${styles.statIcon} ${styles.iconNeg}`}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                                <polyline points="17 18 23 18 23 12"/>
                             </svg>
                         </div>
                     </div>
@@ -205,8 +214,14 @@ const PortfolioResult = () => {
                         <p className={styles.statLabel}>최고 연수익률</p>
                         <p className={`${styles.statValue} ${styles.pos}`}>+{maxAnnualReturn}%</p>
                         <div className={`${styles.statIcon} ${styles.iconPos}`}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                                <path d="M4 22h16"/>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
                             </svg>
                         </div>
                     </div>
@@ -214,8 +229,11 @@ const PortfolioResult = () => {
                         <p className={styles.statLabel}>최저 연수익률</p>
                         <p className={`${styles.statValue} ${styles.neg}`}>{minAnnualReturn}%</p>
                         <div className={`${styles.statIcon} ${styles.iconNeg}`}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
                             </svg>
                         </div>
                     </div>
@@ -224,7 +242,7 @@ const PortfolioResult = () => {
                 {/* 바 차트 */}
                 <div className={styles.chartSection}>
                     <p className={styles.chartTitle}>수익률 분석</p>
-                    <BarChart data={barData} />
+                    <BarChart data={barData}/>
                 </div>
 
                 {/* 구성 종목 */}
@@ -245,19 +263,23 @@ const PortfolioResult = () => {
                 <div className={styles.actionRow}>
                     <button className={styles.primaryBtn} onClick={() => navigate('/portfolio')}>
                         내 포트폴리오에서 이용하기
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
                         </svg>
                     </button>
                     <button
                         className={styles.secondaryBtn}
                         onClick={() => navigate('/portfolio/auto', {
-                            state: { typeName, totalScore, selectedThemes, productScores },
+                            state: {typeName, totalScore, selectedThemes, productScores},
                         })}
                     >
                         직접 만들어 다시하기
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.68"/>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="1 4 1 10 7 10"/>
+                            <path d="M3.51 15a9 9 0 1 0 .49-3.68"/>
                         </svg>
                     </button>
                 </div>
