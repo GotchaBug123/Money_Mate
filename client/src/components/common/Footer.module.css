@@ -1,0 +1,84 @@
+/* src/components/common/Footer.module.css */
+
+.footerWrapper {
+    background-color: var(--color-bg-card);
+    border-top: 1px solid var(--color-border);
+    padding: 40px 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-top: auto; /* 부모가 flex일 때 아래로 밀어내는 역할 */
+}
+
+.container {
+    width: 100%;
+    max-width: 1180px; /* 앱 메인 컨텐츠 영역과 동일한 너비 유지 */
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 상단 영역: 서비스 이름 및 링크 */
+.topArea {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logoTitle {
+    margin: 0 0 8px 0;
+    color: var(--color-primary); /* 글로벌 포인트 컬러 적용 */
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.logoDesc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-sub);
+}
+
+.navLinks {
+    display: flex;
+    gap: 24px;
+    font-weight: 600;
+}
+
+.navLink {
+    color: var(--color-text-sub);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.navLink:hover {
+    color: var(--color-primary); /* 호버 시 블루 테마 포인트 효과 */
+}
+
+/* 중단 영역: 유의사항 */
+.noticeArea {
+    border-top: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border-light);
+    padding: 16px 0;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: justify;
+    color: var(--color-text-muted);
+}
+
+/* 하단 영역: 카피라이트 및 팀 정보 */
+.bottomArea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.teamInfo {
+    display: flex;
+    gap: 16px;
+    font-weight: 500;
+}
