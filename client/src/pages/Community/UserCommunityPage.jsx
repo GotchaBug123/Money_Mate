@@ -360,7 +360,6 @@ function UserCommunityPage({
                 {view === 'home' && (
                     <>
                         <section className={styles.heroSection}>
-                            <span className={styles.heroEyebrow}>MoneyMate Community</span>
                             <h2 className={styles.heroTitle}>투자 이야기를 나누고 종목별 의견을 확인해보세요</h2>
                             <p className={styles.heroDesc}>관심 종목, 인기 게시글, 테마별 커뮤니티를 한 화면에서 빠르게 확인할 수 있어요.</p>
                             <div className={styles.quickActions}>
