@@ -333,3 +333,13 @@
 .buyBtn:hover {
     background: var(--color-primary-hover);
 }
+
+.returnMonth button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+    padding: 0 4px;
+}

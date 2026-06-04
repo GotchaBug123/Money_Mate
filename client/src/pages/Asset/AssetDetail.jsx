@@ -1,16 +1,66 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Link} from "react-router-dom";
 import {useModal} from '../../hooks/useModal';
 import styles from './AssetDetail.module.css';
 
 function AssetDetail() {
-    // 모달 표시 여부를 관리하는 상태
     const {isOpen, open, close} = useModal();
+    const [currentMonth, setCurrentMonth] = useState(4);
 
-    // 백엔드 연동 전 임시로 사용할 하드코딩 데이터
+    const monthlyData = {
+        1: {
+            monthlyReturn: '+1.8%',
+            totalReturn: '+4.2%',
+        },
+        2: {
+            monthlyReturn: '+2.7%',
+            totalReturn: '+6.9%',
+        },
+        3: {
+            monthlyReturn: '-1.1%',
+            totalReturn: '+5.8%',
+        },
+        4: {
+            monthlyReturn: '+5.2%',
+            totalReturn: '+12.8%',
+        },
+        5: {
+            monthlyReturn: '+3.4%',
+            totalReturn: '+16.2%',
+        },
+        6: {
+            monthlyReturn: '-0.8%',
+            totalReturn: '+15.4%',
+        },
+        7: {
+            monthlyReturn: '+2.9%',
+            totalReturn: '+18.3%',
+        },
+    };
+
+    const handlePrevMonth = () => {
+        setCurrentMonth((prevMonth) => {
+            if (prevMonth === 1) {
+                return 1;
+            }
+
+            return prevMonth - 1;
+        });
+    };
+
+    const handleNextMonth = () => {
+        setCurrentMonth((prevMonth) => {
+            if (prevMonth === 12) {
+                return 12;
+            }
+
+            return prevMonth + 1;
+        });
+    };
+
     const mockData = {
-        monthlyReturn: '+5.2%',
-        totalReturn: '+12.8%',
+        monthlyReturn: monthlyData[currentMonth]?.monthlyReturn || '+0.0%',
+        totalReturn: monthlyData[currentMonth]?.totalReturn || '+0.0%',
         investedStocks: [
             {id: 1, name: '삼성전자', quantity: '50주', returnRate: '+2.1%'},
             {id: 2, name: '애플', quantity: '10주', returnRate: '+8.5%'},
@@ -33,7 +83,15 @@ function AssetDetail() {
                 {/* 1. 상단 수익률 카드 */}
                 <div className={styles.topCard}>
                     <div className={styles.returnItem}>
-                        <span className={styles.returnMonth}>◀ 4월 ▶</span>
+                        <span className={styles.returnMonth}>
+                            <button type="button" onClick={handlePrevMonth}>
+                                ◀
+                            </button>
+                            {currentMonth}월
+                            <button type="button" onClick={handleNextMonth}>
+                                ▶
+                            </button>
+                        </span>
                         <span className={styles.returnLabel}>월 수익률</span>
                         <span
                             className={`${styles.returnValue} ${mockData.monthlyReturn.includes('-') ? styles.neg : styles.pos}`}>
