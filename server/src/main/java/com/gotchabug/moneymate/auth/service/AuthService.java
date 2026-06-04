@@ -1,7 +1,7 @@
 package com.gotchabug.moneymate.auth.service;
 
-import com.gotchabug.moneymate.auth.dto.HoldingDto;
 import com.gotchabug.moneymate.auth.dto.LoginRequest;
+import com.gotchabug.moneymate.auth.dto.SignupRequest;
 import com.gotchabug.moneymate.financial.entity.FinancialProfile;
 import com.gotchabug.moneymate.financial.repository.FinancialProfileRepository;
 import com.gotchabug.moneymate.member.entity.Member;
@@ -21,7 +21,7 @@ public class AuthService {
     private final FinancialProfileRepository financialProfileRepository;
 
     @Transactional
-    public void signup(HoldingDto.SignupRequest request) {
+    public void signup(SignupRequest request) {
 
         if (memberRepository.existsByLoginId(request.getLoginId())) {
             throw new IllegalArgumentException("이미 사용중인 아이디");
@@ -35,6 +35,7 @@ public class AuthService {
                 .loginId(request.getLoginId())
                 .email(request.getEmail())
                 .name(request.getName())
+                .birthDate(request.getBirthDate())
                 .build();
 
         memberRepository.save(member);

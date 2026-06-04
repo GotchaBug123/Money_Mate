@@ -28,6 +28,9 @@ public class Member {
 
     private LocalDate birthDate;
 
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
     @Column(nullable = false, length = 20)
     private String signupStatus = "ACTIVE";
 
