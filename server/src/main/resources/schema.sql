@@ -1,51 +1,7 @@
+DROP DATABASE IF EXISTS moneymate_db;
+
+CREATE DATABASE moneymate_db;
 USE moneymate_db;
-
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS data_sync_history;
-DROP TABLE IF EXISTS community_post_like;
-DROP TABLE IF EXISTS community_comment;
-DROP TABLE IF EXISTS community_attachment;
-DROP TABLE IF EXISTS community_post;
-DROP TABLE IF EXISTS community_theme;
-DROP TABLE IF EXISTS goal_strategy_result;
-DROP TABLE IF EXISTS asset_fundamental;
-DROP TABLE IF EXISTS external_data_source;
-DROP TABLE IF EXISTS conversion_funnel_log;
-DROP TABLE IF EXISTS user_event_log;
-DROP TABLE IF EXISTS member_data_consent;
-DROP TABLE IF EXISTS identity_verification;
-DROP TABLE IF EXISTS signup_progress;
-DROP TABLE IF EXISTS notification;
-DROP TABLE IF EXISTS rebalancing_detail;
-DROP TABLE IF EXISTS rebalancing_history;
-DROP TABLE IF EXISTS rebalancing_rule;
-DROP TABLE IF EXISTS recommendation_asset;
-DROP TABLE IF EXISTS recommendation;
-DROP TABLE IF EXISTS portfolio_asset_current;
-DROP TABLE IF EXISTS portfolio_asset_target;
-DROP TABLE IF EXISTS portfolio;
-DROP TABLE IF EXISTS investment_goal;
-DROP TABLE IF EXISTS asset_indicator;
-DROP TABLE IF EXISTS asset_price;
-DROP TABLE IF EXISTS asset;
-DROP TABLE IF EXISTS asset_master;
-DROP TABLE IF EXISTS investment_style;
-DROP TABLE IF EXISTS risk_profile;
-DROP TABLE IF EXISTS risk_answer;
-DROP TABLE IF EXISTS risk_answer_sheet;
-DROP TABLE IF EXISTS risk_question_option;
-DROP TABLE IF EXISTS risk_question;
-DROP TABLE IF EXISTS saving_analysis;
-DROP TABLE IF EXISTS monthly_budget;
-DROP TABLE IF EXISTS spending;
-DROP TABLE IF EXISTS spending_category;
-DROP TABLE IF EXISTS financial_profile;
-DROP TABLE IF EXISTS member_auth;
-DROP TABLE IF EXISTS member;
-
-SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE member
 (
@@ -61,121 +17,20 @@ CREATE TABLE member
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE TABLE community_theme
-(
-    theme_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    theme_name    VARCHAR(50)  NOT NULL,
-    description   VARCHAR(255) NULL,
-    display_order INT          NOT NULL,
-    active_yn     VARCHAR(1)   NOT NULL DEFAULT 'Y',
-    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uq_community_theme_name UNIQUE (theme_name),
-    CONSTRAINT ck_community_theme_active_yn CHECK (active_yn IN ('Y', 'N'))
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
-
-CREATE TABLE community_post
-(
-    post_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id    BIGINT       NOT NULL,
-    theme_id     BIGINT       NULL,
-    category     VARCHAR(30)  NOT NULL,
-    title        VARCHAR(150) NOT NULL,
-    content      TINYTEXT     NOT NULL,
-    stock_symbol VARCHAR(30)  NULL,
-    stock_name   VARCHAR(100) NULL,
-    view_count   BIGINT       NOT NULL DEFAULT 0,
-    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_community_post_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_community_post_theme
-        FOREIGN KEY (theme_id) REFERENCES community_theme (theme_id)
-            ON DELETE SET NULL
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
-
-CREATE INDEX idx_community_post_member ON community_post (member_id);
-CREATE INDEX idx_community_post_theme ON community_post (theme_id);
-CREATE INDEX idx_community_post_category ON community_post (category);
-CREATE INDEX idx_community_post_created_at ON community_post (created_at);
-CREATE INDEX idx_community_post_view_count ON community_post (view_count);
-
-CREATE TABLE community_attachment
-(
-    attachment_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    post_id         BIGINT       NOT NULL,
-    attachment_url  VARCHAR(500) NOT NULL,
-    attachment_name VARCHAR(255) NOT NULL,
-    created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_community_attachment_post
-        FOREIGN KEY (post_id) REFERENCES community_post (post_id)
-            ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
-
-CREATE TABLE community_comment
-(
-    comment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    post_id    BIGINT   NOT NULL,
-    member_id  BIGINT   NOT NULL,
-    content    TINYTEXT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_community_comment_post
-        FOREIGN KEY (post_id) REFERENCES community_post (post_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_community_comment_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
-
-CREATE INDEX idx_community_comment_post ON community_comment (post_id);
-CREATE INDEX idx_community_comment_member ON community_comment (member_id);
-CREATE INDEX idx_community_comment_created_at ON community_comment (created_at);
-
-CREATE TABLE community_post_like
-(
-    post_like_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    post_id      BIGINT   NOT NULL,
-    member_id    BIGINT   NOT NULL,
-    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_community_post_like_post
-        FOREIGN KEY (post_id) REFERENCES community_post (post_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_community_post_like_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT uq_community_post_like_member UNIQUE (post_id, member_id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
-
-CREATE INDEX idx_community_post_like_post ON community_post_like (post_id);
-CREATE INDEX idx_community_post_like_member ON community_post_like (member_id);
-
 CREATE TABLE member_auth
 (
-    auth_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id        BIGINT       NOT NULL,
-    password_hash    VARCHAR(255) NOT NULL,
-    last_login_at    DATETIME     NULL,
-    login_fail_count INT          NOT NULL DEFAULT 0,
-    account_locked_yn VARCHAR(1)  NOT NULL DEFAULT 'N',
-    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_member_auth_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
+    auth_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id         BIGINT       NOT NULL,
+    password_hash     VARCHAR(255) NOT NULL,
+    last_login_at     DATETIME     NULL,
+    login_fail_count  INT          NOT NULL DEFAULT 0,
+    account_locked_yn VARCHAR(1)   NOT NULL DEFAULT 'N',
+    created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_member_auth_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
     CONSTRAINT uq_member_auth_member UNIQUE (member_id),
     CONSTRAINT ck_member_auth_locked CHECK (account_locked_yn IN ('Y', 'N'))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
-
-
 
 CREATE TABLE financial_profile
 (
@@ -188,12 +43,14 @@ CREATE TABLE financial_profile
     total_liability          DECIMAL(15, 2) NOT NULL DEFAULT 0,
     cash_asset               DECIMAL(15, 2) NOT NULL DEFAULT 0,
     investable_amount        DECIMAL(15, 2) NOT NULL DEFAULT 0,
-    diagnosis_grade          VARCHAR(20)     NULL,
+    net_asset                DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    total_expense            DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    expense_ratio            DECIMAL(5, 2)  NOT NULL DEFAULT 0,
+    saving_ratio             DECIMAL(5, 2)  NOT NULL DEFAULT 0,
+    diagnosis_grade          VARCHAR(20)    NULL     DEFAULT 'NORMAL',
     created_at               DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at               DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_financial_profile_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
+    CONSTRAINT fk_financial_profile_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
     CONSTRAINT uq_financial_profile_member UNIQUE (member_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -222,11 +79,8 @@ CREATE TABLE spending
     input_source   VARCHAR(20)    NOT NULL DEFAULT 'MANUAL',
     created_at     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_spending_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_spending_category
-        FOREIGN KEY (category_id) REFERENCES spending_category (category_id),
+    CONSTRAINT fk_spending_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_spending_category FOREIGN KEY (category_id) REFERENCES spending_category (category_id),
     CONSTRAINT ck_spending_input_source CHECK (input_source IN ('MANUAL', 'AUTO'))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -244,9 +98,7 @@ CREATE TABLE monthly_budget
     target_saving_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
     created_at           DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at           DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_monthly_budget_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
+    CONSTRAINT fk_monthly_budget_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
     CONSTRAINT uq_monthly_budget_member UNIQUE (member_id, budget_year, budget_month),
     CONSTRAINT ck_monthly_budget_month CHECK (budget_month BETWEEN 1 AND 12)
 ) ENGINE = InnoDB
@@ -265,11 +117,8 @@ CREATE TABLE saving_analysis
     top_over_category_id    BIGINT         NULL,
     summary_comment         VARCHAR(255)   NULL,
     created_at              DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_saving_analysis_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_saving_analysis_category
-        FOREIGN KEY (top_over_category_id) REFERENCES spending_category (category_id),
+    CONSTRAINT fk_saving_analysis_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_saving_analysis_category FOREIGN KEY (top_over_category_id) REFERENCES spending_category (category_id),
     CONSTRAINT uq_saving_analysis_member UNIQUE (member_id, analysis_year, analysis_month),
     CONSTRAINT ck_saving_analysis_month CHECK (analysis_month BETWEEN 1 AND 12)
 ) ENGINE = InnoDB
@@ -294,34 +143,46 @@ CREATE TABLE risk_question_option
     score        INT          NOT NULL,
     option_order INT          NOT NULL,
     created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_risk_question_option_question
-        FOREIGN KEY (question_id) REFERENCES risk_question (question_id)
+    CONSTRAINT fk_risk_question_option_question FOREIGN KEY (question_id) REFERENCES risk_question (question_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE risk_profile
+(
+    risk_profile_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id       BIGINT      NOT NULL UNIQUE,
+    total_score     INT         NOT NULL,
+    risk_type_code  VARCHAR(20) NOT NULL,
+    risk_type_name  VARCHAR(30) NOT NULL,
+    created_at      DATETIME(6) NULL,
+    CONSTRAINT fk_risk_profile_member
+        FOREIGN KEY (member_id)
+            REFERENCES member (member_id)
             ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
+
 CREATE TABLE risk_answer_sheet
 (
-    answer_sheet_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id       BIGINT      NOT NULL,
-    total_score     INT         NOT NULL DEFAULT 0,
-    result_type     VARCHAR(255) NULL,
-    age_group       VARCHAR(255) NULL,
-    income_range    VARCHAR(255) NULL,
-    investment_purpose VARCHAR(255) NULL,
-    investment_horizon VARCHAR(255) NULL,
-    experience_level VARCHAR(255) NULL,
-    understanding_level VARCHAR(255) NULL,
-    risk_tolerance VARCHAR(255) NULL,
-    preferred_product VARCHAR(255) NULL,
-    preferred_themes TEXT NULL,
-    risk_avoidance_percent DECIMAL(5, 2) NULL,
-    financial_interest_percent DECIMAL(5, 2) NULL,
-    submitted_at    DATETIME    NULL,
-    created_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_risk_answer_sheet_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE
+    answer_sheet_id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id                  BIGINT       NOT NULL,
+    total_score                INT          NOT NULL DEFAULT 0,
+    result_type                VARCHAR(30)  NULL,
+    age_group                  VARCHAR(30)  NULL,
+    income_range               VARCHAR(50)  NULL,
+    investment_purpose         VARCHAR(100) NULL,
+    investment_horizon         VARCHAR(30)  NULL,
+    experience_level           VARCHAR(30)  NULL,
+    understanding_level        VARCHAR(30)  NULL,
+    risk_tolerance             VARCHAR(30)  NULL,
+    preferred_product          VARCHAR(30)  NULL,
+    preferred_themes           VARCHAR(500) NULL,
+    risk_avoidance_percent     DECIMAL(5, 2)         DEFAULT 0.00,
+    financial_interest_percent DECIMAL(5, 2)         DEFAULT 0.00,
+    submitted_at               DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP,
+    created_at                 DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_risk_answer_sheet_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -333,28 +194,9 @@ CREATE TABLE risk_answer
     option_id       BIGINT   NOT NULL,
     score           INT      NOT NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_risk_answer_sheet
-        FOREIGN KEY (answer_sheet_id) REFERENCES risk_answer_sheet (answer_sheet_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_risk_answer_question
-        FOREIGN KEY (question_id) REFERENCES risk_question (question_id),
-    CONSTRAINT fk_risk_answer_option
-        FOREIGN KEY (option_id) REFERENCES risk_question_option (option_id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
-
-CREATE TABLE risk_profile
-(
-    risk_profile_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id       BIGINT       NOT NULL,
-    total_score     INT          NOT NULL,
-    risk_type_code  VARCHAR(20)  NOT NULL,
-    risk_type_name  VARCHAR(30)  NOT NULL,
-    created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_risk_profile_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT uq_risk_profile_member UNIQUE (member_id)
+    CONSTRAINT fk_risk_answer_sheet FOREIGN KEY (answer_sheet_id) REFERENCES risk_answer_sheet (answer_sheet_id) ON DELETE CASCADE,
+    CONSTRAINT fk_risk_answer_question FOREIGN KEY (question_id) REFERENCES risk_question (question_id),
+    CONSTRAINT fk_risk_answer_option FOREIGN KEY (option_id) REFERENCES risk_question_option (option_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -364,23 +206,19 @@ CREATE TABLE investment_style
     member_id                BIGINT        NOT NULL,
     answer_sheet_id          BIGINT        NULL,
     risk_score               INT           NOT NULL,
-    risk_type                VARCHAR(20)   NOT NULL,
+    risk_type                VARCHAR(30)   NOT NULL,
     investment_horizon_month INT           NOT NULL,
     max_loss_tolerance_pct   DECIMAL(5, 2) NULL,
     created_at               DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_investment_style_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_investment_style_answer_sheet
-        FOREIGN KEY (answer_sheet_id) REFERENCES risk_answer_sheet (answer_sheet_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_investment_style_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_investment_style_answer_sheet FOREIGN KEY (answer_sheet_id) REFERENCES risk_answer_sheet (answer_sheet_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE external_data_source
 (
     source_id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    source_name           VARCHAR(50)  NOT NULL,
+    source_name           VARCHAR(50)  NOT NULL UNIQUE,
     source_type           VARCHAR(30)  NOT NULL,
     base_url              VARCHAR(255) NULL,
     auth_method           VARCHAR(30)  NULL,
@@ -389,7 +227,6 @@ CREATE TABLE external_data_source
     active_yn             CHAR(1)      NOT NULL DEFAULT 'Y',
     created_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uq_external_data_source_name UNIQUE (source_name),
     CONSTRAINT ck_external_data_source_active_yn CHECK (active_yn IN ('Y', 'N'))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -397,11 +234,11 @@ CREATE TABLE external_data_source
 CREATE TABLE asset_master
 (
     asset_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
-    symbol       VARCHAR(20)  NOT NULL,
+    symbol       VARCHAR(30)  NOT NULL,
     yahoo_symbol VARCHAR(30)  NOT NULL,
     asset_name   VARCHAR(120) NOT NULL,
-    market       VARCHAR(20)  NOT NULL,
-    asset_type   VARCHAR(20)  NOT NULL,
+    market       VARCHAR(30)  NOT NULL,
+    asset_type   VARCHAR(30)  NOT NULL,
     country      VARCHAR(10)  NOT NULL DEFAULT 'KR',
     created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_asset_master_symbol UNIQUE (symbol),
@@ -430,9 +267,7 @@ CREATE TABLE asset
     source_id       BIGINT        NULL,
     created_at      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_asset_source
-        FOREIGN KEY (source_id) REFERENCES external_data_source (source_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_asset_source FOREIGN KEY (source_id) REFERENCES external_data_source (source_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -447,19 +282,18 @@ CREATE TABLE asset_price
     close_price     DECIMAL(15, 2) NOT NULL,
     adj_close_price DECIMAL(15, 2) NULL,
     volume          BIGINT         NULL,
+    trading_value   BIGINT         NULL,
+    daily_return    DECIMAL(10, 6) NULL,
     source_id       BIGINT         NULL,
     created_at      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_asset_price_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_asset_price_source
-        FOREIGN KEY (source_id) REFERENCES external_data_source (source_id)
-            ON DELETE SET NULL,
+    CONSTRAINT fk_asset_price_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    CONSTRAINT fk_asset_price_source FOREIGN KEY (source_id) REFERENCES external_data_source (source_id) ON DELETE SET NULL,
     CONSTRAINT uq_asset_price UNIQUE (asset_id, price_date)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
 CREATE INDEX idx_asset_price_date ON asset_price (price_date);
+CREATE INDEX idx_asset_price_asset_date ON asset_price (asset_id, price_date);
 
 CREATE TABLE asset_indicator
 (
@@ -477,12 +311,8 @@ CREATE TABLE asset_indicator
     dividend_yield_pct DECIMAL(10, 4) NULL,
     source_id          BIGINT         NULL,
     created_at         DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_asset_indicator_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_asset_indicator_source
-        FOREIGN KEY (source_id) REFERENCES external_data_source (source_id)
-            ON DELETE SET NULL,
+    CONSTRAINT fk_asset_indicator_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    CONSTRAINT fk_asset_indicator_source FOREIGN KEY (source_id) REFERENCES external_data_source (source_id) ON DELETE SET NULL,
     CONSTRAINT uq_asset_indicator UNIQUE (asset_id, base_date)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -506,17 +336,32 @@ CREATE TABLE asset_fundamental
     net_income       BIGINT         NULL,
     source_id        BIGINT         NULL,
     created_at       DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_asset_fundamental_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_asset_fundamental_source
-        FOREIGN KEY (source_id) REFERENCES external_data_source (source_id)
-            ON DELETE SET NULL,
+    CONSTRAINT fk_asset_fundamental_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    CONSTRAINT fk_asset_fundamental_source FOREIGN KEY (source_id) REFERENCES external_data_source (source_id) ON DELETE SET NULL,
     CONSTRAINT uq_asset_fundamental UNIQUE (asset_id, base_date)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
 CREATE INDEX idx_asset_fundamental_base_date ON asset_fundamental (base_date);
+
+CREATE TABLE asset_score
+(
+    score_id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    asset_id             BIGINT   NOT NULL,
+    score_date           DATE     NOT NULL,
+    return_score         DECIMAL(5, 2)     DEFAULT 0,
+    trend_score          DECIMAL(5, 2)     DEFAULT 0,
+    volatility_score     DECIMAL(5, 2)     DEFAULT 0,
+    volume_score         DECIMAL(5, 2)     DEFAULT 0,
+    fundamental_score    DECIMAL(5, 2)     DEFAULT 0,
+    user_interest_score  DECIMAL(5, 2)     DEFAULT 0,
+    total_score          DECIMAL(5, 2)     DEFAULT 0,
+    recommendation_grade VARCHAR(20),
+    created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_asset_score_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_asset_score (asset_id, score_date)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE investment_goal
 (
@@ -530,46 +375,194 @@ CREATE TABLE investment_goal
     goal_status          VARCHAR(20)    NOT NULL DEFAULT 'ACTIVE',
     created_at           DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at           DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_investment_goal_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE
+    CONSTRAINT fk_investment_goal_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE TABLE goal_strategy_result (
-    goal_strategy_result_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id BIGINT NOT NULL,
-    goal_name VARCHAR(100) NOT NULL,
-    current_amount BIGINT NOT NULL,
-    monthly_investment BIGINT NOT NULL,
-    target_amount BIGINT NOT NULL,
-    investment_years INT NOT NULL,
-    rebalance_cycle VARCHAR(30) NOT NULL,
-    selected_asset_summary TINYTEXT NOT NULL,
-    success_probability DOUBLE NOT NULL,
-    average_final_amount BIGINT NOT NULL,
-    optimistic_amount BIGINT NOT NULL,
-    median_amount BIGINT NOT NULL,
-    pessimistic_amount BIGINT NOT NULL,
-    var_amount BIGINT NOT NULL,
-    worst_case_average_amount BIGINT NOT NULL,
-    shortage_amount BIGINT NOT NULL,
-    recommended_monthly_investment BIGINT NULL,
-    strategy_grade VARCHAR(10) NULL,
-    strategy_comment LONGTEXT NULL,
-    what_if_success_probability DOUBLE NULL,
-    probability_improvement DOUBLE NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+CREATE TABLE theme
+(
+    theme_id    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    theme_name  VARCHAR(100) NOT NULL,
+    theme_type  VARCHAR(30)  NOT NULL,
+    description TEXT         NULL,
+    active_yn   CHAR(1)      NOT NULL DEFAULT 'Y',
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_theme_name (theme_name)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
 
-    CONSTRAINT fk_goal_strategy_result_member
-        FOREIGN KEY (member_id)
-        REFERENCES member (member_id)
-        ON DELETE CASCADE,
+CREATE TABLE theme_asset
+(
+    theme_asset_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    theme_id       BIGINT   NOT NULL,
+    asset_id       BIGINT   NOT NULL,
+    display_order  INT      NOT NULL DEFAULT 0,
+    created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_theme_asset_theme FOREIGN KEY (theme_id) REFERENCES theme (theme_id) ON DELETE CASCADE,
+    CONSTRAINT fk_theme_asset_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_theme_asset (theme_id, asset_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
 
-    INDEX idx_goal_strategy_member (member_id),
-    INDEX idx_goal_strategy_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE favorite_asset
+(
+    favorite_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id   BIGINT   NOT NULL,
+    asset_id    BIGINT   NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_favorite_asset_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_favorite_asset_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_favorite_asset (member_id, asset_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_favorite_member ON favorite_asset (member_id, asset_id);
+
+CREATE TABLE cart_asset
+(
+    cart_id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id       BIGINT   NOT NULL,
+    asset_id        BIGINT   NOT NULL,
+    source_theme_id BIGINT   NULL,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cart_asset_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_cart_asset_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE,
+    CONSTRAINT fk_cart_asset_theme FOREIGN KEY (source_theme_id) REFERENCES theme (theme_id) ON DELETE SET NULL,
+    UNIQUE KEY uq_cart_asset (member_id, asset_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE investment_info
+(
+    info_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(200) NOT NULL,
+    content     LONGTEXT     NOT NULL,
+    category    VARCHAR(50),
+    source_name VARCHAR(100),
+    source_url  VARCHAR(500),
+    active      BOOLEAN  DEFAULT TRUE,
+    view_count  BIGINT   DEFAULT 0,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE user_investment_asset
+(
+    investment_asset_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id           BIGINT         NOT NULL,
+    asset_id            BIGINT         NOT NULL,
+    buy_price           DECIMAL(15, 2) NOT NULL,
+    quantity            DECIMAL(15, 4) NOT NULL,
+    buy_date            DATE           NOT NULL DEFAULT (CURRENT_DATE),
+    memo                VARCHAR(255)   NULL,
+    investment_status   VARCHAR(20)    NOT NULL DEFAULT 'HOLDING',
+    created_at          DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_investment_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_investment_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_user_investment_member ON user_investment_asset (member_id, asset_id);
+
+CREATE TABLE investment_holding
+(
+    holding_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id  BIGINT         NOT NULL,
+    ticker     VARCHAR(30)    NOT NULL,
+    asset_name VARCHAR(100)   NOT NULL,
+    market     VARCHAR(30),
+    quantity   INT            NOT NULL DEFAULT 1,
+    buy_price  DECIMAL(15, 2) NOT NULL,
+    buy_date   DATE           NOT NULL DEFAULT (CURRENT_DATE),
+    created_at DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_holding_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_member_ticker_holding (member_id, ticker)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE watchlist
+(
+    watchlist_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id    BIGINT       NOT NULL,
+    ticker       VARCHAR(30)  NOT NULL,
+    asset_name   VARCHAR(100) NOT NULL,
+    market       VARCHAR(30),
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_watchlist_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_member_ticker_watchlist (member_id, ticker)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE goal_simulation
+(
+    simulation_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id               BIGINT         NOT NULL,
+    goal_id                 BIGINT         NULL,
+    goal_amount             DECIMAL(15, 2) NOT NULL,
+    initial_amount          DECIMAL(15, 2) NOT NULL,
+    monthly_invest_amount   DECIMAL(15, 2) NOT NULL,
+    investment_years        INT            NOT NULL,
+    expected_return_pct     DECIMAL(10, 4) NOT NULL,
+    expected_volatility_pct DECIMAL(10, 4) NOT NULL,
+    simulation_count        INT            NOT NULL DEFAULT 1000,
+    success_probability     DECIMAL(5, 2)  NULL,
+    worst_result_amount     DECIMAL(15, 2) NULL,
+    median_result_amount    DECIMAL(15, 2) NULL,
+    best_result_amount      DECIMAL(15, 2) NULL,
+    created_at              DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_goal_simulation_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_goal_simulation_goal FOREIGN KEY (goal_id) REFERENCES investment_goal (goal_id) ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE member_investment_grade
+(
+    grade_id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id           BIGINT        NOT NULL,
+    grade_name          VARCHAR(30)   NOT NULL DEFAULT 'BRONZE',
+    grade_color         VARCHAR(20)   NOT NULL DEFAULT '#CD7F32',
+    investment_months   INT           NOT NULL DEFAULT 0,
+    return_score        DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    understanding_score DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    activity_score      DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    total_score         DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    updated_at          DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_member_grade_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_member_grade (member_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE member_yearly_performance
+(
+    performance_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id               BIGINT         NOT NULL,
+    performance_year        INT            NOT NULL,
+    total_invested_amount   DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    total_evaluation_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    profit_amount           DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    return_rate             DECIMAL(10, 4) NOT NULL DEFAULT 0,
+    risk_type               VARCHAR(30)    NULL,
+    created_at              DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_member_yearly_performance_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_member_yearly_performance (member_id, performance_year)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE investment_performance_summary
+(
+    summary_id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    performance_year  INT            NOT NULL,
+    risk_type         VARCHAR(30)    NOT NULL,
+    member_count      INT            NOT NULL DEFAULT 0,
+    avg_return_rate   DECIMAL(10, 4) NOT NULL DEFAULT 0,
+    avg_profit_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    created_at        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_performance_summary (performance_year, risk_type)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE portfolio
 (
@@ -586,15 +579,9 @@ CREATE TABLE portfolio
     portfolio_status        VARCHAR(20)    NOT NULL DEFAULT 'ACTIVE',
     created_at              DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at              DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_portfolio_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_portfolio_goal
-        FOREIGN KEY (goal_id) REFERENCES investment_goal (goal_id)
-            ON DELETE SET NULL,
-    CONSTRAINT fk_portfolio_style
-        FOREIGN KEY (style_id) REFERENCES investment_style (style_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_portfolio_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_portfolio_goal FOREIGN KEY (goal_id) REFERENCES investment_goal (goal_id) ON DELETE SET NULL,
+    CONSTRAINT fk_portfolio_style FOREIGN KEY (style_id) REFERENCES investment_style (style_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -608,11 +595,8 @@ CREATE TABLE portfolio_asset_target
     risk_score          DECIMAL(10, 4) NULL,
     created_at          DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_portfolio_asset_target_portfolio
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_portfolio_asset_target_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id),
+    CONSTRAINT fk_portfolio_asset_target_portfolio FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id) ON DELETE CASCADE,
+    CONSTRAINT fk_portfolio_asset_target_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id),
     CONSTRAINT uq_portfolio_asset_target UNIQUE (portfolio_id, asset_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -629,11 +613,8 @@ CREATE TABLE portfolio_asset_current
     evaluation_amount      DECIMAL(15, 2) NULL,
     unrealized_profit_loss DECIMAL(15, 2) NULL,
     updated_at             DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_portfolio_asset_current_portfolio
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_portfolio_asset_current_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id),
+    CONSTRAINT fk_portfolio_asset_current_portfolio FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id) ON DELETE CASCADE,
+    CONSTRAINT fk_portfolio_asset_current_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id),
     CONSTRAINT uq_portfolio_asset_current UNIQUE (portfolio_id, asset_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -651,20 +632,13 @@ CREATE TABLE recommendation
     expected_volatility_pct DECIMAL(10, 4) NULL,
     success_probability     DECIMAL(10, 4) NULL,
     recommendation_reason   VARCHAR(500)   NULL,
+    recommendation_date     DATE           NOT NULL DEFAULT (CURRENT_DATE),
     applied_yn              CHAR(1)        NOT NULL DEFAULT 'N',
     created_at              DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_recommendation_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_recommendation_portfolio
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id)
-            ON DELETE SET NULL,
-    CONSTRAINT fk_recommendation_goal
-        FOREIGN KEY (goal_id) REFERENCES investment_goal (goal_id)
-            ON DELETE SET NULL,
-    CONSTRAINT fk_recommendation_style
-        FOREIGN KEY (style_id) REFERENCES investment_style (style_id)
-            ON DELETE SET NULL,
+    CONSTRAINT fk_recommendation_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_recommendation_portfolio FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id) ON DELETE SET NULL,
+    CONSTRAINT fk_recommendation_goal FOREIGN KEY (goal_id) REFERENCES investment_goal (goal_id) ON DELETE SET NULL,
+    CONSTRAINT fk_recommendation_style FOREIGN KEY (style_id) REFERENCES investment_style (style_id) ON DELETE SET NULL,
     CONSTRAINT ck_recommendation_applied_yn CHECK (applied_yn IN ('Y', 'N'))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -678,11 +652,8 @@ CREATE TABLE recommendation_asset
     rank_no                 INT           NOT NULL,
     reason_text             VARCHAR(255)  NULL,
     created_at              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_recommendation_asset_recommendation
-        FOREIGN KEY (recommendation_id) REFERENCES recommendation (recommendation_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_recommendation_asset_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
+    CONSTRAINT fk_recommendation_asset_recommendation FOREIGN KEY (recommendation_id) REFERENCES recommendation (recommendation_id) ON DELETE CASCADE,
+    CONSTRAINT fk_recommendation_asset_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -696,9 +667,7 @@ CREATE TABLE rebalancing_rule
     active_yn               CHAR(1)       NOT NULL DEFAULT 'Y',
     created_at              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_rebalancing_rule_portfolio
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id)
-            ON DELETE CASCADE,
+    CONSTRAINT fk_rebalancing_rule_portfolio FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id) ON DELETE CASCADE,
     CONSTRAINT uq_rebalancing_rule_portfolio UNIQUE (portfolio_id),
     CONSTRAINT ck_rebalancing_rule_auto_yn CHECK (auto_rebalance_yn IN ('Y', 'N')),
     CONSTRAINT ck_rebalancing_rule_active_yn CHECK (active_yn IN ('Y', 'N'))
@@ -719,12 +688,8 @@ CREATE TABLE rebalancing_history
     after_risk_pct             DECIMAL(10, 4) NULL,
     status                     VARCHAR(20)    NOT NULL DEFAULT 'COMPLETED',
     created_at                 DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_rebalancing_history_portfolio
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_rebalancing_history_rule
-        FOREIGN KEY (rule_id) REFERENCES rebalancing_rule (rule_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_rebalancing_history_portfolio FOREIGN KEY (portfolio_id) REFERENCES portfolio (portfolio_id) ON DELETE CASCADE,
+    CONSTRAINT fk_rebalancing_history_rule FOREIGN KEY (rule_id) REFERENCES rebalancing_rule (rule_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -738,13 +703,43 @@ CREATE TABLE rebalancing_detail
     after_weight_pct  DECIMAL(7, 4) NULL,
     action_type       VARCHAR(20)   NOT NULL,
     created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_rebalancing_detail_rebalance
-        FOREIGN KEY (rebalance_id) REFERENCES rebalancing_history (rebalance_id)
-            ON DELETE CASCADE,
-    CONSTRAINT fk_rebalancing_detail_asset
-        FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
+    CONSTRAINT fk_rebalancing_detail_rebalance FOREIGN KEY (rebalance_id) REFERENCES rebalancing_history (rebalance_id) ON DELETE CASCADE,
+    CONSTRAINT fk_rebalancing_detail_asset FOREIGN KEY (asset_id) REFERENCES asset (asset_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE goal_strategy_result
+(
+    goal_strategy_result_id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id                      BIGINT       NOT NULL,
+    goal_name                      VARCHAR(100) NOT NULL,
+    current_amount                 BIGINT       NOT NULL,
+    monthly_investment             BIGINT       NOT NULL,
+    target_amount                  BIGINT       NOT NULL,
+    investment_years               INT          NOT NULL,
+    rebalance_cycle                VARCHAR(30)  NOT NULL,
+    selected_asset_summary         LONGTEXT     NOT NULL,
+    success_probability            DOUBLE       NOT NULL,
+    average_final_amount           BIGINT       NOT NULL,
+    optimistic_amount              BIGINT       NOT NULL,
+    median_amount                  BIGINT       NOT NULL,
+    pessimistic_amount             BIGINT       NOT NULL,
+    var_amount                     BIGINT       NOT NULL,
+    worst_case_average_amount      BIGINT       NOT NULL,
+    shortage_amount                BIGINT       NOT NULL,
+    recommended_monthly_investment BIGINT       NULL,
+    strategy_grade                 VARCHAR(10)  NULL,
+    strategy_comment               LONGTEXT     NULL,
+    what_if_success_probability    DOUBLE       NULL,
+    probability_improvement        DOUBLE       NULL,
+    created_at                     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_goal_strategy_result_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_goal_strategy_member ON goal_strategy_result (member_id);
+CREATE INDEX idx_goal_strategy_created_at ON goal_strategy_result (created_at);
 
 CREATE TABLE notification
 (
@@ -756,9 +751,7 @@ CREATE TABLE notification
     related_id        BIGINT       NULL,
     is_read           CHAR(1)      NOT NULL DEFAULT 'N',
     created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_notification_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
+    CONSTRAINT fk_notification_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
     CONSTRAINT ck_notification_is_read CHECK (is_read IN ('Y', 'N'))
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -777,9 +770,7 @@ CREATE TABLE signup_progress
     completed_at    DATETIME     NULL,
     CONSTRAINT uq_signup_progress_session UNIQUE (session_key),
     CONSTRAINT uq_signup_progress_resume_token UNIQUE (resume_token),
-    CONSTRAINT fk_signup_progress_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_signup_progress_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -800,14 +791,11 @@ CREATE TABLE identity_verification
     expired_at          DATETIME     NULL,
     failure_reason      VARCHAR(255) NULL,
     created_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_identity_verification_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE
+    CONSTRAINT fk_identity_verification_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE INDEX idx_identity_verification_member_status
-    ON identity_verification (member_id, verification_status);
+CREATE INDEX idx_identity_verification_member_status ON identity_verification (member_id, verification_status);
 
 CREATE TABLE member_data_consent
 (
@@ -820,9 +808,7 @@ CREATE TABLE member_data_consent
     revoked_at      DATETIME    NULL,
     source_channel  VARCHAR(30) NULL,
     CONSTRAINT ck_member_data_consent_yn CHECK (consent_yn IN ('Y', 'N')),
-    CONSTRAINT fk_member_data_consent_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE CASCADE,
+    CONSTRAINT fk_member_data_consent_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
     CONSTRAINT uq_member_data_consent UNIQUE (member_id, consent_type, consent_version)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -840,17 +826,12 @@ CREATE TABLE user_event_log
     ref_id         BIGINT       NULL,
     event_metadata JSON         NULL,
     occurred_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_user_event_log_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_user_event_log_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE INDEX idx_user_event_log_member_time
-    ON user_event_log (member_id, occurred_at);
-
-CREATE INDEX idx_user_event_log_event_type_time
-    ON user_event_log (event_type, occurred_at);
+CREATE INDEX idx_user_event_log_member_time ON user_event_log (member_id, occurred_at);
+CREATE INDEX idx_user_event_log_event_type_time ON user_event_log (event_type, occurred_at);
 
 CREATE TABLE conversion_funnel_log
 (
@@ -864,39 +845,199 @@ CREATE TABLE conversion_funnel_log
     entered_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     completed_at  DATETIME     NULL,
     drop_reason   VARCHAR(255) NULL,
-    CONSTRAINT fk_conversion_funnel_log_member
-        FOREIGN KEY (member_id) REFERENCES member (member_id)
-            ON DELETE SET NULL
+    CONSTRAINT fk_conversion_funnel_log_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE INDEX idx_conversion_funnel_log_member
-    ON conversion_funnel_log (member_id, funnel_name);
-
-CREATE INDEX idx_conversion_funnel_log_stage
-    ON conversion_funnel_log (funnel_name, stage_name, stage_status);
+CREATE INDEX idx_conversion_funnel_log_member ON conversion_funnel_log (member_id, funnel_name);
+CREATE INDEX idx_conversion_funnel_log_stage ON conversion_funnel_log (funnel_name, stage_name, stage_status);
 
 CREATE TABLE data_sync_history
 (
     sync_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    source_id        BIGINT       NOT NULL,
-    sync_target      VARCHAR(50)  NOT NULL,
+    source_id        BIGINT       NULL,
+    source_name      VARCHAR(50)  NULL,
+    sync_type        VARCHAR(50)  NULL,
+    sync_target      VARCHAR(50)  NULL,
     target_key       VARCHAR(100) NULL,
     sync_status      VARCHAR(20)  NOT NULL DEFAULT 'SUCCESS',
+    target_date      DATE         NULL,
     requested_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     started_at       DATETIME     NULL,
     finished_at      DATETIME     NULL,
+    ended_at         DATETIME     NULL,
+    success_count    INT          NOT NULL DEFAULT 0,
+    fail_count       INT          NOT NULL DEFAULT 0,
     records_received INT          NOT NULL DEFAULT 0,
     records_saved    INT          NOT NULL DEFAULT 0,
-    error_message    VARCHAR(500) NULL,
-    CONSTRAINT fk_data_sync_history_source
-        FOREIGN KEY (source_id) REFERENCES external_data_source (source_id)
-            ON DELETE CASCADE
+    error_message    TEXT         NULL,
+    CONSTRAINT fk_data_sync_history_source FOREIGN KEY (source_id) REFERENCES external_data_source (source_id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-CREATE INDEX idx_data_sync_history_source_time
-    ON data_sync_history (source_id, requested_at);
+CREATE INDEX idx_data_sync_history_source_time ON data_sync_history (source_id, requested_at);
+CREATE INDEX idx_data_sync_history_target ON data_sync_history (sync_target, sync_status);
 
-CREATE INDEX idx_data_sync_history_target
-    ON data_sync_history (sync_target, sync_status);
+CREATE TABLE community_theme
+(
+    theme_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    theme_name    VARCHAR(50)  NOT NULL,
+    description   VARCHAR(255) NULL,
+    display_order INT          NOT NULL DEFAULT 0,
+    active_yn     VARCHAR(1)   NOT NULL DEFAULT 'Y',
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_community_theme_name UNIQUE (theme_name),
+    CONSTRAINT ck_community_theme_active_yn CHECK (active_yn IN ('Y', 'N'))
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE community_post
+(
+    post_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id    BIGINT       NOT NULL,
+    theme_id     BIGINT       NULL,
+    category     VARCHAR(30)  NOT NULL DEFAULT 'GENERAL',
+    title        VARCHAR(200) NOT NULL,
+    content      LONGTEXT     NOT NULL,
+    stock_symbol VARCHAR(30)  NULL,
+    stock_name   VARCHAR(100) NULL,
+    view_count   BIGINT       NOT NULL DEFAULT 0,
+    like_count   INT          NOT NULL DEFAULT 0,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_post_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT fk_community_post_theme FOREIGN KEY (theme_id) REFERENCES community_theme (theme_id) ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_community_post_member ON community_post (member_id);
+CREATE INDEX idx_community_post_theme ON community_post (theme_id);
+CREATE INDEX idx_community_post_category ON community_post (category);
+CREATE INDEX idx_community_post_created_at ON community_post (created_at);
+CREATE INDEX idx_community_post_view_count ON community_post (view_count);
+
+CREATE TABLE community_attachment
+(
+    attachment_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id         BIGINT       NOT NULL,
+    attachment_url  VARCHAR(500) NOT NULL,
+    attachment_name VARCHAR(255) NOT NULL,
+    created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_attachment_post FOREIGN KEY (post_id) REFERENCES community_post (post_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE community_comment
+(
+    comment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id    BIGINT   NOT NULL,
+    member_id  BIGINT   NOT NULL,
+    content    LONGTEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_comment_post FOREIGN KEY (post_id) REFERENCES community_post (post_id) ON DELETE CASCADE,
+    CONSTRAINT fk_community_comment_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_community_comment_post ON community_comment (post_id);
+CREATE INDEX idx_community_comment_member ON community_comment (member_id);
+CREATE INDEX idx_community_comment_created_at ON community_comment (created_at);
+
+CREATE TABLE community_post_like
+(
+    post_like_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id      BIGINT   NOT NULL,
+    member_id    BIGINT   NOT NULL,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_community_post_like_post FOREIGN KEY (post_id) REFERENCES community_post (post_id) ON DELETE CASCADE,
+    CONSTRAINT fk_community_post_like_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE,
+    CONSTRAINT uq_community_post_like_member UNIQUE (post_id, member_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE INDEX idx_community_post_like_post ON community_post_like (post_id);
+CREATE INDEX idx_community_post_like_member ON community_post_like (member_id);
+
+CREATE TABLE faq
+(
+    faq_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    category   VARCHAR(50)  NOT NULL,
+    question   VARCHAR(255) NOT NULL,
+    answer     TEXT         NOT NULL,
+    view_count INT          NOT NULL DEFAULT 0,
+    active_yn  CHAR(1)      NOT NULL DEFAULT 'Y',
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE customer_inquiry
+(
+    inquiry_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id   BIGINT       NOT NULL,
+    category    VARCHAR(50)  NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    content     TEXT         NOT NULL,
+    answer      TEXT         NULL,
+    status      VARCHAR(20)  NOT NULL DEFAULT 'WAITING',
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    answered_at DATETIME     NULL,
+    CONSTRAINT fk_customer_inquiry_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+INSERT INTO member (login_id, email, name, birth_date, role, signup_status)
+VALUES ('test1', 'test1@test.com', '홍길동', '1995-01-01', 'USER', 'ACTIVE'),
+       ('masteradmin', 'masteradmin@moneymate.com', '최고관리자', NULL, 'ADMIN', 'ACTIVE');
+
+INSERT INTO member_auth (member_id, password_hash, last_login_at, login_fail_count, account_locked_yn)
+SELECT member_id, '1234', NOW(), 0, 'N'
+FROM member
+WHERE login_id = 'test1';
+
+INSERT INTO member_auth (member_id, password_hash, last_login_at, login_fail_count, account_locked_yn)
+SELECT member_id, 'admin1234', NOW(), 0, 'N'
+FROM member
+WHERE login_id = 'masteradmin';
+
+INSERT INTO financial_profile (member_id, monthly_income, monthly_fixed_expense, monthly_variable_expense,
+                               total_asset, total_liability, cash_asset, investable_amount,
+                               net_asset, total_expense, expense_ratio, saving_ratio, diagnosis_grade)
+SELECT member_id,
+       3000000,
+       800000,
+       500000,
+       10000000,
+       2000000,
+       3000000,
+       450000,
+       8000000,
+       1300000,
+       43.33,
+       15.00,
+       'GOOD'
+FROM member
+WHERE login_id = 'test1';
+
+INSERT INTO spending_category (category_name, parent_category, essential_yn)
+VALUES ('월세', '주거', 'Y'),
+       ('보험', '고정지출', 'Y'),
+       ('식비', '생활비', 'Y'),
+       ('쇼핑', '변동지출', 'N');
+
+INSERT INTO external_data_source (source_name, source_type, base_url, auth_method, refresh_cycle, latest_guarantee_rule,
+                                  active_yn)
+VALUES ('YAHOO_FINANCE', 'MARKET_API', 'https://finance.yahoo.com', NULL, 'DAILY', NULL, 'Y'),
+       ('DART', 'FUNDAMENTAL_API', 'https://opendart.fss.or.kr', NULL, 'QUARTERLY', NULL, 'Y');
+
+INSERT INTO faq (category, question, answer, view_count)
+VALUES ('투자', '로보어드바이저 추천 포트폴리오는 어떻게 만들어지나요?', '회원님의 투자성향, 재무정보, 목표금액, 투자기간을 바탕으로 ETF와 주식 데이터를 분석하여 추천 포트폴리오를 제공합니다.',
+        35),
+       ('투자', '투자성향 분석 결과를 다시 받을 수 있나요?', '마이페이지 또는 투자성향 분석 메뉴에서 언제든지 다시 진행할 수 있습니다.', 28),
+       ('수익률', '내 투자 수익률은 어떻게 계산되나요?', '매수가, 보유수량, 현재가를 기준으로 평가금액과 수익률을 계산합니다.', 42),
+       ('계정', '비밀번호를 변경하고 싶어요.', '마이페이지의 비밀번호 변경 메뉴에서 변경할 수 있습니다.', 22),
+       ('데이터', '주식 현재가는 어디서 가져오나요?', 'Yahoo Finance 등 외부 금융 데이터 API를 통해 현재가를 조회합니다.', 31),
+       ('문의', '답변은 얼마나 걸리나요?', '문의 접수 후 보통 1~2영업일 이내 답변됩니다.', 18);
