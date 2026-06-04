@@ -1,52 +1,75 @@
-/* src/pages/CustomerService/CustomerFeedback.module.css */
-
-/* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
     display: flex;
     justify-content: center;
-    padding: 60px 24px 90px;
+    padding: 40px 24px 80px;
 }
 
-/* 💡 글쓰기 폼에 가장 최적화된 800px 레이아웃 유지 */
 .container {
     width: 100%;
-    max-width: 800px;
+    max-width: 920px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
 }
 
-/* 상단 헤더 */
-.header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.backButton {
+    align-self: flex-start;
+    padding: 12px 20px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 900;
+    box-shadow: var(--shadow-card);
+}
+
+.backButton:hover {
+    background: var(--color-primary);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.heroSection {
+    padding: 38px 42px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
 }
 
 .title {
-    font-size: 32px;
-    font-weight: 900;
-    color: var(--color-text-main);
     margin: 0;
-    letter-spacing: -0.02em;
+    color: #ffffff;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
 .subtitle {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 16px;
-    color: var(--color-text-sub);
-    margin: 0;
-    line-height: 1.6;
+    line-height: 1.65;
+    font-weight: 800;
 }
 
-/* 폼 카드 */
 .formCard {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
-    padding: 48px 40px;
+    padding: 42px;
     box-shadow: var(--shadow-card);
 }
 
@@ -63,12 +86,11 @@
 }
 
 .label {
-    font-size: 14px;
-    font-weight: 800;
     color: var(--color-text-main);
+    font-size: 15px;
+    font-weight: 900;
 }
 
-/* 피드백 유형 선택 (버튼형 칩 UI) */
 .typeChips {
     display: flex;
     gap: 12px;
@@ -76,85 +98,92 @@
 }
 
 .chip {
-    padding: 12px 24px;
-    background: var(--color-bg-input);
-    border: 1.5px solid var(--color-border);
+    min-height: 46px;
+    padding: 0 22px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
-    font-size: 14px;
-    font-weight: 700;
     color: var(--color-text-sub);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: var(--shadow-card);
 }
 
 .chip:hover {
     background: var(--color-primary-light);
     border-color: var(--color-primary);
     color: var(--color-primary);
+    transform: translateY(-1px);
 }
 
 .chipActive {
     background: var(--color-primary);
     border-color: var(--color-primary);
-    color: #fff;
+    color: #ffffff;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.22);
 }
 
 .chipActive:hover {
     background: var(--color-primary-hover);
+    color: #ffffff;
 }
 
-/* 입력 필드 공통 */
 .input {
     width: 100%;
-    padding: 16px;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: 15px;
+    padding: 17px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
     color: var(--color-text-main);
-    background: var(--color-bg-page);
+    font-size: 15px;
+    font-weight: 700;
     outline: none;
-    transition: border-color 0.2s ease, background 0.2s ease;
-    box-sizing: border-box;
 }
 
 .input:focus {
     border-color: var(--color-primary);
     background: var(--color-bg-card);
+    box-shadow: 0 0 0 4px rgba(27, 94, 217, 0.12);
 }
 
 .input::placeholder {
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
 }
 
 .textarea {
-    min-height: 240px;
+    min-height: 260px;
     resize: vertical;
-    line-height: 1.6;
+    line-height: 1.65;
     font-family: inherit;
 }
 
-/* 안내 문구 */
 .noticeBox {
+    padding: 20px 22px;
+    border-radius: var(--radius-lg);
     background: var(--color-bg-input);
-    padding: 20px;
-    border-radius: var(--radius-md);
-    font-size: 13px;
     color: var(--color-text-muted);
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 700;
 }
 
-/* 제출 버튼 */
+.noticeBox p {
+    margin: 0;
+}
+
+.noticeBox p + p {
+    margin-top: 6px;
+}
+
 .submitBtn {
-    margin-top: 8px;
-    padding: 18px;
+    height: 58px;
+    border: 0;
+    border-radius: var(--radius-lg);
     background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 16px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 900;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.2);
 }
 
 .submitBtn:hover {
@@ -162,10 +191,18 @@
     transform: translateY(-1px);
 }
 
-/* 모바일 반응형 처리 */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection,
     .formCard {
-        padding: 32px 24px;
+        padding: 30px 22px;
+    }
+
+    .title {
+        font-size: 32px;
     }
 
     .typeChips {
@@ -174,7 +211,17 @@
     }
 
     .chip {
-        text-align: center;
-        padding: 12px;
+        width: 100%;
+        padding: 0 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .typeChips {
+        grid-template-columns: 1fr;
+    }
+
+    .submitBtn {
+        width: 100%;
     }
 }

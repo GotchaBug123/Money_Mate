@@ -1,12 +1,8 @@
-// src/pages/CustomerService/FAQ.jsx
-
 import React, {useState} from 'react';
 import styles from './FAQ.module.css';
 
-// 💡 탭 카테고리 목록
 const CATEGORIES = ['전체', '포트폴리오', '회원/계정', '서비스 이용'];
 
-// 💡 백엔드 연결 전 임시 Mock 데이터
 const MOCK_FAQS = [
     {
         id: 1,
@@ -44,7 +40,6 @@ function FAQ() {
     const [activeCategory, setActiveCategory] = useState('전체');
     const [expandedId, setExpandedId] = useState(null);
 
-    // 카테고리 클릭 핸들러 (탭 변경 시 열려있던 아코디언 닫기)
     const handleCategoryClick = (category) => {
         setActiveCategory(category);
         setExpandedId(null);
@@ -54,70 +49,92 @@ function FAQ() {
         setExpandedId((prev) => (prev === id ? null : id));
     };
 
-    // 선택된 카테고리에 맞게 필터링된 데이터
     const filteredFaqs = activeCategory === '전체'
         ? MOCK_FAQS
-        : MOCK_FAQS.filter(faq => faq.category === activeCategory);
+        : MOCK_FAQS.filter((faq) => faq.category === activeCategory);
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
+                <section className={styles.heroSection}>
+                    <span className={styles.pageBadge}>FAQ</span>
+                    <h1 className={styles.title}>자주하는 질문</h1>
+                    <p className={styles.subtitle}>
+                        MoneyMate 이용 중 자주 묻는 질문을 카테고리별로 확인하세요.
+                    </p>
+                </section>
 
-                <div className={styles.headerRow}>
-                    <h2 className={styles.title}>자주하는 질문 (FAQ)</h2>
-                </div>
+                <section className={styles.faqSummary}>
+                    <div>
+                        <span>전체 질문</span>
+                        <strong>{MOCK_FAQS.length}개</strong>
+                    </div>
+                    <div>
+                        <span>현재 카테고리</span>
+                        <strong>{activeCategory}</strong>
+                    </div>
+                    <div>
+                        <span>조회 결과</span>
+                        <strong>{filteredFaqs.length}개</strong>
+                    </div>
+                </section>
 
-                {/* 카테고리 탭 영역 */}
-                <div className={styles.categoryTabs}>
-                    {CATEGORIES.map(category => (
+                <section className={styles.categoryTabs}>
+                    {CATEGORIES.map((category) => (
                         <button
                             key={category}
+                            type="button"
                             className={`${styles.tabBtn} ${activeCategory === category ? styles.tabBtnActive : ''}`}
                             onClick={() => handleCategoryClick(category)}
                         >
                             {category}
                         </button>
                     ))}
-                </div>
+                </section>
 
-                {/* FAQ 리스트 영역 */}
-                <div className={styles.listCard}>
+                <section className={styles.listCard}>
+                    <div className={styles.listHeader}>
+                        <div>
+                            <span className={styles.sectionBadge}>FAQ List</span>
+                            <h2>{activeCategory} 질문</h2>
+                        </div>
+                        <p>질문을 누르면 답변을 확인할 수 있습니다.</p>
+                    </div>
+
                     {filteredFaqs.length > 0 ? (
                         filteredFaqs.map((faq) => {
                             const isOpen = expandedId === faq.id;
 
                             return (
-                                <div key={faq.id} className={styles.faqItem}>
-                                    {/* ── 질문 (Q) 영역 ── */}
-                                    <div
+                                <article key={faq.id} className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ''}`}>
+                                    <button
+                                        type="button"
                                         className={styles.faqHead}
                                         onClick={() => toggleAccordion(faq.id)}
                                     >
-                                        <div className={styles.qMark}>Q</div>
-                                        <p className={styles.itemTitle}>
-                                            <span style={{
-                                                color: 'var(--color-primary)',
-                                                marginRight: '8px',
-                                                fontSize: '13px'
-                                            }}>
-                                                [{faq.category}]
+                                        <span className={styles.qMark}>Q</span>
+
+                                        <span className={styles.itemText}>
+                                            <span className={styles.categoryBadge}>
+                                                {faq.category}
                                             </span>
-                                            {faq.question}
-                                        </p>
+                                            <span className={styles.itemTitle}>
+                                                {faq.question}
+                                            </span>
+                                        </span>
 
-                                        <div className={`${styles.icon} ${isOpen ? styles.iconOpen : ''}`}>
+                                        <span className={`${styles.icon} ${isOpen ? styles.iconOpen : ''}`}>
                                             ▼
-                                        </div>
-                                    </div>
+                                        </span>
+                                    </button>
 
-                                    {/* ── 답변 (A) 영역 ── */}
                                     {isOpen && (
                                         <div className={styles.faqBody}>
-                                            <div className={styles.aMark}>A</div>
+                                            <span className={styles.aMark}>A</span>
                                             <p className={styles.answerText}>{faq.answer}</p>
                                         </div>
                                     )}
-                                </div>
+                                </article>
                             );
                         })
                     ) : (
@@ -125,8 +142,7 @@ function FAQ() {
                             해당 카테고리에 등록된 자주하는 질문이 없습니다.
                         </div>
                     )}
-                </div>
-
+                </section>
             </div>
         </div>
     );

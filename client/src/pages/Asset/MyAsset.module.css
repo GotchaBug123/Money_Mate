@@ -1,6 +1,6 @@
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: var(--bg-color);
+    background: var(--color-bg-page);
     display: flex;
     justify-content: center;
     padding: 40px 24px 80px;
@@ -20,20 +20,19 @@
 }
 
 .topNavLink {
-    padding: 12px 20px;
-    background: #ffffff;
-    color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
+    padding: 12px 22px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 900;
     text-decoration: none;
-    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
 }
 
 .topNavLink:hover {
-    background: var(--primary-color);
+    background: var(--color-primary);
     color: #ffffff;
     transform: translateY(-1px);
 }
@@ -44,10 +43,10 @@
     grid-template-columns: minmax(0, 1fr) 280px;
     align-items: center;
     gap: 30px;
-    border-radius: 28px;
-    background: var(--primary-color);
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
     color: #ffffff;
-    box-shadow: 0 24px 60px rgba(79, 70, 229, 0.2);
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
 }
 
 .pageBadge {
@@ -63,7 +62,7 @@
     font-size: 40px;
     line-height: 1.2;
     font-weight: 900;
-    letter-spacing: -1.2px;
+    letter-spacing: -1px;
 }
 
 .pageDesc {
@@ -77,7 +76,7 @@
 .scoreCard {
     min-height: 170px;
     padding: 28px;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     background: rgba(255, 255, 255, 0.16);
     border: 1px solid rgba(255, 255, 255, 0.28);
     display: flex;
@@ -88,7 +87,7 @@
 
 .scoreLabel {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.86);
     font-weight: 900;
 }
 
@@ -100,12 +99,12 @@
 }
 
 .chartCard {
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 28px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     padding: 34px;
     min-height: 360px;
-    box-shadow: 0 20px 48px rgba(17, 24, 39, 0.06);
+    box-shadow: var(--shadow-card);
 }
 
 .chartHeader {
@@ -119,33 +118,33 @@
 .chartHeader span {
     display: block;
     margin-bottom: 6px;
-    color: var(--primary-color);
+    color: var(--color-primary);
     font-size: 12px;
     font-weight: 900;
 }
 
 .chartHeader h3 {
     margin: 0;
-    color: var(--text-main);
+    color: var(--color-text-main);
     font-size: 24px;
     font-weight: 900;
 }
 
 .chartHeader strong {
     padding: 9px 16px;
-    border-radius: 999px;
-    color: var(--primary-color);
-    background: #EEF2FF;
+    border-radius: var(--radius-xl);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
     font-size: 14px;
     font-weight: 900;
 }
 
 .lineChartMock {
     height: 260px;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     background:
-        linear-gradient(var(--border-color) 1px, transparent 1px) 0 0 / 100% 33.33%,
-        #ffffff;
+        linear-gradient(var(--color-border) 1px, transparent 1px) 0 0 / 100% 33.33%,
+        var(--color-bg-input);
     overflow: hidden;
 }
 
@@ -156,22 +155,22 @@
 }
 
 .assetLine {
-    stroke: var(--primary-color);
+    stroke: var(--color-primary);
     stroke-width: 6;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
 .assetDotBg {
-    fill: rgba(79, 70, 229, 0.14);
+    fill: rgba(27, 94, 217, 0.14);
 }
 
 .assetDot {
-    fill: var(--primary-color);
+    fill: var(--color-primary);
 }
 
 .assetMonthText {
-    fill: var(--text-muted);
+    fill: var(--color-text-muted);
     font-size: 15px;
     font-weight: 900;
 }
@@ -182,10 +181,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 22px;
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 24px;
-    box-shadow: 0 16px 34px rgba(17, 24, 39, 0.05);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
 }
 
 .filterText {
@@ -195,13 +194,13 @@
 }
 
 .filterText span {
-    color: var(--primary-color);
+    color: var(--color-primary);
     font-size: 13px;
     font-weight: 900;
 }
 
 .filterText strong {
-    color: var(--text-main);
+    color: var(--color-text-main);
     font-size: 17px;
     font-weight: 900;
 }
@@ -216,36 +215,35 @@
     min-width: 92px;
     height: 46px;
     padding: 0 22px;
-    background: #ffffff;
-    color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     font-size: 15px;
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.05);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
 }
 
 .filterBtn:hover {
-    background: #EEF2FF;
-    border-color: var(--primary-color);
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
     transform: translateY(-1px);
 }
 
 .activeFilterBtn {
-    background: var(--primary-color);
+    background: var(--color-primary);
     color: #ffffff;
-    border-color: var(--primary-color);
-    box-shadow: 0 16px 30px rgba(79, 70, 229, 0.2);
+    border-color: var(--color-primary);
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.22);
 }
 
 .summaryCard {
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 28px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     padding: 42px;
-    box-shadow: 0 20px 48px rgba(17, 24, 39, 0.06);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     gap: 34px;
@@ -257,21 +255,21 @@
     align-items: center;
     gap: 14px;
     padding-bottom: 34px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .investableLabel {
     font-size: 17px;
     font-weight: 900;
-    color: var(--text-muted);
+    color: var(--color-text-muted);
 }
 
 .investableValue {
     font-size: 46px;
     line-height: 1.1;
     font-weight: 900;
-    color: var(--text-main);
-    letter-spacing: -1.5px;
+    color: var(--color-text-main);
+    letter-spacing: -1px;
 }
 
 .summaryGrid {
@@ -287,25 +285,24 @@
     align-items: center;
     gap: 18px;
     padding: 20px 24px;
-    background: var(--bg-color);
+    background: var(--color-bg-input);
     border: 1px solid transparent;
-    border-radius: 20px;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    border-radius: var(--radius-lg);
 }
 
 .gridItem:hover {
     transform: translateY(-2px);
-    border-color: var(--border-color);
-    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-card);
 }
 
 .gridCategory {
     display: inline-flex;
     margin-bottom: 6px;
     padding: 4px 9px;
-    border-radius: 999px;
-    background: #EEF2FF;
-    color: var(--primary-color);
+    border-radius: var(--radius-xl);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
     font-size: 12px;
     font-weight: 900;
 }
@@ -313,14 +310,14 @@
 .gridLabel {
     display: block;
     font-size: 16px;
-    color: var(--text-muted);
+    color: var(--color-text-sub);
     font-weight: 900;
 }
 
 .gridValue {
     font-size: 17px;
     font-weight: 900;
-    color: var(--text-main);
+    color: var(--color-text-main);
     text-align: right;
 }
 

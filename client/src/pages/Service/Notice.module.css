@@ -1,6 +1,3 @@
-/* src/pages/CustomerService/Notice.module.css */
-
-/* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
@@ -9,29 +6,76 @@
     padding: 40px 24px 90px;
 }
 
-/* 💡 리스트 화면에 최적화된 900px 너비 적용 */
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.headerRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+.heroSection {
+    padding: 38px 42px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
 }
 
 .title {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--color-text-main);
     margin: 0;
+    color: #ffffff;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
-/* ── 메인 리스트 카드 ── */
+.subtitle {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 800;
+}
+
+.noticeSummary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.noticeSummary div {
+    padding: 24px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+}
+
+.noticeSummary span {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.noticeSummary strong {
+    display: block;
+    color: var(--color-text-main);
+    font-size: 24px;
+    font-weight: 900;
+}
+
 .listCard {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
@@ -40,36 +84,74 @@
     overflow: hidden;
 }
 
-/* ── 아코디언 리스트 아이템 ── */
-.noticeItem {
-    border-bottom: 1px solid var(--color-border-light);
-}
-
-.noticeItem:last-child {
-    border-bottom: none;
-}
-
-/* 제목 행 (클릭 영역) */
-.noticeHead {
+.listHeader {
+    padding: 30px 32px;
     display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sectionBadge {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.listHeader h2 {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.listHeader p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.noticeItem {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.noticeItem:last-of-type {
+    border-bottom: 0;
+}
+
+.noticeItemOpen {
+    background: #ffffff;
+}
+
+.noticeHead {
+    width: 100%;
+    min-height: 82px;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr) 120px 36px;
     align-items: center;
-    padding: 24px 32px;
-    cursor: pointer;
-    transition: background 0.2s ease;
     gap: 16px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
 }
 
 .noticeHead:hover {
     background: var(--color-bg-input);
 }
 
-/* 공지 분류 뱃지 */
 .badge {
-    padding: 6px 12px;
-    border-radius: 20px;
+    width: fit-content;
+    padding: 8px 13px;
+    border-radius: var(--radius-xl);
     font-size: 13px;
-    font-weight: 800;
-    flex-shrink: 0;
+    font-weight: 900;
+    white-space: nowrap;
 }
 
 .badgeNotice {
@@ -78,18 +160,17 @@
 }
 
 .badgeUpdate {
-    background: var(--color-success-bg);
-    color: var(--color-success);
+    background: var(--color-bg-input);
+    color: var(--color-text-sub);
 }
 
-/* 공지 제목 및 날짜 */
 .itemTitle {
-    flex: 1;
-    font-size: 16px;
-    font-weight: 700;
     color: var(--color-text-main);
-    transition: color 0.2s;
-    margin: 0;
+    font-size: 17px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .noticeHead:hover .itemTitle {
@@ -97,37 +178,44 @@
 }
 
 .itemDate {
-    font-size: 14px;
     color: var(--color-text-muted);
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 800;
+    text-align: right;
+    white-space: nowrap;
 }
 
-/* 화살표 아이콘 */
 .icon {
-    font-size: 16px;
-    color: var(--color-text-light);
-    transition: transform 0.3s ease;
-    display: flex;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    background: var(--color-bg-input);
+    font-size: 14px;
+    font-weight: 900;
+    transition: transform 0.25s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .iconOpen {
+    color: #ffffff;
+    background: var(--color-primary);
     transform: rotate(180deg);
-    color: var(--color-primary);
 }
 
-/* 펼쳐지는 본문 영역 */
 .noticeBody {
+    padding: 30px 32px 34px 140px;
     background: var(--color-bg-input);
-    padding: 32px;
-    font-size: 15px;
+    border-top: 1px solid var(--color-border);
     color: var(--color-text-sub);
-    line-height: 1.8;
-    border-top: 1px solid var(--color-border-light);
-    white-space: pre-wrap; /* 줄바꿈 문자를 화면에 그대로 반영 */
+    font-size: 15px;
+    line-height: 1.85;
+    font-weight: 700;
+    white-space: pre-wrap;
 }
 
-/* ── 하단 페이지네이션 ── */
 .pagination {
     display: flex;
     justify-content: center;
@@ -136,15 +224,14 @@
 }
 
 .pageBtn {
+    min-width: 110px;
+    height: 44px;
     background: var(--color-bg-card);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 10px 24px;
-    font-size: 14px;
-    font-weight: 800;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
     color: var(--color-text-sub);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 15px;
+    font-weight: 900;
 }
 
 .pageBtn:hover {
@@ -153,20 +240,67 @@
     color: var(--color-primary);
 }
 
-/* 모바일 반응형 */
-@media (max-width: 600px) {
-    .noticeHead {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 20px;
+@media (max-width: 800px) {
+    .noticeSummary {
+        grid-template-columns: 1fr;
     }
 
-    .badge {
-        font-size: 12px;
+    .listHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .noticeHead {
+        min-height: auto;
+        padding: 22px;
+        grid-template-columns: 1fr 36px;
+        gap: 12px;
+    }
+
+    .badge,
+    .itemTitle,
+    .itemDate {
+        grid-column: 1 / 2;
+    }
+
+    .itemTitle {
+        white-space: normal;
+        line-height: 1.5;
     }
 
     .itemDate {
-        font-size: 13px;
+        text-align: left;
+    }
+
+    .icon {
+        grid-column: 2 / 3;
+        grid-row: 1 / 4;
+        justify-self: end;
+    }
+
+    .noticeBody {
+        padding: 24px 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection {
+        padding: 30px 22px;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .noticeSummary div {
+        padding: 22px;
+    }
+
+    .listHeader {
+        padding: 26px 22px;
     }
 }

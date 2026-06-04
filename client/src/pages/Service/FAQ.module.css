@@ -1,6 +1,3 @@
-/* src/pages/CustomerService/FAQ.module.css */
-
-/* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
@@ -11,59 +8,116 @@
 
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.headerRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+.heroSection {
+    padding: 38px 42px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
 }
 
 .title {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--color-text-main);
     margin: 0;
+    color: #ffffff;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
-/* ── 카테고리 탭 영역 ── */
+.subtitle {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 800;
+}
+
+.faqSummary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.faqSummary div {
+    padding: 24px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+}
+
+.faqSummary span {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.faqSummary strong {
+    display: block;
+    color: var(--color-text-main);
+    font-size: 24px;
+    font-weight: 900;
+}
+
 .categoryTabs {
+    padding: 14px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
 }
 
 .tabBtn {
-    padding: 12px 24px;
+    min-width: 112px;
+    height: 44px;
+    padding: 0 20px;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: 30px;
-    font-size: 14px;
-    font-weight: 700;
+    border-radius: var(--radius-xl);
     color: var(--color-text-sub);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 900;
 }
 
 .tabBtn:hover {
-    background: var(--color-bg-input);
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
 }
 
 .tabBtnActive {
     background: var(--color-primary);
     border-color: var(--color-primary);
-    color: #fff;
+    color: #ffffff;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.22);
 }
 
 .tabBtnActive:hover {
     background: var(--color-primary-hover);
+    color: #ffffff;
 }
 
-/* ── 메인 리스트 카드 ── */
 .listCard {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
@@ -72,33 +126,69 @@
     overflow: hidden;
 }
 
-/* ── 아코디언 리스트 아이템 ── */
+.listHeader {
+    padding: 30px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sectionBadge {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.listHeader h2 {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.listHeader p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
 .faqItem {
-    border-bottom: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .faqItem:last-child {
     border-bottom: none;
 }
 
-/* 질문(Q) 행 (클릭 영역) */
+.faqItemOpen {
+    background: #ffffff;
+}
+
 .faqHead {
-    display: flex;
+    width: 100%;
+    min-height: 82px;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 36px;
     align-items: center;
-    padding: 24px 32px;
-    cursor: pointer;
-    transition: background 0.2s ease;
     gap: 16px;
+    border: 0;
+    background: transparent;
+    text-align: left;
 }
 
 .faqHead:hover {
     background: var(--color-bg-input);
 }
 
-/* Q 마크 */
 .qMark {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background: var(--color-primary-light);
     color: var(--color-primary);
     border-radius: 50%;
@@ -107,52 +197,72 @@
     justify-content: center;
     font-size: 16px;
     font-weight: 900;
+}
+
+.itemText {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.categoryBadge {
     flex-shrink: 0;
+    padding: 6px 11px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
 }
 
 .itemTitle {
-    flex: 1;
-    font-size: 16px;
-    font-weight: 700;
     color: var(--color-text-main);
-    transition: color 0.2s;
-    margin: 0;
+    font-size: 17px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .faqHead:hover .itemTitle {
     color: var(--color-primary);
 }
 
-/* 화살표 아이콘 */
 .icon {
-    font-size: 16px;
-    color: var(--color-text-light);
-    transition: transform 0.3s ease;
-    display: flex;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    background: var(--color-bg-input);
+    font-size: 14px;
+    font-weight: 900;
+    transition: transform 0.25s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .iconOpen {
+    color: #ffffff;
+    background: var(--color-primary);
     transform: rotate(180deg);
-    color: var(--color-primary);
 }
 
-/* 답변(A) 영역 (펼쳐지는 영역) */
 .faqBody {
+    padding: 30px 32px 34px 90px;
     background: var(--color-bg-input);
-    padding: 32px;
-    border-top: 1px solid var(--color-border-light);
+    border-top: 1px solid var(--color-border);
     display: flex;
     gap: 16px;
     align-items: flex-start;
 }
 
-/* A 마크 */
 .aMark {
-    width: 32px;
-    height: 32px;
-    background: var(--color-success-bg);
-    color: var(--color-success);
+    width: 36px;
+    height: 36px;
+    background: var(--color-primary);
+    color: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -163,30 +273,95 @@
 }
 
 .answerText {
-    font-size: 15px;
-    color: var(--color-text-sub);
-    line-height: 1.8;
     margin: 0;
     padding-top: 4px;
+    color: var(--color-text-sub);
+    font-size: 15px;
+    line-height: 1.85;
+    font-weight: 700;
     white-space: pre-wrap;
 }
 
-/* 데이터가 없을 때 */
 .emptyState {
-    padding: 60px 20px;
+    padding: 70px 20px;
     text-align: center;
     color: var(--color-text-muted);
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 800;
 }
 
-/* 모바일 반응형 */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
+    .faqSummary {
+        grid-template-columns: 1fr;
+    }
+
+    .listHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .faqHead {
-        padding: 20px;
+        min-height: auto;
+        padding: 22px;
+        grid-template-columns: 42px minmax(0, 1fr) 36px;
+    }
+
+    .itemText {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .itemTitle {
+        white-space: normal;
+        line-height: 1.5;
     }
 
     .faqBody {
-        padding: 24px 20px;
+        padding: 24px 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection {
+        padding: 30px 22px;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .faqSummary div {
+        padding: 22px;
+    }
+
+    .categoryTabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .tabBtn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .listHeader {
+        padding: 26px 22px;
+    }
+
+    .faqHead {
+        grid-template-columns: 36px minmax(0, 1fr);
+    }
+
+    .icon {
+        grid-column: 1 / 3;
+        justify-self: flex-end;
+    }
+
+    .faqBody {
+        flex-direction: column;
     }
 }

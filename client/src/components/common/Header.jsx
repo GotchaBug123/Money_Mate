@@ -11,11 +11,21 @@ function Header({
                 }) {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
+    const userName =
+        localStorage.getItem('userName') ||
+        localStorage.getItem('memberName') ||
+        localStorage.getItem('name') ||
+        localStorage.getItem('nickname') ||
+        localStorage.getItem('userId') ||
+        localStorage.getItem('loginId') ||
+        localStorage.getItem('id') ||
+        '회원';
+
     const handleLogout = () => {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('role');
         alert('로그아웃 되었습니다.');
-        window.location.href = '/'; // 상태 갱신을 위해 메인으로 이동하며 새로고침
+        window.location.href = '/';
     };
 
     const defaultMenuItems = [
@@ -24,13 +34,12 @@ function Header({
         {label: '리밸런싱', to: '/rebalancing'},
         {label: '투자정보', to: '/investment-information'},
         {label: '커뮤니티', to: '/community'},
+        {label: '고객센터', to: '/customer-service'},
     ];
 
     const finalMenuItems = menuItems || defaultMenuItems;
 
-    // 우측 버튼 렌더링 로직
     const renderRightButtons = () => {
-        // 1. 외부에서 커스텀 버튼을 주입한 경우
         if (rightButtons) {
             return rightButtons.map((button) => {
                 const btnClass = button.primary
@@ -53,13 +62,23 @@ function Header({
             });
         }
 
-        // 2. 로그인 상태인 경우
         if (isLoggedIn) {
             return (
                 <>
+                    <span style={{
+                        color: 'var(--color-text-main)',
+                        fontSize: '15px',
+                        fontWeight: 900,
+                        whiteSpace: 'nowrap',
+                        marginRight: '4px'
+                    }}>
+                        {userName}님! 안녕하세요!
+                    </span>
+
                     <Link to="/mypage" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         내 정보
                     </Link>
+
                     <button onClick={handleLogout} className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         로그아웃
                     </button>
@@ -67,7 +86,6 @@ function Header({
             );
         }
 
-        // 3. 로그아웃 상태인 경우 (기본)
         return (
             <>
                 <Link to="/login" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
@@ -84,7 +102,6 @@ function Header({
         <header className={styles.headerWrapper}>
             <div className={styles.container}>
 
-                {/* 왼쪽: 로고 및 내비게이션 메뉴 */}
                 <div className={styles.leftSection}>
                     <Link to={logoTo} onClick={logoOnClick} className={styles.logoLink}>
                         <img
@@ -118,7 +135,6 @@ function Header({
                     </nav>
                 </div>
 
-                {/* 오른쪽: 로그인/회원가입 등 액션 버튼 */}
                 <div className={styles.rightSection}>
                     {renderRightButtons()}
                 </div>
