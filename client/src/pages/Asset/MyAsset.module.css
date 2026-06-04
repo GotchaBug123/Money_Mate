@@ -1,19 +1,17 @@
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background:
-        radial-gradient(circle at top left, rgba(79, 99, 216, 0.08), transparent 340px),
-        linear-gradient(180deg, #f7f9ff 0%, #f3f6fc 100%);
+    background: var(--bg-color);
     display: flex;
     justify-content: center;
-    padding: 46px 24px 90px;
+    padding: 40px 24px 80px;
 }
 
 .container {
     width: 100%;
-    max-width: 1120px;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
-    gap: 26px;
+    gap: 24px;
 }
 
 .topNavWrapper {
@@ -22,20 +20,20 @@
 }
 
 .topNavLink {
-    padding: 12px 22px;
+    padding: 12px 20px;
     background: #ffffff;
-    color: #4f63d8;
-    border: 1.5px solid #dce3ff;
-    border-radius: 18px;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 800;
     text-decoration: none;
-    box-shadow: 0 10px 24px rgba(79, 99, 216, 0.08);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
     transition: all 0.2s ease;
 }
 
 .topNavLink:hover {
-    background: #4f63d8;
+    background: var(--primary-color);
     color: #ffffff;
     transform: translateY(-1px);
 }
@@ -46,10 +44,10 @@
     grid-template-columns: minmax(0, 1fr) 280px;
     align-items: center;
     gap: 30px;
-    border-radius: 34px;
-    background: linear-gradient(135deg, #4f63d8 0%, #6f82ee 100%);
+    border-radius: 28px;
+    background: var(--primary-color);
     color: #ffffff;
-    box-shadow: 0 24px 60px rgba(79, 99, 216, 0.25);
+    box-shadow: 0 24px 60px rgba(79, 70, 229, 0.2);
 }
 
 .pageBadge {
@@ -79,9 +77,9 @@
 .scoreCard {
     min-height: 170px;
     padding: 28px;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.18);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -90,7 +88,7 @@
 
 .scoreLabel {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.86);
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 900;
 }
 
@@ -103,11 +101,11 @@
 
 .chartCard {
     background: #ffffff;
-    border: 1px solid #e3e8f8;
-    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
     padding: 34px;
     min-height: 360px;
-    box-shadow: 0 20px 48px rgba(79, 99, 216, 0.08);
+    box-shadow: 0 20px 48px rgba(17, 24, 39, 0.06);
 }
 
 .chartHeader {
@@ -121,14 +119,14 @@
 .chartHeader span {
     display: block;
     margin-bottom: 6px;
-    color: #4f63d8;
+    color: var(--primary-color);
     font-size: 12px;
     font-weight: 900;
 }
 
 .chartHeader h3 {
     margin: 0;
-    color: #111827;
+    color: var(--text-main);
     font-size: 24px;
     font-weight: 900;
 }
@@ -136,8 +134,8 @@
 .chartHeader strong {
     padding: 9px 16px;
     border-radius: 999px;
-    color: #4f63d8;
-    background: #eef2ff;
+    color: var(--primary-color);
+    background: #EEF2FF;
     font-size: 14px;
     font-weight: 900;
 }
@@ -146,8 +144,8 @@
     height: 260px;
     border-radius: 24px;
     background:
-        linear-gradient(#e9edf8 1px, transparent 1px) 0 0 / 100% 33.33%,
-        #fbfcff;
+        linear-gradient(var(--border-color) 1px, transparent 1px) 0 0 / 100% 33.33%,
+        #ffffff;
     overflow: hidden;
 }
 
@@ -158,22 +156,22 @@
 }
 
 .assetLine {
-    stroke: #4f63d8;
+    stroke: var(--primary-color);
     stroke-width: 6;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
 .assetDotBg {
-    fill: rgba(79, 99, 216, 0.14);
+    fill: rgba(79, 70, 229, 0.14);
 }
 
 .assetDot {
-    fill: #4f63d8;
+    fill: var(--primary-color);
 }
 
 .assetMonthText {
-    fill: #6b7280;
+    fill: var(--text-muted);
     font-size: 15px;
     font-weight: 900;
 }
@@ -185,9 +183,9 @@
     justify-content: space-between;
     gap: 22px;
     background: #ffffff;
-    border: 1px solid #e3e8f8;
-    border-radius: 26px;
-    box-shadow: 0 16px 34px rgba(79, 99, 216, 0.07);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    box-shadow: 0 16px 34px rgba(17, 24, 39, 0.05);
 }
 
 .filterText {
@@ -197,13 +195,13 @@
 }
 
 .filterText span {
-    color: #4f63d8;
+    color: var(--primary-color);
     font-size: 13px;
     font-weight: 900;
 }
 
 .filterText strong {
-    color: #111827;
+    color: var(--text-main);
     font-size: 17px;
     font-weight: 900;
 }
@@ -219,35 +217,35 @@
     height: 46px;
     padding: 0 22px;
     background: #ffffff;
-    color: #4f63d8;
-    border: 1.5px solid #dce3ff;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
     border-radius: 999px;
     font-size: 15px;
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 10px 24px rgba(79, 99, 216, 0.07);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.05);
     transition: all 0.2s ease;
 }
 
 .filterBtn:hover {
-    background: #eef2ff;
-    border-color: #4f63d8;
+    background: #EEF2FF;
+    border-color: var(--primary-color);
     transform: translateY(-1px);
 }
 
 .activeFilterBtn {
-    background: #4f63d8;
+    background: var(--primary-color);
     color: #ffffff;
-    border-color: #4f63d8;
-    box-shadow: 0 16px 30px rgba(79, 99, 216, 0.22);
+    border-color: var(--primary-color);
+    box-shadow: 0 16px 30px rgba(79, 70, 229, 0.2);
 }
 
 .summaryCard {
     background: #ffffff;
-    border: 1px solid #e3e8f8;
-    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
     padding: 42px;
-    box-shadow: 0 20px 48px rgba(79, 99, 216, 0.08);
+    box-shadow: 0 20px 48px rgba(17, 24, 39, 0.06);
     display: flex;
     flex-direction: column;
     gap: 34px;
@@ -259,20 +257,20 @@
     align-items: center;
     gap: 14px;
     padding-bottom: 34px;
-    border-bottom: 1px solid #e3e8f8;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .investableLabel {
     font-size: 17px;
     font-weight: 900;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .investableValue {
     font-size: 46px;
     line-height: 1.1;
     font-weight: 900;
-    color: #111827;
+    color: var(--text-main);
     letter-spacing: -1.5px;
 }
 
@@ -289,7 +287,7 @@
     align-items: center;
     gap: 18px;
     padding: 20px 24px;
-    background: #f7f9ff;
+    background: var(--bg-color);
     border: 1px solid transparent;
     border-radius: 20px;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
@@ -297,8 +295,8 @@
 
 .gridItem:hover {
     transform: translateY(-2px);
-    border-color: #dce3ff;
-    box-shadow: 0 10px 24px rgba(79, 99, 216, 0.09);
+    border-color: var(--border-color);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
 }
 
 .gridCategory {
@@ -306,8 +304,8 @@
     margin-bottom: 6px;
     padding: 4px 9px;
     border-radius: 999px;
-    background: #eef2ff;
-    color: #4f63d8;
+    background: #EEF2FF;
+    color: var(--primary-color);
     font-size: 12px;
     font-weight: 900;
 }
@@ -315,14 +313,14 @@
 .gridLabel {
     display: block;
     font-size: 16px;
-    color: #555b66;
+    color: var(--text-muted);
     font-weight: 900;
 }
 
 .gridValue {
     font-size: 17px;
     font-weight: 900;
-    color: #111827;
+    color: var(--text-main);
     text-align: right;
 }
 
