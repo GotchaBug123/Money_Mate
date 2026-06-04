@@ -1,0 +1,169 @@
+/* src/pages/CustomerService/StockGuide.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    display: flex;
+    justify-content: center;
+    padding: 60px 24px;
+}
+
+/* 가독성 최적화 800px 레이아웃 */
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* 상단 헤더 영역 */
+.header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--color-text-main);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: var(--color-text-sub);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ── 타임라인 (스텝) 영역 ── */
+.timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-left: 16px;
+}
+
+/* 타임라인 연결선 (왼쪽에 세로 줄) */
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    bottom: 24px;
+    left: 40px; /* 스텝 번호 중앙에 위치 */
+    width: 2px;
+    background: var(--color-border);
+    z-index: 0;
+}
+
+.stepCard {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    gap: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.stepCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-primary-light);
+}
+
+/* 스텝 번호 동그라미 */
+.stepNumber {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 6px var(--color-bg-page); /* 선과 안 겹치게 외곽선 처리 */
+}
+
+/* 스텝 내용 영역 */
+.stepContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 10px;
+}
+
+.stepTitle {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.stepDesc {
+    font-size: 15px;
+    color: var(--color-text-sub);
+    line-height: 1.7;
+    margin: 0;
+    word-break: keep-all;
+}
+
+/* 액션 버튼 (해당 스텝에서 넘어갈 페이지 유도) */
+.actionBtn {
+    align-self: flex-start;
+    margin-top: 8px;
+    padding: 10px 20px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+/* 모바일 반응형 처리 */
+@media (max-width: 600px) {
+    .timeline {
+        padding-left: 0;
+    }
+
+    .timeline::before {
+        display: none; /* 모바일에서는 선 숨김 */
+    }
+
+    .stepCard {
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px;
+    }
+
+    .stepNumber {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .stepContent {
+        padding-top: 0;
+    }
+}
