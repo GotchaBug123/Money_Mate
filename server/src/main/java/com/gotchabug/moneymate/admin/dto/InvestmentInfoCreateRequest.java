@@ -1,4 +1,4 @@
-package com.gotchabug.moneymate.dto.admin.investment;
+package com.gotchabug.moneymate.admin.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

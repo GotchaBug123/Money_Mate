@@ -1,4 +1,4 @@
-package com.gotchabug.moneymate.service.admin;
+package com.gotchabug.moneymate.admin.service;
 
 
 import com.gotchabug.moneymate.admin.dto.AdminAgeGroupStatResponse;
