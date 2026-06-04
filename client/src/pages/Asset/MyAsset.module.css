@@ -1,157 +1,283 @@
-/* src/pages/MyAsset.module.css */
-
-/* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: var(--color-bg-page);
+    background: var(--bg-color);
     display: flex;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 40px 24px 80px;
 }
 
 .container {
     width: 100%;
-    max-width: 900px; /* 💡 정보가 적당히 있는 화면은 900px로 안정감 있게 유지 */
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-/* 상단 이동 링크 */
 .topNavWrapper {
     display: flex;
     justify-content: flex-end;
 }
 
 .topNavLink {
-    padding: 10px 20px;
-    background: var(--color-bg-card);
-    color: var(--color-text-sub);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
+    padding: 12px 20px;
+    background: #ffffff;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 800;
     text-decoration: none;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
     transition: all 0.2s ease;
 }
 
 .topNavLink:hover {
-    background: var(--color-bg-input);
-    color: var(--color-text-main);
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-/* 페이지 타이틀 */
+.heroSection {
+    padding: 42px 44px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: center;
+    gap: 30px;
+    border-radius: 28px;
+    background: var(--primary-color);
+    color: #ffffff;
+    box-shadow: 0 24px 60px rgba(79, 70, 229, 0.2);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
+}
+
 .pageTitle {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--color-text-main);
-    text-align: center;
-    margin: 0 0 8px 0;
+    margin: 0;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1.2px;
 }
 
-/* 1. 재무 평가 점수 카드 */
+.pageDesc {
+    margin: 14px 0 0;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 800;
+    opacity: 0.92;
+}
+
 .scoreCard {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    box-shadow: var(--shadow-card);
+    min-height: 170px;
+    padding: 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .scoreLabel {
     font-size: 15px;
-    color: var(--color-text-muted);
-    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 900;
 }
 
 .scoreValue {
-    font-size: 36px;
-    font-weight: 800;
-    color: var(--color-primary);
+    font-size: 48px;
+    line-height: 1;
+    font-weight: 900;
+    color: #ffffff;
 }
 
-/* 2. 차트 영역 (점선 플레이스홀더 디자인) */
 .chartCard {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    min-height: 280px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    padding: 34px;
+    min-height: 360px;
+    box-shadow: 0 20px 48px rgba(17, 24, 39, 0.06);
+}
+
+.chartHeader {
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.chartHeader span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.chartHeader h3 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.chartHeader strong {
+    padding: 9px 16px;
+    border-radius: 999px;
+    color: var(--primary-color);
+    background: #EEF2FF;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.lineChartMock {
+    height: 260px;
+    border-radius: 24px;
+    background:
+        linear-gradient(var(--border-color) 1px, transparent 1px) 0 0 / 100% 33.33%,
+        #ffffff;
+    overflow: hidden;
+}
+
+.assetLineChart {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.assetLine {
+    stroke: var(--primary-color);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.assetDotBg {
+    fill: rgba(79, 70, 229, 0.14);
+}
+
+.assetDot {
+    fill: var(--primary-color);
+}
+
+.assetMonthText {
+    fill: var(--text-muted);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.filterSection {
+    padding: 22px 26px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text-light);
-    border: 2px dashed var(--color-border);
+    justify-content: space-between;
+    gap: 22px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    box-shadow: 0 16px 34px rgba(17, 24, 39, 0.05);
 }
 
-/* 3. 필터 버튼 그룹 */
+.filterText {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filterText span {
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.filterText strong {
+    color: var(--text-main);
+    font-size: 17px;
+    font-weight: 900;
+}
+
 .filterGroup {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
 .filterBtn {
-    padding: 10px 20px;
-    background: var(--color-bg-card);
-    color: var(--color-text-sub);
-    border: 1.5px solid var(--color-border);
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
+    min-width: 92px;
+    height: 46px;
+    padding: 0 22px;
+    background: #ffffff;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 900;
     cursor: pointer;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.05);
     transition: all 0.2s ease;
 }
 
 .filterBtn:hover {
-    background: var(--color-primary-light);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    background: #EEF2FF;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
 }
 
-/* 4. 하단 재무 요약 정보 카드 */
+.activeFilterBtn {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 16px 30px rgba(79, 70, 229, 0.2);
+}
+
 .summaryCard {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 40px;
-    box-shadow: var(--shadow-card);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    padding: 42px;
+    box-shadow: 0 20px 48px rgba(17, 24, 39, 0.06);
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 34px;
 }
 
-/* 투자 가능 금액 (상단) */
 .investableRow {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 32px;
-    border-bottom: 1.5px solid var(--color-border-light);
+    gap: 14px;
+    padding-bottom: 34px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .investableLabel {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-muted);
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--text-muted);
 }
 
 .investableValue {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--color-text-main);
+    font-size: 46px;
+    line-height: 1.1;
+    font-weight: 900;
+    color: var(--text-main);
+    letter-spacing: -1.5px;
 }
 
-/* 4개 항목 2단 Grid */
 .summaryGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 16px;
+    row-gap: 18px;
     column-gap: 24px;
 }
 
@@ -159,25 +285,97 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    background: var(--color-bg-input);
-    border-radius: var(--radius-md);
-    transition: transform 0.2s, box-shadow 0.2s;
+    gap: 18px;
+    padding: 20px 24px;
+    background: var(--bg-color);
+    border: 1px solid transparent;
+    border-radius: 20px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .gridItem:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--border-color);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+}
+
+.gridCategory {
+    display: inline-flex;
+    margin-bottom: 6px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #EEF2FF;
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 900;
 }
 
 .gridLabel {
-    font-size: 14px;
-    color: var(--color-text-sub);
-    font-weight: 600;
+    display: block;
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 900;
 }
 
 .gridValue {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--color-text-main);
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--text-main);
+    text-align: right;
+}
+
+@media (max-width: 900px) {
+    .heroSection {
+        grid-template-columns: 1fr;
+    }
+
+    .scoreCard {
+        min-height: 130px;
+    }
+
+    .filterSection {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .summaryGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection,
+    .chartCard,
+    .summaryCard {
+        padding: 28px 20px;
+    }
+
+    .pageTitle {
+        font-size: 30px;
+    }
+
+    .investableValue {
+        font-size: 34px;
+    }
+
+    .filterGroup {
+        width: 100%;
+    }
+
+    .filterBtn {
+        flex: 1;
+    }
+
+    .gridItem {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gridValue {
+        text-align: left;
+    }
 }

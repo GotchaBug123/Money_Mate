@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import styles from './MyAsset.module.css'; // 💡 모듈 CSS 불러오기
+import styles from './MyAsset.module.css';
 
 function MyAsset() {
-    // 💡 백엔드 연동 전 임시로 사용할 하드코딩 데이터
+    const [activeFilter, setActiveFilter] = useState('전체');
+
     const mockData = {
         score: 85,
         investableAmount: '5,000,000',
@@ -14,73 +15,140 @@ function MyAsset() {
         cash: '2,000,000'
     };
 
+    const summaryItems = [
+        {category: '수입', label: '월 수입', value: `${mockData.monthlyIncome}원`},
+        {category: '지출', label: '월 고정지출', value: `${mockData.monthlyFixedExpense}원`},
+        {category: '지출', label: '월 변동지출', value: `${mockData.monthlyVariableExpense}원`},
+        {category: '부채', label: '부채', value: `${mockData.debt}원`},
+        {category: '수입', label: '보유 현금', value: `${mockData.cash}원`},
+    ];
+
+    const chartPoints = [
+        {month: '1월', x: 70, y: 150},
+        {month: '2월', x: 185, y: 132},
+        {month: '3월', x: 300, y: 140},
+        {month: '4월', x: 415, y: 105},
+        {month: '5월', x: 530, y: 88},
+        {month: '6월', x: 650, y: 65},
+    ];
+
+    const filteredSummaryItems = activeFilter === '전체'
+        ? summaryItems
+        : summaryItems.filter((item) => item.category === activeFilter);
+
+    const filterDescription = {
+        전체: '전체 재무 정보를 확인합니다.',
+        수입: '월 수입과 보유 현금을 확인합니다.',
+        지출: '월 고정지출과 월 변동지출을 확인합니다.',
+        부채: '현재 부채 정보를 확인합니다.',
+    };
+
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
 
-                {/* 테스트용 페이지 이동 버튼 */}
                 <div className={styles.topNavWrapper}>
                     <Link to="/asset-detail" className={styles.topNavLink}>
-                        상세 화면(Asset Detail)으로 이동 &gt;
+                        상세 화면으로 이동 &gt;
                     </Link>
                 </div>
 
-                <h2 className={styles.pageTitle}>마이 자산 화면</h2>
+                <section className={styles.heroSection}>
+                    <div>
+                        <span className={styles.pageBadge}>My Asset</span>
+                        <h2 className={styles.pageTitle}>마이 자산 화면</h2>
+                        <p className={styles.pageDesc}>재무 평가 점수와 투자 가능 금액을 한눈에 확인합니다.</p>
+                    </div>
 
-                {/* 1. 재무 평가 점수 */}
-                <div className={styles.scoreCard}>
-                    <span className={styles.scoreLabel}>재무 평가 점수</span>
-                    <span className={styles.scoreValue}>{mockData.score}점</span>
-                </div>
+                    <div className={styles.scoreCard}>
+                        <span className={styles.scoreLabel}>재무 평가 점수</span>
+                        <span className={styles.scoreValue}>{mockData.score}점</span>
+                    </div>
+                </section>
 
-                {/* 2. 그래프 (꺾은선) 영역 */}
-                <div className={styles.chartCard}>
-                    그래프(꺾은선) 영역 - 데이터 연동 예정
-                </div>
+                <section className={styles.chartCard}>
+                    <div className={styles.chartHeader}>
+                        <div>
+                            <span>Asset Flow</span>
+                            <h3>자산 흐름 그래프</h3>
+                        </div>
+                        <strong>최근 6개월</strong>
+                    </div>
 
-                {/* 3. 필터 버튼 4개 */}
-                <div className={styles.filterGroup}>
-                    {['필터1', '필터2', '필터3', '필터4'].map(filter => (
-                        <button key={filter} className={styles.filterBtn}>
-                            {filter}
-                        </button>
-                    ))}
-                </div>
+                    <div className={styles.lineChartMock}>
+                        <svg viewBox="0 0 720 250" className={styles.assetLineChart}>
+                            <polyline
+                                points={chartPoints.map((point) => `${point.x},${point.y}`).join(' ')}
+                                fill="none"
+                                className={styles.assetLine}
+                            />
 
-                {/* 4. 재무 요약 정보 카드 */}
-                <div className={styles.summaryCard}>
+                            {chartPoints.map((point) => (
+                                <g key={point.month}>
+                                    <circle
+                                        cx={point.x}
+                                        cy={point.y}
+                                        r="18"
+                                        className={styles.assetDotBg}
+                                    />
+                                    <circle
+                                        cx={point.x}
+                                        cy={point.y}
+                                        r="7"
+                                        className={styles.assetDot}
+                                    />
+                                    <text
+                                        x={point.x}
+                                        y="222"
+                                        textAnchor="middle"
+                                        className={styles.assetMonthText}
+                                    >
+                                        {point.month}
+                                    </text>
+                                </g>
+                            ))}
+                        </svg>
+                    </div>
+                </section>
 
-                    {/* 상단: 투자 가능 금액 */}
+                <section className={styles.filterSection}>
+                    <div className={styles.filterText}>
+                        <span>재무 정보 필터</span>
+                        <strong>{filterDescription[activeFilter]}</strong>
+                    </div>
+
+                    <div className={styles.filterGroup}>
+                        {['전체', '수입', '지출', '부채'].map((filter) => (
+                            <button
+                                key={filter}
+                                type="button"
+                                className={`${styles.filterBtn} ${activeFilter === filter ? styles.activeFilterBtn : ''}`}
+                                onClick={() => setActiveFilter(filter)}
+                            >
+                                {filter}
+                            </button>
+                        ))}
+                    </div>
+                </section>
+
+                <section className={styles.summaryCard}>
                     <div className={styles.investableRow}>
                         <span className={styles.investableLabel}>투자 가능 금액</span>
                         <span className={styles.investableValue}>{mockData.investableAmount}원</span>
                     </div>
 
-                    {/* 하단: 4개 항목 2단 Grid */}
                     <div className={styles.summaryGrid}>
-                        <div className={styles.gridItem}>
-                            <span className={styles.gridLabel}>월 수입</span>
-                            <span className={styles.gridValue}>{mockData.monthlyIncome}원</span>
-                        </div>
-                        <div className={styles.gridItem}>
-                            <span className={styles.gridLabel}>월 고정지출</span>
-                            <span className={styles.gridValue}>{mockData.monthlyFixedExpense}원</span>
-                        </div>
-                        <div className={styles.gridItem}>
-                            <span className={styles.gridLabel}>월 변동지출</span>
-                            <span className={styles.gridValue}>{mockData.monthlyVariableExpense}원</span>
-                        </div>
-                        <div className={styles.gridItem}>
-                            <span className={styles.gridLabel}>부채</span>
-                            <span className={styles.gridValue}>{mockData.debt}원</span>
-                        </div>
-                        <div className={styles.gridItem}>
-                            <span className={styles.gridLabel}>보유 현금</span>
-                            <span className={styles.gridValue}>{mockData.cash}원</span>
-                        </div>
+                        {filteredSummaryItems.map((item) => (
+                            <div className={styles.gridItem} key={item.label}>
+                                <div>
+                                    <span className={styles.gridCategory}>{item.category}</span>
+                                    <span className={styles.gridLabel}>{item.label}</span>
+                                </div>
+                                <span className={styles.gridValue}>{item.value}</span>
+                            </div>
+                        ))}
                     </div>
-
-                </div>
+                </section>
 
             </div>
         </div>
