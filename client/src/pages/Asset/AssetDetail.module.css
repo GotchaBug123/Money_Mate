@@ -1,236 +1,405 @@
-/* src/pages/AssetDetail.module.css */
-
-/* 전체 레이아웃 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
-    background: var(--color-bg-page);
+    background:
+        radial-gradient(circle at top left, rgba(79, 99, 216, 0.08), transparent 340px),
+        linear-gradient(180deg, #f7f9ff 0%, #f3f6fc 100%);
     display: flex;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 46px 24px 90px;
 }
 
 .container {
     width: 100%;
-    max-width: 900px; /* 💡 이 화면은 900px이 가독성에 딱 좋습니다. */
+    max-width: 1120px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 26px;
 }
 
-/* 상단 뒤로가기 링크 */
+.pageTop {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
 .backLink {
     align-self: flex-start;
-    padding: 10px 20px;
-    background: var(--color-bg-card);
-    color: var(--color-text-sub);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
+    padding: 12px 20px;
+    background: #ffffff;
+    color: #4f63d8;
+    border: 1.5px solid #dce3ff;
+    border-radius: 18px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 900;
     text-decoration: none;
+    box-shadow: 0 10px 24px rgba(79, 99, 216, 0.08);
     transition: all 0.2s ease;
 }
 
 .backLink:hover {
-    background: var(--color-bg-input);
-    color: var(--color-text-main);
+    background: #4f63d8;
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-/* 상단 수익률 카드 */
+.pageBadge {
+    display: block;
+    margin-bottom: 6px;
+    color: #4f63d8;
+    font-size: 13px;
+    font-weight: 900;
+    text-align: right;
+}
+
+.pageTitle {
+    margin: 0;
+    color: #111827;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-align: right;
+}
+
+.pageDesc {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: right;
+}
+
 .topCard {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 24px 32px;
-    box-shadow: var(--shadow-card);
-    display: flex;
-    justify-content: flex-start;
-    gap: 60px;
-    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e3e8f8;
+    border-radius: 30px;
+    padding: 30px 34px;
+    box-shadow: 0 20px 48px rgba(79, 99, 216, 0.08);
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    gap: 22px;
+    align-items: stretch;
 }
 
 .returnItem {
+    min-height: 120px;
+    padding: 22px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-}
-
-.returnMonth {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--color-primary);
-    background: var(--color-primary-light);
-    padding: 4px 10px;
-    border-radius: var(--radius-xl);
-    align-self: flex-start;
-    margin-bottom: 4px;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 24px;
+    background: #f7f9ff;
 }
 
 .returnLabel {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 900;
+    color: #6b7280;
 }
 
 .returnValue {
-    font-size: 24px;
-    font-weight: 800;
+    font-size: 38px;
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
 .pos {
-    color: var(--color-success);
+    color: #111827;
 }
 
 .neg {
-    color: var(--color-error);
+    color: #bd422f;
 }
 
-/* 차트 영역 (점선 플레이스홀더 디자인) */
+.returnDateInput {
+    width: 172px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid #dce3ff;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4f63d8;
+    font-size: 16px;
+    font-weight: 900;
+    outline: none;
+    cursor: pointer;
+}
+
+.returnDateInput:focus {
+    box-shadow: 0 0 0 4px rgba(79, 99, 216, 0.14);
+}
+
 .chartCard {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    min-height: 240px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text-light);
-    border: 2px dashed var(--color-border);
+    background: #ffffff;
+    border: 1px solid #e3e8f8;
+    border-radius: 30px;
+    padding: 34px;
+    min-height: 320px;
+    box-shadow: 0 20px 48px rgba(79, 99, 216, 0.08);
 }
 
-/* 하단 종목 리스트 2분할 */
+.chartHeader {
+    margin-bottom: 26px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.chartHeader h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.chartHeader strong {
+    padding: 9px 16px;
+    border-radius: 999px;
+    color: #4f63d8;
+    background: #eef2ff;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.chartBadge {
+    display: block;
+    margin-bottom: 6px;
+    color: #4f63d8;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.barChart {
+    height: 220px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 18px;
+    align-items: end;
+}
+
+.barItem {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 22px 1fr 24px;
+    gap: 8px;
+    text-align: center;
+}
+
+.barItem span {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.barItem div {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-radius: 18px;
+    background: #f3f6fc;
+    overflow: hidden;
+}
+
+.barItem b {
+    width: 100%;
+    display: block;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(180deg, #7f91f4 0%, #4f63d8 100%);
+}
+
+.barItem b.minusBar {
+    background: linear-gradient(180deg, #ff8a75 0%, #bd422f 100%);
+}
+
+.barItem em {
+    color: #111827;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 900;
+}
+
 .listSection {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    gap: 26px;
 }
 
 .listColumn {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
 }
 
 .listBox {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    box-shadow: var(--shadow-card);
+    background: #ffffff;
+    border: 1px solid #e3e8f8;
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 20px 48px rgba(79, 99, 216, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-height: 280px;
+    gap: 14px;
+    min-height: 320px;
+}
+
+.listHeader {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.listHeader span {
+    display: block;
+    margin-bottom: 6px;
+    color: #4f63d8;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.listHeader strong {
+    padding: 8px 12px;
+    border-radius: 999px;
+    color: #4f63d8;
+    background: #eef2ff;
+    font-size: 13px;
+    font-weight: 900;
 }
 
 .listTitle {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--color-text-main);
-    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 900;
+    color: #111827;
+    margin: 0;
 }
 
 .listItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    background: var(--color-bg-input);
-    border-radius: var(--radius-md);
-    transition: transform 0.2s, box-shadow 0.2s;
+    gap: 18px;
+    padding: 18px 20px;
+    background: #f7f9ff;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .listItem:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #dce3ff;
+    box-shadow: 0 10px 24px rgba(79, 99, 216, 0.09);
+}
+
+.stockInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.stockAvatar {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: #4f63d8;
+    background: #eef2ff;
+    font-size: 16px;
+    font-weight: 900;
 }
 
 .itemName {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--color-text-main);
+    font-size: 16px;
+    font-weight: 900;
+    color: #111827;
+    white-space: nowrap;
 }
 
 .itemRight {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
 }
 
 .itemQuantity {
-    font-size: 13px;
-    color: var(--color-text-muted);
-    font-weight: 500;
+    font-size: 15px;
+    color: #6b7280;
+    font-weight: 800;
+    white-space: nowrap;
 }
 
 .itemReturn {
-    font-size: 14px;
-    font-weight: 800;
-    min-width: 50px;
+    font-size: 16px;
+    font-weight: 900;
+    min-width: 62px;
     text-align: right;
 }
 
-/* 버튼 그룹 */
 .btnGroup {
     display: flex;
-    gap: 12px;
+    gap: 14px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    flex: 1;
+    height: 58px;
+    border-radius: 18px;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .primaryBtn {
-    flex: 1;
-    padding: 14px 0;
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    background: #4f63d8;
+    color: #ffffff;
+    border: 0;
+    box-shadow: 0 16px 32px rgba(79, 99, 216, 0.22);
 }
 
 .primaryBtn:hover {
-    background: var(--color-primary-hover);
+    background: #4053c4;
     transform: translateY(-1px);
 }
 
 .secondaryBtn {
-    flex: 1;
-    padding: 14px 0;
-    background: var(--color-bg-card);
-    color: var(--color-primary);
-    border: 1.5px solid var(--color-primary);
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease;
+    background: #ffffff;
+    color: #4f63d8;
+    border: 2px solid #4f63d8;
 }
 
 .secondaryBtn:hover {
-    background: var(--color-primary-light);
+    background: #eef2ff;
+    transform: translateY(-1px);
 }
 
-/* -------------------------------------
- * 모달 (팝업) 스타일
- * ------------------------------------- */
 .modalOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(17, 24, 39, 0.48);
     z-index: 999;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 24px;
 }
 
 .modalContent {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-xl);
+    background: #ffffff;
+    border-radius: 28px;
     padding: 32px;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    max-width: 420px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -243,50 +412,47 @@
 }
 
 .modalTitle {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--color-text-main);
+    font-size: 22px;
+    font-weight: 900;
+    color: #111827;
     margin: 0;
 }
 
 .modalCloseBtn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: var(--color-text-light);
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #4f63d8;
+    font-size: 18px;
+    font-weight: 900;
     cursor: pointer;
-    transition: color 0.2s;
-}
-
-.modalCloseBtn:hover {
-    color: var(--color-text-sub);
 }
 
 .searchPlaceholderBtn {
-    padding: 24px;
-    background: var(--color-bg-input);
-    border: 2px dashed var(--color-border);
-    border-radius: var(--radius-md);
+    padding: 28px;
+    background: #f7f9ff;
+    border: 2px dashed #dce3ff;
+    border-radius: 20px;
     font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text-muted);
+    font-weight: 900;
+    color: #4f63d8;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .searchPlaceholderBtn:hover {
-    background: var(--color-primary-light);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    background: #eef2ff;
 }
 
 .modalBottomRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--color-bg-input);
+    background: #f7f9ff;
     padding: 16px;
-    border-radius: var(--radius-md);
+    border-radius: 18px;
 }
 
 .qtyControl {
@@ -296,50 +462,96 @@
 }
 
 .qtyInput {
-    width: 60px;
-    padding: 8px 12px;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    width: 70px;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #dce3ff;
+    border-radius: 14px;
     text-align: right;
     font-size: 15px;
-    font-weight: 700;
-    color: var(--color-text-main);
+    font-weight: 900;
+    color: #111827;
     outline: none;
-    transition: border-color 0.2s;
 }
 
 .qtyInput:focus {
-    border-color: var(--color-primary);
+    border-color: #4f63d8;
+    box-shadow: 0 0 0 3px rgba(79, 99, 216, 0.14);
 }
 
 .unitText {
     font-size: 14px;
-    font-weight: 700;
-    color: var(--color-text-sub);
+    font-weight: 900;
+    color: #555555;
 }
 
 .buyBtn {
-    padding: 12px 24px;
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
+    height: 44px;
+    padding: 0 22px;
+    background: #4f63d8;
+    color: #ffffff;
+    border: 0;
+    border-radius: 14px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 900;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
 .buyBtn:hover {
-    background: var(--color-primary-hover);
+    background: #4053c4;
 }
 
-.returnMonth button {
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    font-weight: 900;
-    cursor: pointer;
-    padding: 0 4px;
+@media (max-width: 900px) {
+    .pageTop {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .pageBadge,
+    .pageTitle,
+    .pageDesc {
+        text-align: left;
+    }
+
+    .topCard {
+        grid-template-columns: 1fr;
+    }
+
+    .listSection {
+        grid-template-columns: 1fr;
+    }
+
+    .barChart {
+        gap: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .chartCard,
+    .listBox,
+    .topCard {
+        padding: 24px 18px;
+    }
+
+    .returnValue {
+        font-size: 32px;
+    }
+
+    .btnGroup {
+        flex-direction: column;
+    }
+
+    .listItem {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .itemRight {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
