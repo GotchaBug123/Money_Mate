@@ -5,7 +5,7 @@ spring:
 
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/moneymate_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/moneymate_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false}
     username: ${SPRING_DATASOURCE_USERNAME:moneymate_user}
     password: ${SPRING_DATASOURCE_PASSWORD:qwer1234}
     driver-class-name: com.mysql.cj.jdbc.Driver

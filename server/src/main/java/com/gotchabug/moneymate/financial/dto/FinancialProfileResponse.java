@@ -34,6 +34,10 @@ public class FinancialProfileResponse {
     private LocalDateTime updatedAt;
 
     public static FinancialProfileResponse from(FinancialProfile profile) {
+        if (profile == null) {
+            return null;
+        }
+
         return FinancialProfileResponse.builder()
                 .profileId(profile.getProfileId())
                 .memberId(profile.getMember().getMemberId())

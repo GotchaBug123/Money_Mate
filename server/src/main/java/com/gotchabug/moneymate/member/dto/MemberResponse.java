@@ -19,6 +19,10 @@ public class MemberResponse {
     private String signupStatus;
 
     public static MemberResponse from(Member member) {
+        if (member == null) {
+            return null;
+        }
+
         return MemberResponse.builder()
                 .memberId(member.getMemberId())
                 .email(member.getEmail())
