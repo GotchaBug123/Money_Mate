@@ -1,48 +1,130 @@
 import React, {useEffect, useState} from 'react';
 import styles from './MyPage.module.css';
+import {
+    getFinanceDiagnosisApi,
+    getFinancialProfileApi,
+    getMyInfoApi,
+    getMyInvestmentApi,
+    updateMyInfoApi
+} from "../../api/myPageApi.js";
+import {useAuthStore} from "../../store/useAuthStore.js";
 
 function MyPage() {
-    const mockData = {
-        profile: {
-            name: '김수형',
-            tier: 'Gold',
-            email: 'bestevan01@gmail.com',
-            userId: 'bestevan01'
-        },
-        finance: {
-            score: 85,
-            investableAmount: '500,000',
-            propensity: '위험중립형',
-            progress: '80%'
-        }
-    };
+    const {user, login} = useAuthStore();
 
-    const [userInfo, setUserInfo] = useState(mockData.profile);
-    const [financeInfo, setFinanceInfo] = useState(mockData.finance);
-    const [formData, setFormData] = useState(mockData.profile);
+    const [userInfo, setUserInfo] = useState({
+        name: user?.name || '회원',
+        tier: '일반',
+        email: user?.email || '',
+        loginId: user?.loginId || '',
+        birthDate: ''
+    });
+
+    const [financeInfo, setFinanceInfo] = useState({
+        score: 0,
+        investableAmount: '0',
+        propensity: '진단 전',
+        progress: '0%'
+    });
+
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        birthDate: ''
+    });
+
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        // axios.get('/api/member/mypage').then(res => {
-        //   setUserInfo(res.data.profile);
-        //   setFinanceInfo(res.data.finance);
-        //   setFormData(res.data.profile);
-        // })
+        const fetchMyData = async () => {
+            try {
+                const res = await getMyInfoApi();
+                if (res.success) {
+                    const data = res.data;
+                    setUserInfo(prev => ({
+                        ...prev,
+                        name: data.name,
+                        email: data.email,
+                        loginId: data.loginId,
+                        birthDate: data.birthDate
+                    }));
+                    setFormData({
+                        name: data.name,
+                        email: data.email,
+                        birthDate: data.birthDate
+                    });
+                }
+
+                const [diagnosisRes, profileRes, investmentRes] = await Promise.all([
+                    getFinanceDiagnosisApi().catch(() => null),
+                    getFinancialProfileApi().catch(() => null),
+                    getMyInvestmentApi().catch(() => null)
+                ]);
+
+                if (diagnosisRes) {
+                    setUserInfo(prev => ({...prev, tier: diagnosisRes.grade || '일반'}));
+                    setFinanceInfo(prev => ({...prev, score: diagnosisRes.totalScore || 0}));
+                }
+
+                if (profileRes) {
+                    const formattedAmount = (profileRes.investableAmount || 0).toLocaleString();
+                    setFinanceInfo(prev => ({...prev, investableAmount: formattedAmount}));
+                }
+
+                if (investmentRes && investmentRes.riskResult) {
+                    setFinanceInfo(prev => ({...prev, propensity: investmentRes.riskResult.resultType || '진단 전'}));
+                }
+
+                let progressPercent = 0;
+                if (profileRes) progressPercent += 50;
+                if (diagnosisRes) progressPercent += 50;
+                setFinanceInfo(prev => ({...prev, progress: `${progressPercent}%`}));
+            } catch (error) {
+                console.error('마이페이지 정보 로드 실패: ', error);
+            }
+        };
+        fetchMyData();
     }, []);
 
     const handleChange = (event) => {
         const {name, value} = event.target;
-
         setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        setUserInfo(formData);
-        alert('회원 정보가 수정되었습니다.');
+        if (!formData.name || !formData.email) {
+            return alert('이름과 이메일은 필수 입력 항목입니다.');
+        }
+
+        setIsLoading(true);
+
+        try {
+            await updateMyInfoApi({
+                name: formData.name,
+                email: formData.email,
+                birthDate: formData.birthDate
+            });
+
+            setUserInfo(prev => ({
+                ...prev,
+                name: formData.name,
+                email: formData.email
+            }));
+
+            login({...user, name: formData.name, email: formData.email});
+
+            alert('회원 정보가 성공적으로 수정되었습니다.');
+        } catch (error) {
+            console.error('회원 정보 수정 실패: ', error);
+            alert('회원 정보 수정에 실패했습니다. 다시 시도해 주세요.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -72,23 +154,25 @@ function MyPage() {
                         </div>
 
                         <form className={styles.form} onSubmit={handleSubmit}>
+                            {/* 아이디 - 읽기 전용 (disabled) */}
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>아이디</label>
+                                <input
+                                    type="text"
+                                    name="loginId"
+                                    value={userInfo.loginId}
+                                    className={styles.input}
+                                    disabled
+                                    style={{backgroundColor: 'var(--color-bg-input)', color: 'var(--color-text-muted)'}}
+                                />
+                            </div>
+
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>이름</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
-                                    onChange={handleChange}
-                                    className={styles.input}
-                                />
-                            </div>
-
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>아이디</label>
-                                <input
-                                    type="text"
-                                    name="userId"
-                                    value={formData.userId}
                                     onChange={handleChange}
                                     className={styles.input}
                                 />
@@ -105,12 +189,8 @@ function MyPage() {
                                 />
                             </div>
 
-                            <div className={styles.noticeBox}>
-                                백엔드 연동 전까지는 화면에서만 임시로 수정됩니다.
-                            </div>
-
-                            <button type="submit" className={styles.saveButton}>
-                                회원 정보 저장
+                            <button type="submit" className={styles.saveButton} disabled={isLoading}>
+                                {isLoading ? '저장 중...' : '회원 정보 저장'}
                             </button>
                         </form>
                     </section>

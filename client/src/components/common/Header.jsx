@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import styles from './Header.module.css';
 import moneymateLogo from '../../assets/moneymate_logo.png';
+import {useAuthStore} from '../../store/useAuthStore'; // 💡 Zustand 스토어 가져오기
+import {logoutApi} from '../../api/authApi';           // 💡 로그아웃 API 가져오기
 
 function Header({
                     menuItems,
@@ -9,32 +11,31 @@ function Header({
                     logoTo = '/',
                     logoOnClick,
                 }) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const navigate = useNavigate();
 
-    const userName =
-        localStorage.getItem('userName') ||
-        localStorage.getItem('memberName') ||
-        localStorage.getItem('name') ||
-        localStorage.getItem('nickname') ||
-        localStorage.getItem('userId') ||
-        localStorage.getItem('loginId') ||
-        localStorage.getItem('id') ||
-        '회원';
+    const {isLoggedIn, user, logout} = useAuthStore();
 
-    const handleLogout = () => {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('role');
-        alert('로그아웃 되었습니다.');
-        window.location.href = '/';
+    const userName = user?.name || '회원';
+
+    const handleLogout = async () => {
+        try {
+            await logoutApi();
+        } catch (error) {
+            console.error('백엔드 로그아웃 실패:', error);
+        } finally {
+            logout();
+            alert('로그아웃 되었습니다.');
+            navigate('/');
+        }
     };
 
     const defaultMenuItems = [
-        { label: 'MY자산', to: '/asset' },
-        { label: '포트폴리오', to: '/portfolio' },
-        { label: '리밸런싱', to: '/rebalancing' },
-        { label: '투자정보', to: '/investment-information' },
-        { label: '커뮤니티', to: '/community' },
-        { label: '고객센터', to: '/customer-service' },
+        {label: 'MY자산', to: '/asset'},
+        {label: '포트폴리오', to: '/portfolio'},
+        {label: '리밸런싱', to: '/rebalancing'},
+        {label: '투자정보', to: '/investment-information'},
+        {label: '커뮤니티', to: '/community'},
+        {label: '고객센터', to: '/customer-service'},
     ];
 
     const finalMenuItems = menuItems || defaultMenuItems;
@@ -66,8 +67,13 @@ function Header({
             return (
                 <>
                     <div style={userNameStyle}>
-                        <span style={{ fontSize: '20px', lineHeight: 1 }}>🙂</span>
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)', whiteSpace: 'nowrap' }}>
+                        <span style={{fontSize: '20px', lineHeight: 1}}>🙂</span>
+                        <span style={{
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: 'var(--color-text-main)',
+                            whiteSpace: 'nowrap'
+                        }}>
                             {userName}님
                         </span>
                     </div>
@@ -151,20 +157,6 @@ const userNameStyle = {
     display: 'flex',
     alignItems: 'center',
     gap: 7,
-};
-
-const avatarStyle = {
-    width: 28,
-    height: 28,
-    borderRadius: '50%',
-    background: 'var(--color-primary, #2563EB)',
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: 700,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
 };
 
 export default Header;
