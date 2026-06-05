@@ -25,3 +25,13 @@ export const findIdApi = async (name, email) => {
     });
     return response.data;
 }
+
+export const resetPasswordApi = async (loginId, email, newPassword, newPasswordConfirm) => {
+    const response = await axiosInstance.post('/auth/reset-password', {
+        loginId: loginId,
+        email: email,
+        newPassword: newPassword,
+        newPasswordConfirm: newPasswordConfirm
+    });
+    return response.data;
+}

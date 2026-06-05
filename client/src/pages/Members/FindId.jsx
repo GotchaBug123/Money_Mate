@@ -7,7 +7,6 @@ function FindId() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     const [foundId, setFoundId] = useState(null);
 
     const handleVerify = async () => {
