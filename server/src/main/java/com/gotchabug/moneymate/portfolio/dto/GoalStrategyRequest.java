@@ -18,6 +18,7 @@ public class GoalStrategyRequest {
     @Min(value = 0, message = "현재 보유 금액은 0원 이상이어야 합니다.")
     private Long currentAmount;
 
+    // 리밸런싱 화면의 "투자 금액" 입력값은 월 투자금으로 처리합니다.
     @NotNull(message = "월 투자금은 필수입니다.")
     @Min(value = 0, message = "월 투자금은 0원 이상이어야 합니다.")
     private Long monthlyInvestment;
@@ -26,7 +27,6 @@ public class GoalStrategyRequest {
     @Min(value = 1000000, message = "목표 금액은 최소 100만원 이상이어야 합니다.")
     private Long targetAmount;
 
-    @NotNull(message = "투자 기간은 필수입니다.")
     @Min(value = 1, message = "투자 기간은 최소 1년 이상이어야 합니다.")
     private Integer investmentYears;
 
@@ -44,6 +44,7 @@ public class GoalStrategyRequest {
         if (investmentMonths != null) {
             return investmentMonths;
         }
+
         return safeInvestmentYears() * 12;
     }
 
@@ -59,10 +60,19 @@ public class GoalStrategyRequest {
         return investmentYears == null ? 0 : investmentYears;
     }
 
+    public int storageInvestmentYears() {
+        if (investmentYears != null) {
+            return investmentYears;
+        }
+
+        return Math.max(1, totalInvestmentMonths() / 12);
+    }
+
     public String safeGoalName() {
         if (goalName == null || goalName.trim().isEmpty()) {
             return "포트폴리오 리밸런싱 분석";
         }
+
         return goalName.trim();
     }
 
@@ -71,16 +81,16 @@ public class GoalStrategyRequest {
                 + (safeMonthlyInvestment() * totalInvestmentMonths());
     }
 
-    // 💡 [수정] 프론트엔드(리액트)에서 전송된 자산 비중 소수점 합산 시,
-    // 자바 부동소수점 오차로 인해 올바른 값도 유효성 검증 실패(400 Bad Request)가 뜨는 현상을 방지합니다.
-    @AssertTrue(message = "선택한 자산 비중의 합은 100%(1.0)여야 합니다.")
+    @AssertTrue(message = "선택한 자산 비중의 합은 100%여야 합니다.")
     public boolean isValidWeightSum() {
+
         if (selectedAssets == null || selectedAssets.isEmpty()) {
             return false;
         }
 
         if (selectedAssets.stream()
-                .anyMatch(asset -> asset == null || asset.getTargetWeight() == null)) {
+                .anyMatch(asset -> asset == null
+                        || asset.getTargetWeight() == null)) {
             return false;
         }
 
@@ -88,7 +98,11 @@ public class GoalStrategyRequest {
                 .mapToDouble(SelectedAssetRequest::getTargetWeight)
                 .sum();
 
-        // 오차 범위(0.0001)를 두어 프론트엔드 데이터 형식과 싱크를 맞춥니다.
         return Math.abs(totalWeight - 1.0) < 0.0001;
+    }
+
+    @AssertTrue(message = "투자 기간은 연 단위 또는 월 단위 중 하나는 필수입니다.")
+    public boolean isValidInvestmentPeriod() {
+        return investmentYears != null || investmentMonths != null;
     }
 }

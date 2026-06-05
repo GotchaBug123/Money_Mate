@@ -15,6 +15,7 @@ public class MemberResponse {
     private String email;
     private String name;
     private LocalDate birthDate;
+    private String phoneNumber;
     private String signupStatus;
 
     public static MemberResponse from(Member member) {
@@ -23,6 +24,7 @@ public class MemberResponse {
                 .email(member.getEmail())
                 .name(member.getName())
                 .birthDate(member.getBirthDate())
+                .phoneNumber(member.getPhoneNumber())
                 .signupStatus(member.getSignupStatus())
                 .build();
     }

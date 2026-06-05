@@ -5,7 +5,6 @@ import styles from './InquiryWrite.module.css';
 function InquiryWrite() {
     const navigate = useNavigate();
 
-    // 폼 상태 관리
     const [formData, setFormData] = useState({
         title: '',
         type: '',
@@ -13,36 +12,72 @@ function InquiryWrite() {
         file: null
     });
 
-    const handleChange = (e) => {
-        const {name, value, files} = e.target;
-        setFormData(prev => ({
+    const inquiryTypes = [
+        {value: 'account', label: '계정/로그인 문의'},
+        {value: 'service', label: '서비스 이용 문의'},
+        {value: 'error', label: '오류 신고'},
+        {value: 'other', label: '기타'},
+    ];
+
+    const handleChange = (event) => {
+        const {name, value, files} = event.target;
+
+        setFormData((prev) => ({
             ...prev,
             [name]: files ? files[0] : value
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        event.preventDefault();
 
-        // 필수 입력값 검증
-        if (!formData.title || !formData.type || !formData.content) {
+        if (!formData.title.trim() || !formData.type || !formData.content.trim()) {
             alert('제목, 문의 유형, 내용을 모두 입력해 주세요.');
             return;
         }
 
-        // 백엔드 연동 전 임시 성공 처리
         alert('문의가 성공적으로 등록되었습니다.');
-        navigate('/customer-service'); // 등록 완료 후 고객센터 메인으로 복귀
+        navigate('/customer-service');
     };
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
-                <div className={styles.card}>
-                    <h2 className={styles.title}>고객센터 문의하기</h2>
+                <section className={styles.heroSection}>
+                    <span className={styles.pageBadge}>Inquiry</span>
+                    <h1 className={styles.title}>고객센터 문의하기</h1>
+                    <p className={styles.subtitle}>
+                        서비스 이용 중 궁금한 점이나 오류 내용을 자세히 남겨주시면 확인 후 답변드리겠습니다.
+                    </p>
+
+                    <div className={styles.heroButtons}>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/customer-service')}
+                        >
+                            고객센터 홈
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => navigate('/inquiry-list')}
+                        >
+                            내 문의내역
+                        </button>
+                    </div>
+                </section>
+
+                <section className={styles.formCard}>
+                    <div className={styles.formHeader}>
+                        <div>
+                            <span className={styles.sectionBadge}>Write Inquiry</span>
+                            <h2>문의 내용 작성</h2>
+                        </div>
+
+                        <p>필수 항목을 모두 입력한 뒤 문의를 등록해주세요.</p>
+                    </div>
 
                     <form onSubmit={handleSubmit} className={styles.form}>
-                        {/* 1. 제목 입력 */}
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>제목</label>
                             <input
@@ -55,7 +90,6 @@ function InquiryWrite() {
                             />
                         </div>
 
-                        {/* 2. 문의 유형 선택 (Select) */}
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>문의 유형</label>
                             <select
@@ -65,14 +99,14 @@ function InquiryWrite() {
                                 className={`${styles.input} ${styles.select}`}
                             >
                                 <option value="">문의 유형을 선택해주세요</option>
-                                <option value="account">계정/로그인 문의</option>
-                                <option value="service">서비스 이용 문의</option>
-                                <option value="error">오류 신고</option>
-                                <option value="other">기타</option>
+                                {inquiryTypes.map((type) => (
+                                    <option key={type.value} value={type.value}>
+                                        {type.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
-                        {/* 3. 문의 내용 입력 (Textarea) */}
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>문의 내용</label>
                             <textarea
@@ -84,25 +118,34 @@ function InquiryWrite() {
                             />
                         </div>
 
-                        {/* 4. 파일 첨부 */}
                         <div className={styles.inputGroup}>
-                            <label className={styles.label}>첨부 파일 (선택)</label>
-                            <div className={styles.fileWrapper}>
+                            <label className={styles.label}>첨부 파일</label>
+
+                            <label className={styles.fileWrapper}>
                                 <input
                                     type="file"
                                     name="file"
                                     onChange={handleChange}
                                     className={styles.fileInput}
                                 />
-                            </div>
+
+                                <span className={styles.fileButton}>파일 선택</span>
+                                <strong>
+                                    {formData.file ? formData.file.name : '선택된 파일이 없습니다.'}
+                                </strong>
+                            </label>
                         </div>
 
-                        {/* 5. 문의 등록 버튼 */}
+                        <div className={styles.noticeBox}>
+                            <p>답변은 문의 내역에서 확인할 수 있습니다.</p>
+                            <p>오류 신고의 경우 화면 캡처 파일을 함께 첨부하면 더 빠르게 확인할 수 있습니다.</p>
+                        </div>
+
                         <button type="submit" className={styles.submitBtn}>
                             문의 등록하기
                         </button>
                     </form>
-                </div>
+                </section>
             </div>
         </div>
     );

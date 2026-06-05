@@ -5,69 +5,125 @@ import styles from './InquiryList.module.css';
 function InquiryList() {
     const navigate = useNavigate();
 
-    // 💡 백엔드 연동 전 임시 테스트용 데이터
     const [inquiries] = useState([
-        {id: 2, type: '서비스 이용 문의', title: '포트폴리오 비중 조정은 어떻게 하나요?', date: '2026-05-25', status: '답변완료'},
-        {id: 1, type: '오류 신고', title: '재무 진단 페이지 접속 시 에러가 납니다.', date: '2026-05-24', status: '답변대기'}
+        {
+            id: 2,
+            type: '서비스 이용 문의',
+            title: '포트폴리오 비중 조정은 어떻게 하나요?',
+            date: '2026-05-25',
+            status: '답변완료'
+        },
+        {
+            id: 1,
+            type: '오류 신고',
+            title: '재무 진단 페이지 접속 시 에러가 납니다.',
+            date: '2026-05-24',
+            status: '답변대기'
+        }
     ]);
 
-    // 문의 현황 카운트 계산
     const totalCount = inquiries.length;
-    const pendingCount = inquiries.filter(item => item.status === '답변대기').length;
-    const completedCount = inquiries.filter(item => item.status === '답변완료').length;
+    const pendingCount = inquiries.filter((item) => item.status === '답변대기').length;
+    const completedCount = inquiries.filter((item) => item.status === '답변완료').length;
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
+                <section className={styles.heroSection}>
+                    <span className={styles.pageBadge}>My Inquiry</span>
+                    <h1 className={styles.title}>나의 문의 내역</h1>
+                    <p className={styles.subtitle}>
+                        내가 남긴 문의와 답변 상태를 한눈에 확인할 수 있습니다.
+                    </p>
 
-                <h2 className={styles.title}>나의 문의 내역</h2>
+                    <div className={styles.heroButtons}>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/customer-service')}
+                        >
+                            고객센터 홈
+                        </button>
 
-                {/* 상단: 나의 문의 현황 요약 카드 */}
-                <div className={styles.summaryCard}>
-                    <div className={styles.statItem}>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/inquiry-write')}
+                        >
+                            새 문의 작성
+                        </button>
+                    </div>
+                </section>
+
+                <section className={styles.summaryCard}>
+                    <article className={styles.statItem}>
                         <span className={styles.statLabel}>전체 문의</span>
-                        <span className={styles.statValue}>{totalCount}건</span>
-                    </div>
-                    <div className={styles.statItem}>
-                        <span className={styles.statLabel}>답변 대기</span>
-                        <span className={`${styles.statValue} ${styles.statHighlight}`}>{pendingCount}건</span>
-                    </div>
-                    <div className={styles.statItem}>
-                        <span className={styles.statLabel}>답변 완료</span>
-                        <span className={styles.statValue}>{completedCount}건</span>
-                    </div>
-                </div>
+                        <strong className={styles.statValue}>{totalCount}건</strong>
+                    </article>
 
-                {/* 메인: 문의 내역 테이블 영역 */}
-                <div className={styles.listCard}>
-                    <h3 className={styles.listTitle}>문의 목록</h3>
+                    <article className={styles.statItem}>
+                        <span className={styles.statLabel}>답변 대기</span>
+                        <strong className={`${styles.statValue} ${styles.statHighlight}`}>
+                            {pendingCount}건
+                        </strong>
+                    </article>
+
+                    <article className={styles.statItem}>
+                        <span className={styles.statLabel}>답변 완료</span>
+                        <strong className={styles.statValue}>{completedCount}건</strong>
+                    </article>
+                </section>
+
+                <section className={styles.listCard}>
+                    <div className={styles.listHeader}>
+                        <div>
+                            <span className={styles.sectionBadge}>Inquiry List</span>
+                            <h2 className={styles.listTitle}>문의 목록</h2>
+                        </div>
+
+                        <p>문의 제목과 답변 상태를 확인하세요.</p>
+                    </div>
 
                     <div className={styles.tableWrap}>
                         <table className={styles.table}>
                             <thead>
                             <tr>
-                                <th className={styles.th} style={{width: '10%'}}>번호</th>
-                                <th className={styles.th} style={{width: '20%'}}>구분</th>
-                                <th className={styles.th} style={{width: '40%', textAlign: 'left'}}>제목</th>
-                                <th className={styles.th} style={{width: '15%'}}>작성일</th>
-                                <th className={styles.th} style={{width: '15%'}}>상태</th>
+                                <th className={styles.th}>번호</th>
+                                <th className={styles.th}>구분</th>
+                                <th className={`${styles.th} ${styles.titleTh}`}>제목</th>
+                                <th className={styles.th}>작성일</th>
+                                <th className={styles.th}>상태</th>
                             </tr>
                             </thead>
+
                             <tbody>
                             {inquiries.length > 0 ? (
                                 inquiries.map((inquiry, index) => (
                                     <tr key={inquiry.id}>
-                                        <td className={styles.td}
-                                            style={{textAlign: 'center'}}>{inquiries.length - index}</td>
-                                        <td className={styles.td} style={{textAlign: 'center'}}>{inquiry.type}</td>
+                                        <td className={styles.td}>
+                                            {inquiries.length - index}
+                                        </td>
+
+                                        <td className={styles.td}>
+                                            <span className={styles.typeBadge}>
+                                                {inquiry.type}
+                                            </span>
+                                        </td>
+
                                         <td className={`${styles.td} ${styles.tdTitle}`}>
                                             {inquiry.title}
                                         </td>
-                                        <td className={styles.td} style={{textAlign: 'center'}}>{inquiry.date}</td>
-                                        <td className={styles.td} style={{textAlign: 'center'}}>
-                                            {/* 💡 조건부 클래스로 상태별 배지(Badge) 적용 */}
+
+                                        <td className={styles.td}>
+                                            {inquiry.date}
+                                        </td>
+
+                                        <td className={styles.td}>
                                             <span
-                                                className={`${styles.statusBadge} ${inquiry.status === '답변완료' ? styles.statusCompleted : styles.statusPending}`}>
+                                                className={`${styles.statusBadge} ${
+                                                    inquiry.status === '답변완료'
+                                                        ? styles.statusCompleted
+                                                        : styles.statusPending
+                                                }`}
+                                            >
                                                 {inquiry.status}
                                             </span>
                                         </td>
@@ -84,20 +140,20 @@ function InquiryList() {
                         </table>
                     </div>
 
-                    {/* 하단: 페이지네이션 및 새 문의 작성 버튼 */}
                     <div className={styles.footer}>
-                        <button className={styles.pagination}>
+                        <button type="button" className={styles.pagination}>
                             &lt; 1 &gt;
                         </button>
 
                         <button
+                            type="button"
                             onClick={() => navigate('/inquiry-write')}
                             className={styles.writeBtn}
                         >
                             새 문의 작성
                         </button>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
     );

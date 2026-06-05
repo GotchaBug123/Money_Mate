@@ -1,88 +1,151 @@
-/* src/pages/InquiryList.module.css */
-
-/* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
     display: flex;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 40px 24px 90px;
 }
 
-/* 💡 리스트 화면에 최적화된 900px 너비 적용 */
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.title {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--color-text-main);
-    text-align: center;
-    margin: 0;
+.heroSection {
+    padding: 38px 42px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
 }
 
-/* 상단 요약 통계 카드 */
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
+}
+
+.title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 800;
+}
+
+.heroButtons {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+}
+
+.heroButtons button {
+    min-width: 130px;
+    height: 48px;
+    padding: 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+    color: var(--color-primary);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.heroButtons button:last-child {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.heroButtons button:hover {
+    transform: translateY(-1px);
+}
+
 .summaryCard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.statItem {
+    padding: 24px;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-card);
-    display: flex;
-    overflow: hidden;
-}
-
-.statItem {
-    flex: 1;
-    padding: 24px;
-    text-align: center;
-    border-right: 1.5px solid var(--color-border-light);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.statItem:last-child {
-    border-right: none;
 }
 
 .statLabel {
-    font-size: 14px;
-    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
     color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 900;
 }
 
 .statValue {
-    font-size: 28px;
-    font-weight: 800;
+    display: block;
     color: var(--color-text-main);
+    font-size: 28px;
+    font-weight: 900;
 }
 
 .statHighlight {
     color: var(--color-primary);
 }
 
-/* 문의 목록 영역 (모던한 리스트 카드 디자인) */
 .listCard {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
-    padding: 32px;
     box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.listHeader {
+    padding: 30px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sectionBadge {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
 }
 
 .listTitle {
-    font-size: 18px;
-    font-weight: 800;
+    margin: 0;
     color: var(--color-text-main);
-    margin: 0 0 16px 0;
+    font-size: 26px;
+    font-weight: 900;
 }
 
-/* 테이블 레이아웃 */
+.listHeader p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
 .tableWrap {
     width: 100%;
     overflow-x: auto;
@@ -90,110 +153,138 @@
 
 .table {
     width: 100%;
-    min-width: 600px;
+    min-width: 760px;
     border-collapse: collapse;
-    border-top: 1.5px solid var(--color-border);
 }
 
 .th {
+    height: 58px;
+    padding: 0 18px;
     background: var(--color-bg-input);
     color: var(--color-text-sub);
+    border-bottom: 1px solid var(--color-border);
     font-size: 14px;
-    font-weight: 700;
-    padding: 16px;
-    border-bottom: 1.5px solid var(--color-border);
+    font-weight: 900;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.titleTh {
+    text-align: left;
 }
 
 .td {
-    padding: 16px;
-    border-bottom: 1px solid var(--color-border-light);
-    font-size: 14px;
+    min-height: 64px;
+    padding: 18px;
+    border-bottom: 1px solid var(--color-border);
     color: var(--color-text-main);
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
     vertical-align: middle;
 }
 
-/* 마지막 행 테두리 제거 */
+.table tbody tr:hover {
+    background: var(--color-bg-input);
+}
+
 .table tbody tr:last-child .td {
     border-bottom: none;
 }
 
+.typeBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
 .tdTitle {
+    color: var(--color-text-main);
+    font-weight: 900;
     text-align: left;
-    font-weight: 700;
     cursor: pointer;
-    transition: color 0.2s;
 }
 
 .tdTitle:hover {
     color: var(--color-primary);
 }
 
-/* 💡 동적 상태 배지(Badge) 스타일 (글로벌 변수 적용) */
 .statusBadge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: var(--radius-xl);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 900;
+    white-space: nowrap;
 }
 
-/* 답변완료 (초록색) */
 .statusCompleted {
-    background: var(--color-success-bg);
-    color: var(--color-success);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
 }
 
-/* 답변대기 (노란색) */
 .statusPending {
-    background: var(--color-warning-bg);
-    color: var(--color-warning);
+    background: #fff7ed;
+    color: #c2410c;
 }
 
-/* 빈 상태 */
 .emptyRow {
-    padding: 60px 20px;
-    text-align: center;
+    padding: 70px 20px;
     color: var(--color-text-muted);
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
 }
 
-/* 하단 영역 (페이지네이션 및 버튼) */
 .footer {
+    padding: 24px 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 24px;
+    gap: 16px;
+    border-top: 1px solid var(--color-border);
 }
 
 .pagination {
+    min-width: 110px;
+    height: 44px;
     background: var(--color-bg-card);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 700;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
     color: var(--color-text-sub);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 15px;
+    font-weight: 900;
 }
 
 .pagination:hover {
-    background: var(--color-bg-input);
+    background: var(--color-primary-light);
     border-color: var(--color-primary);
     color: var(--color-primary);
 }
 
 .writeBtn {
+    min-width: 130px;
+    height: 46px;
+    padding: 0 20px;
     background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    color: #ffffff;
+    border: 0;
+    border-radius: var(--radius-lg);
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.18);
 }
 
 .writeBtn:hover {
@@ -201,26 +292,52 @@
     transform: translateY(-1px);
 }
 
-/* 모바일 반응형 처리 */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
     .summaryCard {
+        grid-template-columns: 1fr;
+    }
+
+    .listHeader {
+        align-items: flex-start;
         flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection {
+        padding: 30px 22px;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .heroButtons {
+        flex-direction: column;
+    }
+
+    .heroButtons button {
+        width: 100%;
     }
 
     .statItem {
-        border-right: none;
-        border-bottom: 1px solid var(--color-border-light);
+        padding: 22px;
     }
 
-    .statItem:last-child {
-        border-bottom: none;
+    .listHeader {
+        padding: 26px 22px;
     }
 
     .footer {
+        padding: 22px;
         flex-direction: column;
-        gap: 16px;
     }
 
+    .pagination,
     .writeBtn {
         width: 100%;
     }

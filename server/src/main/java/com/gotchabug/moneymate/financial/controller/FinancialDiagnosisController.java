@@ -1,57 +1,41 @@
 package com.gotchabug.moneymate.financial.controller;
 
+import com.gotchabug.moneymate.auth.SessionMemberResolver;
 import com.gotchabug.moneymate.financial.dto.FinancialDiagnosisResponse;
-import com.gotchabug.moneymate.member.entity.Member;
 import com.gotchabug.moneymate.investment.repository.WatchlistRepository;
+import com.gotchabug.moneymate.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(
-        name = "재무진단",
+        name = "Financial Diagnosis",
         description = "회원 재무진단 결과 조회 API"
 )
-@Controller
+@RestController
+@RequestMapping("/api/financial-diagnosis")
 @RequiredArgsConstructor
 public class FinancialDiagnosisController {
 
     private final WatchlistRepository.FinancialDiagnosisService financialDiagnosisService;
+    private final SessionMemberResolver sessionMemberResolver;
 
     @Operation(
-            summary = "재무진단 결과 조회",
-            description = "로그인한 회원의 재무 정보를 기반으로 재무 건강 점수, 등급, 소비율, 저축률 등의 진단 결과를 조회합니다."
+            summary = "내 재무진단 결과 조회",
+            description = "세션 로그인 사용자의 재무 프로필을 기반으로 재무진단 점수, 등급, 위험도, 피드백을 조회합니다."
     )
-    @GetMapping("/diagnosis")
-    public String diagnosis(
-
+    @GetMapping("/me")
+    public FinancialDiagnosisResponse getMyFinancialDiagnosis(
             @Parameter(hidden = true)
-            HttpSession session,
-
-            @Parameter(hidden = true)
-            Model model
+            HttpSession session
     ) {
+        Member loginUser = sessionMemberResolver.resolve(session);
 
-        Object loginUserObj =
-                session.getAttribute("loginUser");
-
-        if (!(loginUserObj instanceof Member loginUser)) {
-            return "redirect:/login";
-        }
-
-        FinancialDiagnosisResponse result =
-                financialDiagnosisService
-                        .diagnose(loginUser.getMemberId());
-
-        model.addAttribute(
-                "result",
-                result
-        );
-
-        return "diagnosis/result";
+        return financialDiagnosisService.diagnose(loginUser.getMemberId());
     }
 }

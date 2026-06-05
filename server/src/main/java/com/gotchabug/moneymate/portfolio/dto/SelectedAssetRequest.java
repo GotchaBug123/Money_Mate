@@ -3,7 +3,6 @@ package com.gotchabug.moneymate.portfolio.dto;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
@@ -21,43 +20,73 @@ public class SelectedAssetRequest {
     @NotBlank(message = "시장 정보는 필수입니다.")
     private String market;
 
-    @NotNull(message = "목표 비중은 필수입니다.")
     @DecimalMin(
             value = "0.0",
             inclusive = false,
             message = "목표 비중은 0보다 커야 합니다."
     )
     @DecimalMax(
-            value = "1.0",
-            inclusive = true,
-            message = "목표 비중은 100%(1.0) 이하여야 합니다."
+            value = "100.0",
+            message = "목표 비중은 100% 이하여야 합니다."
     )
     private Double targetWeight;
 
-    @NotNull(message = "예상 연 수익률은 필수입니다.")
     @DecimalMin(
             value = "-1.0",
-            inclusive = true,
-            message = "예상 연 수익률은 -100%(-1.0) 이상이어야 합니다."
+            message = "예상 연 수익률은 -100% 이상이어야 합니다."
     )
     private Double expectedAnnualReturn;
 
-    @NotNull(message = "연 변동성은 필수입니다.")
     @DecimalMin(
             value = "0.0",
-            inclusive = true,
             message = "연 변동성은 0 이상이어야 합니다."
     )
     private Double annualVolatility;
 
     private String theme;
 
+    public Double getTargetWeight() {
+        if (targetWeight == null) {
+            return null;
+        }
+
+        if (targetWeight > 1.0) {
+            return targetWeight / 100.0;
+        }
+
+        return targetWeight;
+    }
+
+    public Double getExpectedAnnualReturn() {
+        if (expectedAnnualReturn != null) {
+            return expectedAnnualReturn;
+        }
+
+        if ("ETF".equalsIgnoreCase(assetType)) {
+            return 0.06;
+        }
+
+        return 0.08;
+    }
+
+    public Double getAnnualVolatility() {
+        if (annualVolatility != null) {
+            return annualVolatility;
+        }
+
+        if ("ETF".equalsIgnoreCase(assetType)) {
+            return 0.15;
+        }
+
+        return 0.22;
+    }
+
     public double monthlyExpectedReturn() {
-        return expectedAnnualReturn / 12.0;
+        return getExpectedAnnualReturn() / 12.0;
     }
 
     public double monthlyVolatility() {
-        return annualVolatility / Math.sqrt(12.0);
+        return getAnnualVolatility() / Math.sqrt(12.0);
     }
 
     public long allocateFrom(long totalAmount) {
@@ -65,11 +94,11 @@ public class SelectedAssetRequest {
     }
 
     public double allocationFrom(double totalAmount) {
-        return totalAmount * (targetWeight != null ? targetWeight : 0.0);
+        return totalAmount * getTargetWeight();
     }
 
     public double targetWeightPercent() {
-        return (targetWeight != null ? targetWeight : 0.0) * 100.0;
+        return getTargetWeight() * 100.0;
     }
 
     public String displayName() {
