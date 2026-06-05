@@ -100,7 +100,6 @@ function AssetDetail() {
                 <section className={styles.chartCard}>
                     <div className={styles.chartHeader}>
                         <div>
-                            <span className={styles.chartBadge}>Monthly Return</span>
                             <h3>월별 수익률 흐름</h3>
                         </div>
                         <strong>{selectedMonthKey}</strong>
@@ -150,7 +149,6 @@ function AssetDetail() {
                         <div className={styles.listBox}>
                             <div className={styles.listHeader}>
                                 <div>
-                                    <span>Holding</span>
                                     <h3 className={styles.listTitle}>투자 종목</h3>
                                 </div>
                                 <strong>{mockData.investedStocks.length}개</strong>
@@ -187,7 +185,6 @@ function AssetDetail() {
                         <div className={styles.listBox}>
                             <div className={styles.listHeader}>
                                 <div>
-                                    <span>Watchlist</span>
                                     <h3 className={styles.listTitle}>관심 종목</h3>
                                 </div>
                                 <strong>{mockData.watchList.length}개</strong>

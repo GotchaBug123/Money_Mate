@@ -384,7 +384,6 @@ function UserCommunityPage({
                             <article className={styles.rankPanel}>
                                 <div className={styles.sectionTitleRow}>
                                     <div>
-                                        <span>Popular Posts</span>
                                         <h2>인기 글</h2>
                                     </div>
                                     <small>좋아요 + 댓글 기준</small>
@@ -408,7 +407,6 @@ function UserCommunityPage({
                             <article className={styles.rankPanel}>
                                 <div className={styles.sectionTitleRow}>
                                     <div>
-                                        <span>Hot Themes</span>
                                         <h2>인기 커뮤니티</h2>
                                     </div>
                                     <small>활동 많은 테마</small>
@@ -435,7 +433,6 @@ function UserCommunityPage({
                                     <article className={styles.themeCard} key={theme}>
                                         <div className={styles.themeCardHeader}>
                                             <div>
-                                                <span>Theme</span>
                                                 <h3>{theme}</h3>
                                             </div>
                                             <button type="button"
@@ -478,7 +475,6 @@ function UserCommunityPage({
                         <section className={styles.boardMain}>
                             <div className={styles.boardTop}>
                                 <div>
-                                    <span>Community Board</span>
                                     <h2 className={styles.boardTitle}>{selectedTheme} 게시글</h2>
                                 </div>
                                 <div className={styles.quickActions}>

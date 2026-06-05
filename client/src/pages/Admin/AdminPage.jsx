@@ -83,7 +83,6 @@ function AdminPage({
                 <main className={styles.mainContainer}>
                     <section className={styles.heroSection}>
                         <div>
-                            <span className={styles.eyebrow}>Administrator Dashboard</span>
                             <h1 className={styles.heroTitle}>머니메이트 관리자 센터</h1>
                             <p className={styles.heroDesc}>
                                 회원, 투자, 커뮤니티, 고객 문의 등 서비스 전체 현황을 한눈에 파악하고 관리하세요.

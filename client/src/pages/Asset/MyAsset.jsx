@@ -55,7 +55,6 @@ function MyAsset() {
 
                 <section className={styles.heroSection}>
                     <div>
-                        <span className={styles.pageBadge}>My Asset</span>
                         <h2 className={styles.pageTitle}>마이 자산 화면</h2>
                         <p className={styles.pageDesc}>재무 평가 점수와 투자 가능 금액을 한눈에 확인합니다.</p>
                     </div>
@@ -69,7 +68,6 @@ function MyAsset() {
                 <section className={styles.chartCard}>
                     <div className={styles.chartHeader}>
                         <div>
-                            <span>Asset Flow</span>
                             <h3>자산 흐름 그래프</h3>
                         </div>
                         <strong>최근 6개월</strong>
