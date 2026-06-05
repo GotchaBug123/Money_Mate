@@ -1,5 +1,7 @@
 package com.gotchabug.moneymate.auth.service;
 
+import com.gotchabug.moneymate.auth.dto.FindIdRequest;
+import com.gotchabug.moneymate.auth.dto.FindPasswordRequest;
 import com.gotchabug.moneymate.auth.dto.LoginRequest;
 import com.gotchabug.moneymate.auth.dto.SignupRequest;
 import com.gotchabug.moneymate.financial.entity.FinancialProfile;
@@ -80,6 +82,41 @@ public class AuthService {
         auth.loginSuccess();
 
         return member;
+    }
+
+    @Transactional(readOnly = true)
+    public String findId(FindIdRequest request) {
+
+        Member member = memberRepository.findByNameAndEmail(
+                        request.getName(),
+                        request.getEmail()
+                )
+                .orElseThrow(() -> new IllegalArgumentException("일치하는 회원 정보가 없습니다."));
+
+        return member.getLoginId();
+    }
+
+    @Transactional
+    public void resetPassword(FindPasswordRequest request) {
+
+        if (!request.getNewPassword().equals(request.getNewPasswordConfirm())) {
+            throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+
+        Member member = memberRepository.findByLoginIdAndEmail(
+                        request.getLoginId(),
+                        request.getEmail()
+                )
+                .orElseThrow(() -> new IllegalArgumentException("일치하는 회원 정보가 없습니다."));
+
+        MemberAuth auth = memberAuthRepository.findByMember(member)
+                .orElseThrow(() -> new IllegalArgumentException("인증 정보가 없습니다."));
+
+        if (passwordMatches(request.getNewPassword(), auth.getPasswordHash())) {
+            throw new IllegalArgumentException("기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.");
+        }
+
+        auth.setPasswordHash(hashPassword(request.getNewPassword()));
     }
 
     private String hashPassword(String rawPassword) {

@@ -19,4 +19,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     long countByRole(String role);
 
     List<Member> findAllByOrderByCreatedAtDesc();
+    // 아이디 찾기
+    Optional<Member> findByNameAndEmail(String name, String email);
+
+    // 비밀번호 재설정
+    Optional<Member> findByLoginIdAndEmail(String loginId, String email);
 }

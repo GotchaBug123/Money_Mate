@@ -18,7 +18,10 @@ public class FindPasswordRequest {
     private String email;
 
     @NotBlank(message = "새 비밀번호를 입력해주세요.")
-    @Size(min = 4, max = 100,
-            message = "비밀번호는 4자 이상 입력해주세요.")
+    @Size(min = 4, max = 100, message = "비밀번호는 4자 이상 입력해주세요.")
     private String newPassword;
+
+    @NotBlank(message = "새 비밀번호 확인을 입력해주세요.")
+    @Size(min = 4, max = 100, message = "비밀번호 확인은 4자 이상 입력해주세요.")
+    private String newPasswordConfirm;
 }

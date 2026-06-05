@@ -4,6 +4,8 @@ import com.gotchabug.moneymate.auth.dto.LoginRequest;
 import com.gotchabug.moneymate.auth.dto.SignupRequest;
 import com.gotchabug.moneymate.auth.service.AuthService;
 import com.gotchabug.moneymate.member.entity.Member;
+import com.gotchabug.moneymate.auth.dto.FindIdRequest;
+import com.gotchabug.moneymate.auth.dto.FindPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
@@ -128,6 +130,43 @@ public class AuthController {
                     member.getName(),
                     member.getRole()
             );
+        }
+    }
+    @Operation(summary = "아이디 찾기", description = "이름과 이메일을 통해 회원 아이디를 조회합니다.")
+    @PostMapping("/find-id")
+    public ResponseEntity<ApiResponse<String>> findId(
+            @Valid @RequestBody FindIdRequest request
+    ) {
+        try {
+            String loginId = authService.findId(request);
+
+            return ResponseEntity.ok(
+                    ApiResponse.success("아이디 조회 성공", loginId)
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "비밀번호 재설정", description = "아이디와 이메일을 확인한 뒤 새 비밀번호로 재설정합니다.")
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody FindPasswordRequest request
+    ) {
+        try {
+            authService.resetPassword(request);
+
+            return ResponseEntity.ok(
+                    ApiResponse.success("비밀번호가 변경되었습니다.", null)
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.fail(e.getMessage()));
         }
     }
 }
