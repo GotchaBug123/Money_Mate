@@ -27,7 +27,6 @@ public class GoalStrategyRequest {
     @Min(value = 1000000, message = "목표 금액은 최소 100만원 이상이어야 합니다.")
     private Long targetAmount;
 
-    @NotNull(message = "투자 기간은 필수입니다.")
     @Min(value = 1, message = "투자 기간은 최소 1년 이상이어야 합니다.")
     private Integer investmentYears;
 
@@ -61,6 +60,14 @@ public class GoalStrategyRequest {
         return investmentYears == null ? 0 : investmentYears;
     }
 
+    public int storageInvestmentYears() {
+        if (investmentYears != null) {
+            return investmentYears;
+        }
+
+        return Math.max(1, totalInvestmentMonths() / 12);
+    }
+
     public String safeGoalName() {
         if (goalName == null || goalName.trim().isEmpty()) {
             return "포트폴리오 리밸런싱 분석";
@@ -92,5 +99,10 @@ public class GoalStrategyRequest {
                 .sum();
 
         return Math.abs(totalWeight - 1.0) < 0.0001;
+    }
+
+    @AssertTrue(message = "투자 기간은 연 단위 또는 월 단위 중 하나는 필수입니다.")
+    public boolean isValidInvestmentPeriod() {
+        return investmentYears != null || investmentMonths != null;
     }
 }

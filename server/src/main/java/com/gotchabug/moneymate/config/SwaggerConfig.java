@@ -22,7 +22,7 @@ public class SwaggerConfig {
     public GroupedOpenApi moneyMateApiGroup() {
         return GroupedOpenApi.builder()
                 .group("MoneyMate")
-                .pathsToMatch("/**")
+                .pathsToMatch("/api/**")
                 .build();
     }
 }

@@ -26,7 +26,7 @@ spring:
 
 
 springdoc:
-  paths-to-match: /**
+  paths-to-match: /api/**
   api-docs:
     enabled: true
     path: /v3/api-docs

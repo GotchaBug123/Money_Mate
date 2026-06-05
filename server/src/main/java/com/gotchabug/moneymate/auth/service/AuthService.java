@@ -12,16 +12,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    private static final String PASSWORD_HASH_PREFIX = "sha256:";
 
     private final MemberRepository memberRepository;
     private final MemberAuthRepository memberAuthRepository;
     private final FinancialProfileRepository financialProfileRepository;
 
     @Transactional
-    public void signup(SignupRequest request) {
+    public Member signup(SignupRequest request) {
 
         if (memberRepository.existsByLoginId(request.getLoginId())) {
             throw new IllegalArgumentException("이미 사용중인 아이디");
@@ -42,7 +49,7 @@ public class AuthService {
 
         MemberAuth auth = MemberAuth.builder()
                 .member(member)
-                .passwordHash(request.getPassword())
+                .passwordHash(hashPassword(request.getPassword()))
                 .build();
 
         memberAuthRepository.save(auth);
@@ -52,6 +59,8 @@ public class AuthService {
                 .build();
 
         financialProfileRepository.save(profile);
+
+        return member;
     }
 
     @Transactional
@@ -63,15 +72,35 @@ public class AuthService {
         MemberAuth auth = memberAuthRepository.findByMember_MemberId(member.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("인증 정보가 없습니다."));
 
-        if (!auth.getPasswordHash().equals(request.getPassword())) {
+        if (!passwordMatches(request.getPassword(), auth.getPasswordHash())) {
             auth.loginFail();
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         auth.loginSuccess();
 
-        System.out.println("로그인 성공: " + member.getLoginId());
-
         return member;
+    }
+
+    private String hashPassword(String rawPassword) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashed = digest.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
+            return PASSWORD_HASH_PREFIX + HexFormat.of().formatHex(hashed);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("비밀번호 암호화 알고리즘을 사용할 수 없습니다.", e);
+        }
+    }
+
+    private boolean passwordMatches(String rawPassword, String storedPassword) {
+        if (storedPassword == null) {
+            return false;
+        }
+
+        if (storedPassword.startsWith(PASSWORD_HASH_PREFIX)) {
+            return hashPassword(rawPassword).equals(storedPassword);
+        }
+
+        return storedPassword.equals(rawPassword);
     }
 }
