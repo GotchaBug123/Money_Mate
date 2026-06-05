@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styles from './Header.module.css';
 import moneymateLogo from '../../assets/moneymate_logo.png';
 
@@ -29,12 +29,12 @@ function Header({
     };
 
     const defaultMenuItems = [
-        {label: 'MY자산', to: '/asset'},
-        {label: '포트폴리오', to: '/portfolio'},
-        {label: '리밸런싱', to: '/rebalancing'},
-        {label: '투자정보', to: '/investment-information'},
-        {label: '커뮤니티', to: '/community'},
-        {label: '고객센터', to: '/customer-service'},
+        { label: 'MY자산', to: '/asset' },
+        { label: '포트폴리오', to: '/portfolio' },
+        { label: '리밸런싱', to: '/rebalancing' },
+        { label: '투자정보', to: '/investment-information' },
+        { label: '커뮤니티', to: '/community' },
+        { label: '고객센터', to: '/customer-service' },
     ];
 
     const finalMenuItems = menuItems || defaultMenuItems;
@@ -65,15 +65,12 @@ function Header({
         if (isLoggedIn) {
             return (
                 <>
-                    <span style={{
-                        color: 'var(--color-text-main)',
-                        fontSize: '15px',
-                        fontWeight: 900,
-                        whiteSpace: 'nowrap',
-                        marginRight: '4px'
-                    }}>
-                        {userName}님! 안녕하세요!
-                    </span>
+                    <div style={userNameStyle}>
+                        <span style={{ fontSize: '20px', lineHeight: 1 }}>🙂</span>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-main)', whiteSpace: 'nowrap' }}>
+                            {userName}님
+                        </span>
+                    </div>
 
                     <Link to="/mypage" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         내 정보
@@ -101,7 +98,6 @@ function Header({
     return (
         <header className={styles.headerWrapper}>
             <div className={styles.container}>
-
                 <div className={styles.leftSection}>
                     <Link to={logoTo} onClick={logoOnClick} className={styles.logoLink}>
                         <img
@@ -109,6 +105,7 @@ function Header({
                             alt="MoneyMate 로고"
                             className={styles.logoImg}
                         />
+                        <span style={logoTextStyle}>MoneyMate</span>
                     </Link>
 
                     <nav className={styles.nav}>
@@ -120,7 +117,6 @@ function Header({
                                     </Link>
                                 );
                             }
-
                             return (
                                 <button
                                     key={item.label}
@@ -138,10 +134,37 @@ function Header({
                 <div className={styles.rightSection}>
                     {renderRightButtons()}
                 </div>
-
             </div>
         </header>
     );
 }
+
+const logoTextStyle = {
+    fontSize: '16px',
+    fontWeight: 700,
+    color: 'var(--color-primary, #2563EB)',
+    letterSpacing: '-0.3px',
+    marginLeft: '6px',
+};
+
+const userNameStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 7,
+};
+
+const avatarStyle = {
+    width: 28,
+    height: 28,
+    borderRadius: '50%',
+    background: 'var(--color-primary, #2563EB)',
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 700,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+};
 
 export default Header;

@@ -2,11 +2,15 @@ package com.gotchabug.moneymate.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -39,6 +43,50 @@ public class GlobalExceptionHandler {
                         "status", e.getStatusCode().value(),
                         "error", e.getReason() != null ? e.getReason() : "Error",
                         "message", e.getMessage(),
+                        "timestamp", LocalDateTime.now().toString()
+                ));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException e) {
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        e.getBindingResult()
+                .getFieldErrors()
+                .forEach(error -> fieldErrors.put(
+                        error.getField(),
+                        error.getDefaultMessage()
+                ));
+
+        e.getBindingResult()
+                .getGlobalErrors()
+                .forEach(error -> fieldErrors.put(
+                        error.getObjectName(),
+                        error.getDefaultMessage()
+                ));
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "status", 400,
+                        "error", "Validation Failed",
+                        "message", "요청 값이 올바르지 않습니다.",
+                        "errors", fieldErrors,
+                        "timestamp", LocalDateTime.now().toString()
+                ));
+    }
+
+    @ExceptionHandler({
+            NoHandlerFoundException.class,
+            NoResourceFoundException.class
+    })
+    public ResponseEntity<Map<String, Object>> handleNotFound(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of(
+                        "status", 404,
+                        "error", "Not Found",
+                        "message", "요청한 경로를 찾을 수 없습니다.",
                         "timestamp", LocalDateTime.now().toString()
                 ));
     }

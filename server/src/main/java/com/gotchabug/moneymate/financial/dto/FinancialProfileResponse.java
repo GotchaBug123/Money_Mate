@@ -23,6 +23,10 @@ public class FinancialProfileResponse {
     private BigDecimal cashAsset;
 
     private BigDecimal investableAmount;
+    private BigDecimal netAsset;
+    private BigDecimal totalExpense;
+    private BigDecimal expenseRatio;
+    private BigDecimal savingRatio;
 
     private String diagnosisGrade;
 
@@ -30,6 +34,10 @@ public class FinancialProfileResponse {
     private LocalDateTime updatedAt;
 
     public static FinancialProfileResponse from(FinancialProfile profile) {
+        if (profile == null) {
+            return null;
+        }
+
         return FinancialProfileResponse.builder()
                 .profileId(profile.getProfileId())
                 .memberId(profile.getMember().getMemberId())
@@ -40,6 +48,10 @@ public class FinancialProfileResponse {
                 .totalLiability(profile.getTotalLiability())
                 .cashAsset(profile.getCashAsset())
                 .investableAmount(profile.getInvestableAmount())
+                .netAsset(profile.getNetAsset())
+                .totalExpense(profile.getTotalExpense())
+                .expenseRatio(profile.getExpenseRatio())
+                .savingRatio(profile.getSavingRatio())
                 .diagnosisGrade(profile.getDiagnosisGrade())
                 .createdAt(profile.getCreatedAt())
                 .updatedAt(profile.getUpdatedAt())

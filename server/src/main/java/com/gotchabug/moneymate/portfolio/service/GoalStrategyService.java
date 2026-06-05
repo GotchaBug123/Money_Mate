@@ -579,7 +579,7 @@ public class GoalStrategyService {
                 .currentAmount(request.safeCurrentAmount())
                 .monthlyInvestment(request.safeMonthlyInvestment())
                 .targetAmount(request.getTargetAmount())
-                .investmentYears(request.getInvestmentYears())
+                .investmentYears(request.storageInvestmentYears())
                 .rebalanceCycle(request.getRebalanceCycle())
                 .selectedAssetSummary(assetSummary)
                 .successProbability(summary.successProbability())
