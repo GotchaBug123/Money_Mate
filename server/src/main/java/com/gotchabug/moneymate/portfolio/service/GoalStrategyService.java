@@ -33,7 +33,6 @@ public class GoalStrategyService {
             Long memberId,
             GoalStrategyRequest request
     ) {
-
         Member member = findMember(memberId);
         long simulationSeed = createSimulationSeed(request);
 
@@ -101,7 +100,6 @@ public class GoalStrategyService {
             RebalanceCycle rebalanceCycle,
             long simulationSeed
     ) {
-
         Random random = new Random(simulationSeed);
         long[] finalAmounts = new long[SIMULATION_COUNT];
         long[][] monthlyAmounts = new long[SIMULATION_COUNT][totalMonths + 1];
@@ -144,7 +142,6 @@ public class GoalStrategyService {
             RebalanceCycle rebalanceCycle,
             Random random
     ) {
-
         double[] assetAmounts = initializeAssetAmounts(request);
         RebalanceCycle activeCycle = rebalanceCycle == null
                 ? RebalanceCycle.NONE
@@ -210,7 +207,6 @@ public class GoalStrategyService {
     private double[] initializeAssetAmounts(
             GoalStrategyRequest request
     ) {
-
         List<SelectedAssetRequest> assets = request.getSelectedAssets();
         double[] assetAmounts = new double[assets.size()];
 
@@ -228,7 +224,6 @@ public class GoalStrategyService {
             long monthlyInvestment,
             Random random
     ) {
-
         double totalBeforeGrowth = Arrays.stream(assetAmounts).sum();
         double portfolioGrowthFactor = totalBeforeGrowth > 0
                 ? 0.0
@@ -260,7 +255,6 @@ public class GoalStrategyService {
             double[] assetAmounts,
             List<SelectedAssetRequest> assets
     ) {
-
         double totalAmount = Arrays.stream(assetAmounts).sum();
 
         for (int i = 0; i < assets.size(); i++) {
@@ -290,7 +284,6 @@ public class GoalStrategyService {
             double[] bestAnnualReturns,
             double[] worstAnnualReturns
     ) {
-
         int successCount = 0;
 
         for (long amount : finalAmounts) {
@@ -335,7 +328,6 @@ public class GoalStrategyService {
             GoalStrategyRequest request,
             long finalAmount
     ) {
-
         long totalContribution = request.estimatedTotalContribution();
 
         if (totalContribution <= 0) {
@@ -362,7 +354,6 @@ public class GoalStrategyService {
     private Double summarizeMetricAsPercent(
             double[] values
     ) {
-
         if (values == null || values.length == 0) {
             return null;
         }
@@ -377,7 +368,6 @@ public class GoalStrategyService {
             long[][] monthlyAmounts,
             long targetAmount
     ) {
-
         if (monthlyAmounts == null || monthlyAmounts.length == 0) {
             return List.of();
         }
@@ -431,7 +421,6 @@ public class GoalStrategyService {
             long[] sortedAmounts,
             double percentile
     ) {
-
         int index = (int) Math.round(
                 (sortedAmounts.length - 1) * percentile
         );
@@ -447,7 +436,6 @@ public class GoalStrategyService {
             double[] sortedValues,
             double percentile
     ) {
-
         int index = (int) Math.round(
                 (sortedValues.length - 1) * percentile
         );
@@ -463,7 +451,6 @@ public class GoalStrategyService {
             long[] sortedAmounts,
             double percentile
     ) {
-
         int count = Math.max(
                 1,
                 (int) Math.ceil(sortedAmounts.length * percentile)
@@ -481,7 +468,6 @@ public class GoalStrategyService {
     private String createAssetSummary(
             List<SelectedAssetRequest> assets
     ) {
-
         return assets.stream()
                 .map(asset -> String.format(
                         Locale.US,
@@ -496,7 +482,6 @@ public class GoalStrategyService {
     private List<GoalStrategyResponse.AssetSummary> createAssetSummaries(
             List<SelectedAssetRequest> assets
     ) {
-
         return assets.stream()
                 .map(asset -> GoalStrategyResponse.AssetSummary.builder()
                         .symbol(asset.getSymbol())
@@ -513,7 +498,6 @@ public class GoalStrategyService {
             GoalStrategyRequest request,
             SimulationSummary summary
     ) {
-
         long targetAmount = request.getTargetAmount();
 
         if (summary.pessimisticAmount() >= targetAmount) {
@@ -551,7 +535,6 @@ public class GoalStrategyService {
             GoalStrategyRequest request,
             SimulationSummary summary
     ) {
-
         if (summary.pessimisticAmount() >= request.getTargetAmount()) {
             return request.safeMonthlyInvestment();
         }
@@ -572,6 +555,11 @@ public class GoalStrategyService {
             SimulationSummary summary,
             String assetSummary
     ) {
+        // 💡 [수정 / 지침 3번 반영] 프론트(리액트)에서 investmentYears 대신 개월 수만 보내는 변칙 상황 방어
+        Integer years = request.getInvestmentYears();
+        if (years == null || years == 0) {
+            years = (int) Math.ceil((double) request.totalInvestmentMonths() / 12.0);
+        }
 
         GoalStrategyResult result = GoalStrategyResult.builder()
                 .member(member)
@@ -579,8 +567,8 @@ public class GoalStrategyService {
                 .currentAmount(request.safeCurrentAmount())
                 .monthlyInvestment(request.safeMonthlyInvestment())
                 .targetAmount(request.getTargetAmount())
-                .investmentYears(request.getInvestmentYears())
-                .rebalanceCycle(request.getRebalanceCycle())
+                .investmentYears(years) // 💡 Null 안 나게 가공된 변수 할당
+                .rebalanceCycle(request.getRebalanceCycle() != null ? request.getRebalanceCycle() : RebalanceCycle.NONE)
                 .selectedAssetSummary(assetSummary)
                 .successProbability(summary.successProbability())
                 .averageFinalAmount(summary.averageFinalAmount())
@@ -598,20 +586,22 @@ public class GoalStrategyService {
     private long createSimulationSeed(
             GoalStrategyRequest request
     ) {
-
         long seed = 1469598103934665603L;
         seed = mix(seed, request.safeCurrentAmount());
         seed = mix(seed, request.safeMonthlyInvestment());
         seed = mix(seed, request.getTargetAmount());
         seed = mix(seed, request.totalInvestmentMonths());
-        seed = mix(seed, safeHash(request.getRebalanceCycle().name()));
+
+        // 💡 [수정 / Null 방어] 리밸런싱 주기가 누락되어 넘어올 때 시드 연산 과정에서 NPE 발생하는 현상 차단
+        String cycleName = request.getRebalanceCycle() != null ? request.getRebalanceCycle().name() : "NONE";
+        seed = mix(seed, safeHash(cycleName));
 
         for (SelectedAssetRequest asset : request.getSelectedAssets()) {
             seed = mix(seed, safeHash(asset.getSymbol()));
             seed = mix(seed, safeHash(asset.getAssetName()));
-            seed = mix(seed, Double.doubleToLongBits(asset.getTargetWeight()));
-            seed = mix(seed, Double.doubleToLongBits(asset.getExpectedAnnualReturn()));
-            seed = mix(seed, Double.doubleToLongBits(asset.getAnnualVolatility()));
+            seed = mix(seed, Double.doubleToLongBits(asset.getTargetWeight() != null ? asset.getTargetWeight() : 0.0));
+            seed = mix(seed, Double.doubleToLongBits(asset.getExpectedAnnualReturn() != null ? asset.getExpectedAnnualReturn() : 0.0));
+            seed = mix(seed, Double.doubleToLongBits(asset.getAnnualVolatility() != null ? asset.getAnnualVolatility() : 0.0));
         }
 
         return seed;

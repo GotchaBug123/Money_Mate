@@ -12,6 +12,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
 public class Member {
+    // @Setter는 클래스 상단에서 제거하고, 아래 메서드를 엔티티 내부에 추가하세요.[cite: 6]
+    public void updateMyInfo(String name, String email, LocalDate birthDate) {
+        this.name = name;
+        this.email = email;
+        this.birthDate = birthDate;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

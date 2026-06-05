@@ -29,20 +29,23 @@ public class SelectedAssetRequest {
     )
     @DecimalMax(
             value = "1.0",
-            message = "목표 비중은 100% 이하여야 합니다."
+            inclusive = true,
+            message = "목표 비중은 100%(1.0) 이하여야 합니다."
     )
     private Double targetWeight;
 
     @NotNull(message = "예상 연 수익률은 필수입니다.")
     @DecimalMin(
             value = "-1.0",
-            message = "예상 연 수익률은 -100% 이상이어야 합니다."
+            inclusive = true,
+            message = "예상 연 수익률은 -100%(-1.0) 이상이어야 합니다."
     )
     private Double expectedAnnualReturn;
 
     @NotNull(message = "연 변동성은 필수입니다.")
     @DecimalMin(
             value = "0.0",
+            inclusive = true,
             message = "연 변동성은 0 이상이어야 합니다."
     )
     private Double annualVolatility;
@@ -62,11 +65,11 @@ public class SelectedAssetRequest {
     }
 
     public double allocationFrom(double totalAmount) {
-        return totalAmount * targetWeight;
+        return totalAmount * (targetWeight != null ? targetWeight : 0.0);
     }
 
     public double targetWeightPercent() {
-        return targetWeight * 100.0;
+        return (targetWeight != null ? targetWeight : 0.0) * 100.0;
     }
 
     public String displayName() {
