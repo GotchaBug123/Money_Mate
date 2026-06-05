@@ -30,7 +30,6 @@ function InquiryList() {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
                 <section className={styles.heroSection}>
-                    <span className={styles.pageBadge}>My Inquiry</span>
                     <h1 className={styles.title}>나의 문의 내역</h1>
                     <p className={styles.subtitle}>
                         내가 남긴 문의와 답변 상태를 한눈에 확인할 수 있습니다.
@@ -75,7 +74,6 @@ function InquiryList() {
                 <section className={styles.listCard}>
                     <div className={styles.listHeader}>
                         <div>
-                            <span className={styles.sectionBadge}>Inquiry List</span>
                             <h2 className={styles.listTitle}>문의 목록</h2>
                         </div>
 

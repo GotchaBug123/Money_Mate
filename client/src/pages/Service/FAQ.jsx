@@ -26,7 +26,7 @@ const MOCK_FAQS = [
         id: 4,
         category: '회원/계정',
         question: '회원 탈퇴는 어디서 할 수 있나요?',
-        answer: '로그인 후 [마이페이지] 하단에 위치한 "회원 탈퇴" 버튼을 클릭하시면 진행하실 수 있습니다.\n단, 회원 탈퇴 시 기존에 진단받으셨던 재무/투자 성향 내역과 저장된 포트폴리오 정보는 모두 안전하게 파기되며 복구할 수 없으니 유의해 주시기 바랍니다.'
+        answer: '로그인 후 [고객센터]에서 [문의하기]로 진행하실 수 있습니다.\n단, 회원 탈퇴 시 기존에 진단받으셨던 재무/투자 성향 내역과 저장된 포트폴리오 정보는 모두 안전하게 파기되며 복구할 수 없으니 유의해 주시기 바랍니다.'
     },
     {
         id: 5,
@@ -57,7 +57,6 @@ function FAQ() {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
                 <section className={styles.heroSection}>
-                    <span className={styles.pageBadge}>FAQ</span>
                     <h1 className={styles.title}>자주하는 질문</h1>
                     <p className={styles.subtitle}>
                         MoneyMate 이용 중 자주 묻는 질문을 카테고리별로 확인하세요.

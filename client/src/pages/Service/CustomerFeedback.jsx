@@ -58,7 +58,6 @@ function CustomerFeedback() {
                 </button>
 
                 <section className={styles.heroSection}>
-                    <span className={styles.pageBadge}>Customer Voice</span>
                     <h1 className={styles.title}>고객의 소리</h1>
                     <p className={styles.subtitle}>
                         머니메이트를 이용하시면서 느꼈던 칭찬, 불편, 제안 등

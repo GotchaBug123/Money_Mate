@@ -54,7 +54,6 @@ function Notice() {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
                 <section className={styles.heroSection}>
-                    <span className={styles.pageBadge}>Notice</span>
                     <h1 className={styles.title}>공지사항</h1>
                     <p className={styles.subtitle}>
                         MoneyMate의 서비스 점검, 업데이트, 중요 안내를 확인하세요.
@@ -79,7 +78,6 @@ function Notice() {
                 <section className={styles.listCard}>
                     <div className={styles.listHeader}>
                         <div>
-                            <span className={styles.sectionBadge}>Notice List</span>
                             <h2>공지 목록</h2>
                         </div>
                         <p>제목을 누르면 자세한 내용을 확인할 수 있습니다.</p>

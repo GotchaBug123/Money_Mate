@@ -42,7 +42,6 @@ function StockGuide() {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
                 <section className={styles.heroSection}>
-                    <span className={styles.pageBadge}>Stock Guide</span>
                     <h1 className={styles.title}>초보자를 위한 주식 준비 5단계</h1>
                     <p className={styles.subtitle}>
                         어렵게만 느껴졌던 주식 투자, MoneyMate가 제안하는 안전한 5단계 가이드를 따라

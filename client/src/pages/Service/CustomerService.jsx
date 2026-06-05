@@ -102,7 +102,6 @@ function CustomerService() {
                     <article className={styles.previewCard}>
                         <div className={styles.sectionHeader}>
                             <div>
-                                <span className={styles.sectionBadge}>Notice</span>
                                 <h2>최근 공지사항</h2>
                             </div>
 
@@ -136,7 +135,6 @@ function CustomerService() {
                     <article className={styles.previewCard}>
                         <div className={styles.sectionHeader}>
                             <div>
-                                <span className={styles.sectionBadge}>FAQ</span>
                                 <h2>자주하는 질문</h2>
                             </div>
 
@@ -166,7 +164,6 @@ function CustomerService() {
 
                 <section className={styles.bottomGrid}>
                     <article className={styles.guideCard}>
-                        <span className={styles.sectionBadge}>Stock Guide</span>
                         <h2>투자 시작이 처음이라면</h2>
                         <p>
                             계좌 개설부터 투자 성향 진단, 포트폴리오 구성, 리밸런싱까지
@@ -182,7 +179,6 @@ function CustomerService() {
                     </article>
 
                     <article className={styles.feedbackCard}>
-                        <span className={styles.sectionBadge}>Customer Voice</span>
                         <h2>서비스 의견을 남겨주세요</h2>
                         <p>
                             MoneyMate를 이용하면서 좋았던 점, 불편했던 점, 추가되었으면 하는 기능을 알려주세요.

@@ -44,7 +44,6 @@ function InquiryWrite() {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
                 <section className={styles.heroSection}>
-                    <span className={styles.pageBadge}>Inquiry</span>
                     <h1 className={styles.title}>고객센터 문의하기</h1>
                     <p className={styles.subtitle}>
                         서비스 이용 중 궁금한 점이나 오류 내용을 자세히 남겨주시면 확인 후 답변드리겠습니다.
@@ -70,7 +69,6 @@ function InquiryWrite() {
                 <section className={styles.formCard}>
                     <div className={styles.formHeader}>
                         <div>
-                            <span className={styles.sectionBadge}>Write Inquiry</span>
                             <h2>문의 내용 작성</h2>
                         </div>
 
