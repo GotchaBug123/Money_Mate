@@ -1,9 +1,20 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {createInquiry} from '../../api/customerServiceApi';
+import {useAuthStore} from '../../store/useAuthStore';
+import {useInquiryStore} from '../../store/useInquiryStore';
 import styles from './InquiryWrite.module.css';
 
 function InquiryWrite() {
     const navigate = useNavigate();
+
+    const storeLoggedIn = useAuthStore((state) => state.isLoggedIn);
+    const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const isLoggedIn = storeLoggedIn || localLoggedIn;
+
+    const addInquiry = useInquiryStore((state) => state.addInquiry);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -13,10 +24,11 @@ function InquiryWrite() {
     });
 
     const inquiryTypes = [
-        {value: 'account', label: '계정/로그인 문의'},
-        {value: 'service', label: '서비스 이용 문의'},
-        {value: 'error', label: '오류 신고'},
-        {value: 'other', label: '기타'},
+        {value: '계정', label: '계정/로그인 문의'},
+        {value: '서비스', label: '서비스 이용 문의'},
+        {value: '투자', label: '투자 문의'},
+        {value: '오류', label: '오류 신고'},
+        {value: '기타', label: '기타'},
     ];
 
     const handleChange = (event) => {
@@ -28,16 +40,51 @@ function InquiryWrite() {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!formData.title.trim() || !formData.type || !formData.content.trim()) {
+        if (isSubmitting) {
+            return;
+        }
+
+        if (!isLoggedIn) {
+            alert('로그인 후 문의를 등록할 수 있습니다.');
+            navigate('/login');
+            return;
+        }
+
+        const title = formData.title.trim();
+        const content = formData.content.trim();
+
+        if (!title || !formData.type || !content) {
             alert('제목, 문의 유형, 내용을 모두 입력해 주세요.');
             return;
         }
 
-        alert('문의가 성공적으로 등록되었습니다.');
-        navigate('/customer-service');
+        try {
+            setIsSubmitting(true);
+
+            const inquiryData = {
+                category: formData.type,
+                title,
+                content
+            };
+
+            await createInquiry(inquiryData);
+
+            addInquiry(inquiryData);
+
+            alert('문의가 성공적으로 등록되었습니다.');
+            navigate('/inquiry-list');
+        } catch (error) {
+            console.error('문의 등록 실패:', error);
+            console.error('상태 코드:', error.response?.status);
+            console.error('응답 데이터:', error.response?.data);
+
+            alert('문의 등록에 실패했습니다.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -139,8 +186,12 @@ function InquiryWrite() {
                             <p>오류 신고의 경우 화면 캡처 파일을 함께 첨부하면 더 빠르게 확인할 수 있습니다.</p>
                         </div>
 
-                        <button type="submit" className={styles.submitBtn}>
-                            문의 등록하기
+                        <button
+                            type="submit"
+                            className={styles.submitBtn}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? '등록 중...' : '문의 등록하기'}
                         </button>
                     </form>
                 </section>

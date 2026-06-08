@@ -25,7 +25,6 @@ const MOCK_RESPONSE = () => ({
     ],
 });
 
-// 💡 하드코딩 헥스코드 대신 글로벌 CSS 변수 사용!
 const CATEGORY_COLOR = {'국내': 'var(--color-primary)', '해외': 'var(--color-error)', 'ETF': 'var(--color-success)'};
 const CATEGORY_BG = {
     '국내': 'var(--color-primary-light)',
@@ -80,7 +79,6 @@ const PortfolioAuto = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // 이전 진단 결과에서 넘어온 성향 정보
     const {typeName = '위험중립형', totalScore, selectedThemes, productScores} = location.state || {};
 
     const [currency, setCurrency] = useState('원화');
@@ -99,11 +97,7 @@ const PortfolioAuto = () => {
         }
         setLoading(true);
         try {
-            // ✅ 실제 API 연결 시 주석 해제 및 활용
-            // const res = await fetch('/api/portfolio/recommend', { method:'POST', ... });
-            // setStocks((await res.json()).stocks);
-
-            await new Promise(res => setTimeout(res, 1200)); // 인공 딜레이
+            await new Promise(res => setTimeout(res, 1200));
             setStocks(MOCK_RESPONSE().stocks);
         } catch {
             alert('포트폴리오 생성 중 오류가 발생했습니다.');
@@ -115,16 +109,20 @@ const PortfolioAuto = () => {
     const handleResult = () => {
         navigate('/portfolio/result', {
             state: {
-                stocks,
-                investAmount: amount,
+                stocks: stocks.map(st => ({
+                    ...st,
+                    annualVolatility: 0,
+                })),
+                investAmount: Number(amount),
                 currency,
                 startDate,
                 endDate,
-                goalAmount,
+                goalAmount: Number(goalAmount),
+                rebalanceCycle: 'QUARTERLY',
                 typeName,
                 totalScore,
                 selectedThemes,
-                productScores
+                productScores,
             },
         });
     };
@@ -133,7 +131,6 @@ const PortfolioAuto = () => {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
 
-                {/* ── 상단 헤더 ── */}
                 <div className={styles.pageHeader}>
                     <div className={styles.pageHeaderIcon}>✦</div>
                     <div>
@@ -145,20 +142,18 @@ const PortfolioAuto = () => {
                     </div>
                 </div>
 
-                {/* ── 2단 레이아웃 ── */}
                 <div className={styles.layout}>
 
-                    {/* 왼쪽: 설정 폼 */}
                     <div className={styles.formSection}>
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>투자 금액</label>
+                            <label className={styles.inputLabel}>투자 금액 (만원)</label>
                             <div className={styles.fieldRow}>
                                 <select className={styles.sel} value={currency}
                                         onChange={e => setCurrency(e.target.value)}>
                                     <option>원화</option>
                                     <option>달러</option>
                                 </select>
-                                <input className={styles.textInput} type="number" placeholder="금액 입력"
+                                <input className={styles.textInput} type="number" placeholder="예: 500 (만원 단위)"
                                        value={amount} onChange={e => setAmount(e.target.value)}/>
                             </div>
                         </div>
@@ -175,8 +170,8 @@ const PortfolioAuto = () => {
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>목표 금액</label>
-                            <input className={styles.textInput} type="number" placeholder="목표 금액 입력"
+                            <label className={styles.inputLabel}>목표 금액 (만원)</label>
+                            <input className={styles.textInput} type="number" placeholder="예: 800 (만원 단위)"
                                    value={goalAmount} onChange={e => setGoalAmount(e.target.value)}/>
                         </div>
 
@@ -191,10 +186,8 @@ const PortfolioAuto = () => {
                         )}
                     </div>
 
-                    {/* 오른쪽: 추천 결과 */}
                     <div className={styles.resultSection}>
 
-                        {/* 초기 상태 */}
                         {!loading && !stocks && (
                             <div className={styles.emptyState}>
                                 <div className={styles.emptyIllust}>🤖</div>
@@ -203,7 +196,6 @@ const PortfolioAuto = () => {
                             </div>
                         )}
 
-                        {/* 로딩 상태 */}
                         {loading && (
                             <div className={styles.emptyState}>
                                 <div className={styles.spinner}/>
@@ -211,7 +203,6 @@ const PortfolioAuto = () => {
                             </div>
                         )}
 
-                        {/* 완료 상태 */}
                         {!loading && stocks && (
                             <div className={styles.stockResult}>
                                 <div className={styles.chartRow}>

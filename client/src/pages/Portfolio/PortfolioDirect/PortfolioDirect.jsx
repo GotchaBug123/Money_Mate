@@ -156,9 +156,23 @@ const PortfolioDirect = () => {
         setShowNameModal(false);
         navigate('/portfolio/result', {
             state: {
-                stocks: cart.map(s => ({name: s.name, ticker: s.ticker, weight: s.weight})),
-                investAmount, currency, addPeriod, addAmount,
-                startDate, endDate, goalAmount, portfolioName, isDirect: true,
+                stocks: cart.map(s => ({
+                    name: s.name,
+                    ticker: s.ticker,
+                    weight: s.weight,
+                    category: s.market,
+                    annualVolatility: 0,
+                })),
+                investAmount,
+                currency,
+                addPeriod,
+                addAmount,
+                startDate,
+                endDate,
+                goalAmount,
+                rebalanceCycle: 'QUARTERLY',
+                portfolioName,
+                isDirect: true,
             },
         });
     };

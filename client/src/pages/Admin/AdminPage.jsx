@@ -5,8 +5,9 @@ import MemberManagePage from './MemberManagePage';
 import InvestmentManagePage from './InvestmentManagePage';
 import CommunityManagePage from './CommunityManagePage';
 import CustomerInquiryManagePage from './CustomerInquiryManagePage';
+import {useInquiryStore} from '../../store/useInquiryStore';
 
-import styles from './AdminPage.module.css'; // 💡 모듈 CSS 불러오기
+import styles from './AdminPage.module.css';
 
 function AdminPage({
                        onLogout,
@@ -17,7 +18,10 @@ function AdminPage({
     const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState('dashboard');
 
-    // 💡 기존의 상태 데이터 (Members, Inquiries 등) 그대로 유지
+    const inquiries = useInquiryStore((state) => state.inquiries);
+    const answerInquiry = useInquiryStore((state) => state.answerInquiry);
+    const deleteInquiry = useInquiryStore((state) => state.deleteInquiry);
+
     const [members, setMembers] = useState([
         {
             memberNo: '1', userId: 'admin01', name: '김관리', birthDate: '1998-03-15',
@@ -28,27 +32,51 @@ function AdminPage({
             joinedAt: '2026-05-10', phone: '010-2222-3333', email: 'user01@moneymate.com',
         },
     ]);
+
     const [posts, setPosts] = useState(externalPosts || []);
-    const [inquiries, setInquiries] = useState([
-        {inquiryNo: '1', status: '대기'}
-    ]);
-    const waitingInquiryCount = inquiries.filter(inq => inq.status === '대기').length;
 
-    // 핸들러 함수들 (기존 로직 유지)
-    const handleDeleteMember = () => { /* ... */
-    };
-    const handleUpdateMember = () => { /* ... */
-    };
-    const handleUpdatePost = () => { /* ... */
-    };
-    const handleDeletePost = () => { /* ... */
-    };
-    const handleAnswerInquiry = () => { /* ... */
-    };
-    const handleDeleteInquiry = () => { /* ... */
+    const waitingInquiryCount = inquiries.filter(
+        (inq) => inq.status === '대기' || inq.status === '답변 대기'
+    ).length;
+
+    const handleDeleteMember = () => {
+        /* 기존 로직 유지 */
     };
 
-    // 관리자 전용 헤더 메뉴 구성
+    const handleUpdateMember = () => {
+        /* 기존 로직 유지 */
+    };
+
+    const handleUpdatePost = (updatedPost) => {
+        if (onUpdatePost) {
+            onUpdatePost(updatedPost);
+            return;
+        }
+
+        setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+                post.id === updatedPost.id ? {...post, ...updatedPost} : post
+            )
+        );
+    };
+
+    const handleDeletePost = (postId) => {
+        if (onDeletePost) {
+            onDeletePost(postId);
+            return;
+        }
+
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    };
+
+    const handleAnswerInquiry = (updatedInquiry) => {
+        answerInquiry(updatedInquiry);
+    };
+
+    const handleDeleteInquiry = (inquiryNo) => {
+        deleteInquiry(inquiryNo);
+    };
+
     const adminMenuItems = [
         {label: '대시보드', onClick: () => setActiveMenu('dashboard')},
         {label: '회원관리', onClick: () => setActiveMenu('memberManage')},
@@ -71,7 +99,6 @@ function AdminPage({
     return (
         <div className={styles.pageWrapper}>
 
-            {/* 💡 관리자용 커스텀 헤더 적용 */}
             <Header
                 logoTo="/admin"
                 logoOnClick={() => setActiveMenu('dashboard')}
@@ -134,7 +161,6 @@ function AdminPage({
                 </main>
             )}
 
-            {/* 서브 페이지 라우팅 */}
             {activeMenu === 'memberManage' && (
                 <MemberManagePage
                     members={members}
