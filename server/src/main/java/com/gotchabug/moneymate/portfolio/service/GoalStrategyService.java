@@ -1,17 +1,20 @@
 package com.gotchabug.moneymate.portfolio.service;
 
+import com.gotchabug.moneymate.enums.RebalanceCycle;
+import com.gotchabug.moneymate.market.entity.AssetPrice;
+import com.gotchabug.moneymate.market.repository.AssetPriceRepository;
+import com.gotchabug.moneymate.member.entity.Member;
+import com.gotchabug.moneymate.member.repository.MemberRepository;
 import com.gotchabug.moneymate.portfolio.dto.GoalStrategyRequest;
 import com.gotchabug.moneymate.portfolio.dto.GoalStrategyResponse;
 import com.gotchabug.moneymate.portfolio.dto.SelectedAssetRequest;
 import com.gotchabug.moneymate.portfolio.entity.GoalStrategyResult;
-import com.gotchabug.moneymate.member.entity.Member;
-import com.gotchabug.moneymate.enums.RebalanceCycle;
 import com.gotchabug.moneymate.portfolio.repository.GoalStrategyResultRepository;
-import com.gotchabug.moneymate.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +30,7 @@ public class GoalStrategyService {
 
     private final GoalStrategyResultRepository goalStrategyResultRepository;
     private final MemberRepository memberRepository;
+    private final AssetPriceRepository assetPriceRepository;
 
     @Transactional
     public GoalStrategyResponse analyzeGoalStrategy(
@@ -56,6 +60,7 @@ public class GoalStrategyService {
                 request,
                 summary
         );
+
         long recommendedMonthlyInvestment =
                 calculateRecommendedMonthlyInvestment(request, summary);
 
@@ -146,11 +151,15 @@ public class GoalStrategyService {
     ) {
 
         double[] assetAmounts = initializeAssetAmounts(request);
-        RebalanceCycle activeCycle = rebalanceCycle == null
-                ? RebalanceCycle.NONE
-                : rebalanceCycle;
+
+        RebalanceCycle activeCycle =
+                rebalanceCycle == null
+                        ? RebalanceCycle.NONE
+                        : rebalanceCycle;
+
         long[] monthlyAmounts = new long[totalMonths + 1];
         double[] indexHistory = new double[totalMonths + 1];
+
         double portfolioIndex = 1.0;
         double peakIndex = 1.0;
         double maxDrawdown = 0.0;
@@ -161,6 +170,7 @@ public class GoalStrategyService {
         indexHistory[0] = portfolioIndex;
 
         for (int month = 1; month <= totalMonths; month++) {
+
             double portfolioGrowthFactor = applyMonthlyInvestmentGrowth(
                     request.getSelectedAssets(),
                     assetAmounts,
@@ -170,16 +180,19 @@ public class GoalStrategyService {
 
             portfolioIndex *= portfolioGrowthFactor;
             peakIndex = Math.max(peakIndex, portfolioIndex);
+
             maxDrawdown = Math.min(
                     maxDrawdown,
                     (portfolioIndex / peakIndex) - 1.0
             );
+
             monthlyAmounts[month] = toFinalAmount(assetAmounts);
             indexHistory[month] = portfolioIndex;
 
             if (month >= 12) {
                 double annualReturn =
                         (portfolioIndex / indexHistory[month - 12]) - 1.0;
+
                 bestAnnualReturn = Math.max(bestAnnualReturn, annualReturn);
                 worstAnnualReturn = Math.min(worstAnnualReturn, annualReturn);
             }
@@ -215,8 +228,8 @@ public class GoalStrategyService {
         double[] assetAmounts = new double[assets.size()];
 
         for (int i = 0; i < assets.size(); i++) {
-            assetAmounts[i] = assets.get(i)
-                    .allocationFrom(request.safeCurrentAmount());
+            assetAmounts[i] =
+                    assets.get(i).allocationFrom(request.safeCurrentAmount());
         }
 
         return assetAmounts;
@@ -230,30 +243,129 @@ public class GoalStrategyService {
     ) {
 
         double totalBeforeGrowth = Arrays.stream(assetAmounts).sum();
-        double portfolioGrowthFactor = totalBeforeGrowth > 0
-                ? 0.0
-                : 1.0;
+
+        double portfolioGrowthFactor =
+                totalBeforeGrowth > 0 ? 0.0 : 1.0;
 
         for (int i = 0; i < assets.size(); i++) {
+
             SelectedAssetRequest asset = assets.get(i);
-            double monthlyVolatility = asset.monthlyVolatility();
-            double drift = asset.monthlyExpectedReturn()
-                    - 0.5 * monthlyVolatility * monthlyVolatility;
-            double randomShock = random.nextGaussian();
-            double growthFactor = Math.exp(
-                    drift + monthlyVolatility * randomShock
-            );
+
+            MarketStat stat =
+                    calculateMarketStat(asset);
+
+            double monthlyExpectedReturn =
+                    Math.pow(
+                            1.0 + stat.expectedAnnualReturn(),
+                            1.0 / 12.0
+                    ) - 1.0;
+
+            double monthlyVolatility =
+                    stat.annualVolatility() / Math.sqrt(12.0);
+
+            double drift =
+                    monthlyExpectedReturn
+                            - 0.5 * monthlyVolatility * monthlyVolatility;
+
+            double randomShock =
+                    random.nextGaussian();
+
+            double growthFactor =
+                    Math.exp(
+                            drift + monthlyVolatility * randomShock
+                    );
 
             if (totalBeforeGrowth > 0) {
-                double assetWeight = assetAmounts[i] / totalBeforeGrowth;
-                portfolioGrowthFactor += assetWeight * growthFactor;
+                double assetWeight =
+                        assetAmounts[i] / totalBeforeGrowth;
+
+                portfolioGrowthFactor +=
+                        assetWeight * growthFactor;
             }
 
-            assetAmounts[i] = assetAmounts[i] * growthFactor;
-            assetAmounts[i] += asset.allocationFrom(monthlyInvestment);
+            assetAmounts[i] =
+                    assetAmounts[i] * growthFactor;
+
+            assetAmounts[i] +=
+                    asset.allocationFrom(monthlyInvestment);
         }
 
         return portfolioGrowthFactor;
+    }
+
+    private MarketStat calculateMarketStat(
+            SelectedAssetRequest asset
+    ) {
+
+        LocalDate startDate =
+                LocalDate.now().minusYears(5);
+
+        List<AssetPrice> prices =
+                assetPriceRepository.findPriceHistoryByTicker(
+                        asset.getSymbol(),
+                        startDate
+                );
+
+        if (prices == null || prices.size() < 30) {
+            return new MarketStat(
+                    asset.getExpectedAnnualReturn(),
+                    asset.getAnnualVolatility()
+            );
+        }
+
+        List<Double> dailyReturns = new ArrayList<>();
+
+        for (int i = 1; i < prices.size(); i++) {
+
+            double prev =
+                    prices.get(i - 1)
+                            .getClosePrice()
+                            .doubleValue();
+
+            double curr =
+                    prices.get(i)
+                            .getClosePrice()
+                            .doubleValue();
+
+            if (prev > 0 && curr > 0) {
+                dailyReturns.add((curr - prev) / prev);
+            }
+        }
+
+        if (dailyReturns.isEmpty()) {
+            return new MarketStat(
+                    asset.getExpectedAnnualReturn(),
+                    asset.getAnnualVolatility()
+            );
+        }
+
+        double avgDailyReturn =
+                dailyReturns.stream()
+                        .mapToDouble(Double::doubleValue)
+                        .average()
+                        .orElse(0.0);
+
+        double variance =
+                dailyReturns.stream()
+                        .mapToDouble(r ->
+                                Math.pow(r - avgDailyReturn, 2)
+                        )
+                        .average()
+                        .orElse(0.0);
+
+        double dailyVolatility =
+                Math.sqrt(variance);
+
+        double annualReturn =
+                Math.pow(1.0 + avgDailyReturn, 252.0) - 1.0;
+
+        double annualVolatility =
+                dailyVolatility * Math.sqrt(252.0);
+
+        return new MarketStat(
+                annualReturn,
+                annualVolatility
+        );
     }
 
     private void rebalanceAssets(
@@ -264,7 +376,8 @@ public class GoalStrategyService {
         double totalAmount = Arrays.stream(assetAmounts).sum();
 
         for (int i = 0; i < assets.size(); i++) {
-            assetAmounts[i] = assets.get(i).allocationFrom(totalAmount);
+            assetAmounts[i] =
+                    assets.get(i).allocationFrom(totalAmount);
         }
     }
 
@@ -299,19 +412,24 @@ public class GoalStrategyService {
             }
         }
 
-        double successProbability = roundOne(
-                (double) successCount / finalAmounts.length * 100.0
-        );
+        double successProbability =
+                roundOne((double) successCount / finalAmounts.length * 100.0);
 
-        long averageAmount = Math.round(Arrays.stream(finalAmounts)
-                .average()
-                .orElse(0));
+        long averageAmount =
+                Math.round(
+                        Arrays.stream(finalAmounts)
+                                .average()
+                                .orElse(0)
+                );
+
         long optimistic = percentile(finalAmounts, 0.90);
         long median = percentile(finalAmounts, 0.50);
         long pessimistic = percentile(finalAmounts, 0.10);
         long varAmount = percentile(finalAmounts, 0.05);
         long worstCaseAverageAmount = worstCaseAverage(finalAmounts, 0.05);
-        long shortageAmount = Math.max(0, request.getTargetAmount() - median);
+
+        long shortageAmount =
+                Math.max(0, request.getTargetAmount() - median);
 
         return new SimulationSummary(
                 successProbability,
@@ -350,11 +468,14 @@ public class GoalStrategyService {
             return -100.0;
         }
 
-        double annualizedReturn = Math.pow(
-                1.0 + cumulativeReturn,
-                1.0 / Math.max(1.0 / 12.0,
-                        request.totalInvestmentMonths() / 12.0)
-        ) - 1.0;
+        double annualizedReturn =
+                Math.pow(
+                        1.0 + cumulativeReturn,
+                        1.0 / Math.max(
+                                1.0 / 12.0,
+                                request.totalInvestmentMonths() / 12.0
+                        )
+                ) - 1.0;
 
         return roundOne(annualizedReturn * 100.0);
     }
@@ -367,7 +488,9 @@ public class GoalStrategyService {
             return null;
         }
 
-        double[] sortedValues = Arrays.copyOf(values, values.length);
+        double[] sortedValues =
+                Arrays.copyOf(values, values.length);
+
         Arrays.sort(sortedValues);
 
         return roundOne(percentile(sortedValues, 0.50) * 100.0);
@@ -384,6 +507,7 @@ public class GoalStrategyService {
 
         int totalMonths = monthlyAmounts[0].length - 1;
         int intervalMonths = chartIntervalMonths(totalMonths);
+
         List<GoalStrategyResponse.ChartPoint> chartData = new ArrayList<>();
 
         for (int month = 0; month <= totalMonths; month++) {
@@ -393,10 +517,12 @@ public class GoalStrategyService {
                 continue;
             }
 
-            long[] amountsAtMonth = new long[monthlyAmounts.length];
+            long[] amountsAtMonth =
+                    new long[monthlyAmounts.length];
 
             for (int i = 0; i < monthlyAmounts.length; i++) {
-                amountsAtMonth[i] = monthlyAmounts[i][month];
+                amountsAtMonth[i] =
+                        monthlyAmounts[i][month];
             }
 
             Arrays.sort(amountsAtMonth);
@@ -432,15 +558,14 @@ public class GoalStrategyService {
             double percentile
     ) {
 
-        int index = (int) Math.round(
-                (sortedAmounts.length - 1) * percentile
-        );
+        int index =
+                (int) Math.round(
+                        (sortedAmounts.length - 1) * percentile
+                );
 
-        return sortedAmounts[clamp(
-                index,
-                0,
-                sortedAmounts.length - 1
-        )];
+        return sortedAmounts[
+                clamp(index, 0, sortedAmounts.length - 1)
+                ];
     }
 
     private double percentile(
@@ -448,15 +573,14 @@ public class GoalStrategyService {
             double percentile
     ) {
 
-        int index = (int) Math.round(
-                (sortedValues.length - 1) * percentile
-        );
+        int index =
+                (int) Math.round(
+                        (sortedValues.length - 1) * percentile
+                );
 
-        return sortedValues[clamp(
-                index,
-                0,
-                sortedValues.length - 1
-        )];
+        return sortedValues[
+                clamp(index, 0, sortedValues.length - 1)
+                ];
     }
 
     private long worstCaseAverage(
@@ -464,10 +588,11 @@ public class GoalStrategyService {
             double percentile
     ) {
 
-        int count = Math.max(
-                1,
-                (int) Math.ceil(sortedAmounts.length * percentile)
-        );
+        int count =
+                Math.max(
+                        1,
+                        (int) Math.ceil(sortedAmounts.length * percentile)
+                );
 
         long sum = 0L;
 
@@ -556,11 +681,14 @@ public class GoalStrategyService {
             return request.safeMonthlyInvestment();
         }
 
-        int totalMonths = Math.max(1, request.totalInvestmentMonths());
-        long conservativeShortage = Math.max(
-                0L,
-                request.getTargetAmount() - summary.pessimisticAmount()
-        );
+        int totalMonths =
+                Math.max(1, request.totalInvestmentMonths());
+
+        long conservativeShortage =
+                Math.max(
+                        0L,
+                        request.getTargetAmount() - summary.pessimisticAmount()
+                );
 
         return request.safeMonthlyInvestment()
                 + (long) Math.ceil((double) conservativeShortage / totalMonths);
@@ -573,24 +701,25 @@ public class GoalStrategyService {
             String assetSummary
     ) {
 
-        GoalStrategyResult result = GoalStrategyResult.builder()
-                .member(member)
-                .goalName(request.safeGoalName())
-                .currentAmount(request.safeCurrentAmount())
-                .monthlyInvestment(request.safeMonthlyInvestment())
-                .targetAmount(request.getTargetAmount())
-                .investmentYears(request.storageInvestmentYears())
-                .rebalanceCycle(request.getRebalanceCycle())
-                .selectedAssetSummary(assetSummary)
-                .successProbability(summary.successProbability())
-                .averageFinalAmount(summary.averageFinalAmount())
-                .optimisticAmount(summary.optimisticAmount())
-                .medianAmount(summary.medianAmount())
-                .pessimisticAmount(summary.pessimisticAmount())
-                .varAmount(summary.varAmount())
-                .worstCaseAverageAmount(summary.worstCaseAverageAmount())
-                .shortageAmount(summary.shortageAmount())
-                .build();
+        GoalStrategyResult result =
+                GoalStrategyResult.builder()
+                        .member(member)
+                        .goalName(request.safeGoalName())
+                        .currentAmount(request.safeCurrentAmount())
+                        .monthlyInvestment(request.safeMonthlyInvestment())
+                        .targetAmount(request.getTargetAmount())
+                        .investmentYears(request.storageInvestmentYears())
+                        .rebalanceCycle(request.getRebalanceCycle())
+                        .selectedAssetSummary(assetSummary)
+                        .successProbability(summary.successProbability())
+                        .averageFinalAmount(summary.averageFinalAmount())
+                        .optimisticAmount(summary.optimisticAmount())
+                        .medianAmount(summary.medianAmount())
+                        .pessimisticAmount(summary.pessimisticAmount())
+                        .varAmount(summary.varAmount())
+                        .worstCaseAverageAmount(summary.worstCaseAverageAmount())
+                        .shortageAmount(summary.shortageAmount())
+                        .build();
 
         return goalStrategyResultRepository.save(result);
     }
@@ -600,11 +729,15 @@ public class GoalStrategyService {
     ) {
 
         long seed = 1469598103934665603L;
+
         seed = mix(seed, request.safeCurrentAmount());
         seed = mix(seed, request.safeMonthlyInvestment());
         seed = mix(seed, request.getTargetAmount());
         seed = mix(seed, request.totalInvestmentMonths());
-        seed = mix(seed, safeHash(request.getRebalanceCycle().name()));
+
+        if (request.getRebalanceCycle() != null) {
+            seed = mix(seed, safeHash(request.getRebalanceCycle().name()));
+        }
 
         for (SelectedAssetRequest asset : request.getSelectedAssets()) {
             seed = mix(seed, safeHash(asset.getSymbol()));
@@ -657,6 +790,12 @@ public class GoalStrategyService {
             double maxDrawdown,
             double bestAnnualReturn,
             double worstAnnualReturn
+    ) {
+    }
+
+    private record MarketStat(
+            double expectedAnnualReturn,
+            double annualVolatility
     ) {
     }
 

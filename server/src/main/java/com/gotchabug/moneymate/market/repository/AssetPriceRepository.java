@@ -183,4 +183,17 @@ public interface AssetPriceRepository extends JpaRepository<AssetPrice, Long> {
     LIMIT 10
     """, nativeQuery = true)
     List<AssetPrice> findEtfThemeTop10();
+    // 특정 종목의 최근 N년 가격 데이터 조회
+    @Query("""
+SELECT ap
+FROM AssetPrice ap
+JOIN ap.asset a
+WHERE a.ticker = :ticker
+  AND ap.priceDate >= :startDate
+ORDER BY ap.priceDate ASC
+""")
+    List<AssetPrice> findPriceHistoryByTicker(
+            @Param("ticker") String ticker,
+            @Param("startDate") LocalDate startDate
+    );
 }

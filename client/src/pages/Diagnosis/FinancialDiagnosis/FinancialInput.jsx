@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './FinancialDiagnosis.module.css';
+import {saveFinancialProfile, getFinancialDiagnosis} from '../../../api/financialDiagnosisApi.js';
 
 const fields = [
     {
@@ -25,8 +26,15 @@ const fields = [
         icon: '🛒',
     },
     {
+        key: 'totalAsset',
+        label: '총 자산',
+        desc: '부동산, 금융자산 등 보유한 총 자산 금액을 입력해주세요.',
+        placeholder: '총 자산을 입력하세요',
+        icon: '🏦',
+    },
+    {
         key: 'debt',
-        label: '부채',
+        label: '총 부채',
         desc: '대출, 카드빚 등 총 부채 금액을 입력해주세요.',
         placeholder: '총 부채를 입력하세요',
         icon: '📊',
@@ -43,8 +51,9 @@ const fields = [
 const FinancialInput = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState({
-        income: '', fixedExpense: '', variableExpense: '', debt: '', cash: '',
+        income: '', fixedExpense: '', variableExpense: '', totalAsset: '', debt: '', cash: '',
     });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (key) => (e) => {
         const val = e.target.value.replace(/[^0-9]/g, '');
@@ -53,8 +62,27 @@ const FinancialInput = () => {
 
     const isValid = Object.values(form).every((v) => v !== '');
 
-    const handleSubmit = () => {
-        if (isValid) navigate('/financial/result', {state: {result: form}});
+    const handleSubmit = async () => {
+        if (!isValid) return alert('모든 항목을 입력해주세요.');
+        setLoading(true);
+        try {
+            const toWon = (manwon) => Number(manwon) * 10000;
+            await saveFinancialProfile({
+                monthlyIncome: toWon(form.income),
+                monthlyFixedExpense: toWon(form.fixedExpense),
+                monthlyVariableExpense: toWon(form.variableExpense),
+                totalAsset: toWon(form.totalAsset),
+                totalLiability: toWon(form.debt),
+                cashAsset: toWon(form.cash),
+            });
+            const diagnosisData = await getFinancialDiagnosis();
+            navigate('/financial/result', {state: {diagnosisData, form}});
+        } catch (error) {
+            console.error('재무진단 실패:', error);
+            alert('재무진단 요청 중 오류가 발생했습니다. 다시 시도해주세요.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -115,11 +143,11 @@ const FinancialInput = () => {
                 {/* 제출 버튼 */}
                 <div className={styles.submitRow}>
                     <button
-                        className={`${styles.submitBtn} ${!isValid ? styles.submitBtnDisabled : ''}`}
+                        className={`${styles.submitBtn} ${(!isValid || loading) ? styles.submitBtnDisabled : ''}`}
                         onClick={handleSubmit}
-                        disabled={!isValid}
+                        disabled={!isValid || loading}
                     >
-                        ✦ 재무진단 시작하기
+                        {loading ? '분석 중...' : '✦ 재무진단 시작하기'}
                     </button>
                     <p className={styles.submitHint}>입력하신 정보를 바탕으로 맞춤형 재무진단을 시작합니다.</p>
                 </div>
