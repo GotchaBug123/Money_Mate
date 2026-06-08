@@ -28,6 +28,10 @@ public interface PortfolioAssetTargetRepository extends JpaRepository<PortfolioA
             Long assetId
     );
 
+    List<PortfolioAssetTarget> findByPortfolio_PortfolioIdOrderByTargetIdAsc(Long portfolioId);
+
+    void deleteByPortfolio_PortfolioId(Long portfolioId);
+
     @Query("""
         SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END
         FROM PortfolioAssetTarget t
