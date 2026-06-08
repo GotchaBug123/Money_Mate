@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styles from './InvestmentInformation.module.css';
-import {TOP_100_STOCKS} from '../../data/top100Stocks';
+import {getInvestmentInfoApi} from '../../api/investmentApi';
 
 const LOGO_MAP = {
     '005930': 'samsung.com', '000660': 'skhynix.com', 'NVDA': 'nvidia.com',
@@ -14,6 +14,7 @@ const BADGE_COLORS = ['#E8F0FE', '#EDFAF4', '#FFF0EE', '#FAEEDA', '#F0F4FF', '#F
 const BADGE_TEXT = ['#1B5ED9', '#1A7A45', '#C0392B', '#B47D0C', '#2E5CD9', '#C03980', '#0C7CD9', '#7B3FA0'];
 
 const getBadge = (ticker) => {
+    if (!ticker) return {bg: BADGE_COLORS[0], color: BADGE_TEXT[0]};
     const idx = ticker.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % BADGE_COLORS.length;
     return {bg: BADGE_COLORS[idx], color: BADGE_TEXT[idx]};
 };
@@ -36,7 +37,7 @@ const StockLogo = ({ticker, name, size = 36}) => {
                     borderRadius: '50%'
                 }}
             >
-                {name.charAt(0)}
+                {name ? name.charAt(0) : '?'}
             </div>
         );
     }
@@ -52,109 +53,6 @@ const StockLogo = ({ticker, name, size = 36}) => {
     );
 };
 
-const MOCK_INDEX = [
-    {
-        label: '코스피',
-        value: '2,634.82',
-        change: '+32.14',
-        changeRate: '+1.24%',
-        pos: true,
-        chart: [0, 4, 6, 10, 12, 16, 18, 22, 24, 20, 22, 26]
-    },
-    {
-        label: '코스닥',
-        value: '728.15',
-        change: '-2.82',
-        changeRate: '-0.38%',
-        pos: false,
-        chart: [24, 22, 20, 18, 16, 14, 12, 10, 12, 8, 6, 4]
-    },
-    {
-        label: 'S&P 500',
-        value: '5,304.72',
-        change: '+45.88',
-        changeRate: '+0.87%',
-        pos: true,
-        chart: [4, 6, 4, 10, 8, 14, 12, 18, 16, 20, 22, 26]
-    },
-    {
-        label: '달러 환율',
-        value: '1,342.50',
-        change: '-1.60',
-        changeRate: '-0.12%',
-        pos: false,
-        chart: [6, 8, 7, 12, 14, 16, 14, 18, 20, 22, 24, 26]
-    },
-];
-
-const MOCK_STOCKS = TOP_100_STOCKS;
-
-const MOCK_THEMES = [
-    {
-        name: 'AI 테마',
-        avg: '+2.1%',
-        pos: true,
-        stocks: [
-            {n: 'NVIDIA', c: '+3.14%', p: true},
-            {n: '삼성전자', c: '+2.61%', p: true},
-            {n: 'SK하이닉스', c: '-0.88%', p: false}
-        ]
-    },
-    {
-        name: '반도체 테마',
-        avg: '+0.9%',
-        pos: true,
-        stocks: [
-            {n: 'SK하이닉스', c: '-0.88%', p: false},
-            {n: 'TSMC', c: '+1.22%', p: true},
-            {n: '마이크론', c: '+0.74%', p: true}
-        ]
-    },
-    {
-        name: '2차전지 테마',
-        avg: '-1.2%',
-        pos: false,
-        stocks: [
-            {n: 'LG에너지솔루션', c: '-1.45%', p: false},
-            {n: 'POSCO홀딩스', c: '+0.33%', p: true},
-            {n: '에코프로비엠', c: '-2.11%', p: false}
-        ]
-    },
-];
-
-const MOCK_DIVIDEND = [
-    {
-        title: '국내 고배당주',
-        market: 'domestic',
-        list: [
-            {id: 'd1', name: 'KT&G', price: '88,500원', yield: '6.8%', freq: '연 배당 2회'},
-            {id: 'd2', name: '하나금융지주', price: '62,400원', yield: '6.2%', freq: '연 배당 4회'},
-            {id: 'd3', name: '우리금융지주', price: '14,250원', yield: '5.9%', freq: '연 배당 4회'},
-            {id: 'd4', name: '기업은행', price: '13,800원', yield: '5.5%', freq: '연 배당 2회'},
-        ]
-    },
-    {
-        title: '해외 고배당주',
-        market: 'foreign',
-        list: [
-            {id: 'd5', name: 'Altria Group', price: '$44.20', yield: '9.1%', freq: '분기 배당'},
-            {id: 'd6', name: 'AT&T', price: '$16.80', yield: '6.7%', freq: '분기 배당'},
-            {id: 'd7', name: 'Verizon', price: '$39.40', yield: '6.4%', freq: '분기 배당'},
-            {id: 'd8', name: 'Realty Income', price: '$52.30', yield: '5.9%', freq: '월 배당'},
-        ]
-    },
-    {
-        title: 'ETF 고배당',
-        market: 'etf',
-        list: [
-            {id: 'd9', name: 'TIGER 리츠부동산', price: '4,850원', yield: '5.4%', freq: '월 배당'},
-            {id: 'd10', name: 'KODEX 배당가치', price: '11,240원', yield: '4.8%', freq: '분기 배당'},
-            {id: 'd11', name: 'SCHD', price: '$27.80', yield: '3.6%', freq: '분기 배당'},
-            {id: 'd12', name: 'VYM', price: '$118.40', yield: '3.1%', freq: '분기 배당'},
-        ]
-    },
-];
-
 const FILTERS = ['전체', '국내', '해외', 'ETF'];
 const SORTS = ['거래대금', '거래량', '급상승', '급하락'];
 const THEMES = ['전체', 'AI', '반도체', '2차전지', '자동차', '광통신'];
@@ -169,51 +67,31 @@ const SIDEBAR_TABS = [
     {key: 'recent', label: '최근 본', icon: '🕐'},
 ];
 
-const parseChange = (chg) => Number(chg.replace('%', '').replace('+', ''));
+const parseChange = (chg) => {
+    if (!chg) return 0;
+    return Number(chg.replace('%', '').replace('+', ''));
+};
 
 const getTradeValue = (vol) => {
-    if (vol.includes('조')) {
-        return Number(vol.replace('조', '')) * 10000;
-    }
-
-    if (vol.includes('억')) {
-        return Number(vol.replace('억', '').replace(',', ''));
-    }
-
-    if (vol.includes('B')) {
-        return Number(vol.replace('$', '').replace('B', '')) * 13000;
-    }
-
-    if (vol.includes('M')) {
-        return Number(vol.replace('$', '').replace('M', '')) * 13;
-    }
-
+    if (!vol) return 0;
+    if (vol.includes('조')) return Number(vol.replace('조', '')) * 10000;
+    if (vol.includes('억')) return Number(vol.replace('억', '').replace(',', ''));
+    if (vol.includes('B')) return Number(vol.replace('$', '').replace('B', '')) * 13000;
+    if (vol.includes('M')) return Number(vol.replace('$', '').replace('M', '')) * 13;
     return 0;
 };
 
 const sortStocks = (stocks, sort) => {
     const sorted = [...stocks];
-
-    if (sort === '거래대금') {
-        return sorted.sort((a, b) => getTradeValue(b.vol) - getTradeValue(a.vol));
-    }
-
-    if (sort === '거래량') {
-        return sorted.sort((a, b) => b.volume - a.volume);
-    }
-
-    if (sort === '급상승') {
-        return sorted.sort((a, b) => parseChange(b.chg) - parseChange(a.chg));
-    }
-
-    if (sort === '급하락') {
-        return sorted.sort((a, b) => parseChange(a.chg) - parseChange(b.chg));
-    }
-
+    if (sort === '거래대금') return sorted.sort((a, b) => getTradeValue(b.vol) - getTradeValue(a.vol));
+    if (sort === '거래량') return sorted.sort((a, b) => (b.volume || 0) - (a.volume || 0));
+    if (sort === '급상승') return sorted.sort((a, b) => parseChange(b.chg) - parseChange(a.chg));
+    if (sort === '급하락') return sorted.sort((a, b) => parseChange(a.chg) - parseChange(b.chg));
     return sorted;
 };
 
 const Spark = ({data, pos}) => {
+    if (!data || data.length === 0) return null;
     const W = 80;
     const H = 28;
     const min = Math.min(...data);
@@ -239,6 +117,14 @@ const Spark = ({data, pos}) => {
 };
 
 const InvestmentInformation = () => {
+    // 백엔드 연결용 상태 변수들
+    const [isLoading, setIsLoading] = useState(true);
+    const [indices, setIndices] = useState([]);
+    const [stockList, setStockList] = useState([]);
+    const [themeList, setThemeList] = useState([]);
+    const [divList, setDivList] = useState([]);
+
+    // 기존 UI 및 필터 상태 변수들
     const [filter, setFilter] = useState('전체');
     const [sort, setSort] = useState('거래대금');
     const [theme, setTheme] = useState('전체');
@@ -246,9 +132,9 @@ const InvestmentInformation = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarTab, setSidebarTab] = useState('cart');
-    const [cart, setCart] = useState([1, 3]);
-    const [likes, setLikes] = useState([2]);
-    const [recent, setRecent] = useState([1, 2, 3]);
+    const [cart, setCart] = useState([]);
+    const [likes, setLikes] = useState([]);
+    const [recent, setRecent] = useState([]);
 
     const [themePanel, setThemePanel] = useState(null);
     const [detailPeriod, setDetailPeriod] = useState('1일');
@@ -260,8 +146,128 @@ const InvestmentInformation = () => {
     const [divSort, setDivSort] = useState('배당 수익률순');
     const [divSelected, setDivSelected] = useState([]);
 
+    // 백엔드 API 호출
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                const res = await getInvestmentInfoApi('ALL');
+
+                // 1. 시장 지수 데이터 맵핑
+                const mappedIndices = [];
+                if (res.kospi) mappedIndices.push({
+                    label: '코스피',
+                    value: res.kospi.priceLabel,
+                    change: res.kospi.changeLabel,
+                    changeRate: `${res.kospi.changePercent > 0 ? '+' : ''}${res.kospi.changePercent}%`,
+                    pos: res.kospi.rise,
+                    chart: res.kospi.sparkline || []
+                });
+                if (res.kosdaq) mappedIndices.push({
+                    label: '코스닥',
+                    value: res.kosdaq.priceLabel,
+                    change: res.kosdaq.changeLabel,
+                    changeRate: `${res.kosdaq.changePercent > 0 ? '+' : ''}${res.kosdaq.changePercent}%`,
+                    pos: res.kosdaq.rise,
+                    chart: res.kosdaq.sparkline || []
+                });
+                if (res.snp500) mappedIndices.push({
+                    label: 'S&P 500',
+                    value: res.snp500.priceLabel,
+                    change: res.snp500.changeLabel,
+                    changeRate: `${res.snp500.changePercent > 0 ? '+' : ''}${res.snp500.changePercent}%`,
+                    pos: res.snp500.rise,
+                    chart: res.snp500.sparkline || []
+                });
+                if (res.usdKrw) mappedIndices.push({
+                    label: '달러 환율',
+                    value: res.usdKrw.priceLabel,
+                    change: res.usdKrw.changeLabel,
+                    changeRate: `${res.usdKrw.changePercent > 0 ? '+' : ''}${res.usdKrw.changePercent}%`,
+                    pos: res.usdKrw.rise,
+                    chart: res.usdKrw.sparkline || []
+                });
+                setIndices(mappedIndices);
+
+                // 2. 메인 주식 리스트 (TOP 100) 맵핑
+                const mappedStocks = (res.assetList || []).map(s => ({
+                    id: s.assetId || s.symbol,
+                    name: s.assetName,
+                    ticker: s.ticker || s.symbol,
+                    market: s.market,
+                    price: s.closePriceLabel || `${s.closePrice}`,
+                    chg: s.dailyReturnLabel || `${s.dailyReturnPct > 0 ? '+' : ''}${s.dailyReturnPct}%`,
+                    vol: s.tradingValueLabel || s.volumeLabel || '0',
+                    pos: s.rise,
+                    volume: s.volume || 0
+                }));
+                setStockList(mappedStocks);
+
+                // 3. 테마별 섹션 맵핑
+                const makeTheme = (name, list) => {
+                    if (!list || list.length === 0) return null;
+                    const avgPct = list.reduce((acc, curr) => acc + (curr.dailyReturnPct || 0), 0) / list.length;
+                    return {
+                        name,
+                        avg: `${avgPct > 0 ? '+' : ''}${avgPct.toFixed(1)}%`,
+                        pos: avgPct >= 0,
+                        stocks: list.map(s => ({
+                            id: s.assetId || s.symbol,
+                            name: s.assetName,
+                            ticker: s.ticker || s.symbol,
+                            chg: s.dailyReturnLabel || `${s.dailyReturnPct > 0 ? '+' : ''}${s.dailyReturnPct}%`,
+                            pos: s.rise,
+                            price: s.closePriceLabel,
+                            vol: s.tradingValueLabel,
+                            volume: s.volume
+                        }))
+                    };
+                };
+                const themes = [
+                    makeTheme('반도체 테마', res.semiList),
+                    makeTheme('AI 테마', res.aiList),
+                    makeTheme('2차전지 테마', res.batteryList),
+                    makeTheme('바이오 테마', res.bioList),
+                    makeTheme('금융 테마', res.finList),
+                ].filter(Boolean);
+                setThemeList(themes);
+
+                // 4. 배당 데이터 맵핑
+                const makeDiv = (title, market, list) => {
+                    if (!list || list.length === 0) return null;
+                    return {
+                        title,
+                        market,
+                        list: list.map(s => ({
+                            id: s.assetId || s.symbol,
+                            name: s.assetName,
+                            ticker: s.ticker || s.symbol,
+                            price: s.closePriceLabel,
+                            yield: s.dividendYieldLabel || `${s.dividendYieldPct}%`,
+                            freq: s.country === 'US' ? '분기 배당' : '연 배당',
+                            pos: s.rise
+                        }))
+                    };
+                };
+                const divs = [
+                    makeDiv('국내 고배당주', 'domestic', res.dividendKoreanList),
+                    makeDiv('해외 고배당주', 'foreign', res.dividendOverseasList),
+                    makeDiv('ETF 고배당', 'etf', res.dividendEtfList),
+                ].filter(Boolean);
+                setDivList(divs);
+
+            } catch (e) {
+                console.error("투자정보 불러오기 실패", e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadData();
+    }, []);
+
+    // 💡 필터 및 정렬 로직에 이제 MOCK_STOCKS 대신 백엔드에서 받은 stockList를 사용합니다.
     const filtered = sortStocks(
-        MOCK_STOCKS.filter((stock) =>
+        stockList.filter((stock) =>
             (filter === '전체' || stock.market === filter) &&
             (
                 !query ||
@@ -291,10 +297,10 @@ const InvestmentInformation = () => {
     };
 
     const sidebarData = sidebarTab === 'cart'
-        ? MOCK_STOCKS.filter((stock) => cart.includes(stock.id))
+        ? stockList.filter((stock) => cart.includes(stock.id))
         : sidebarTab === 'like'
-            ? MOCK_STOCKS.filter((stock) => likes.includes(stock.id))
-            : MOCK_STOCKS.filter((stock) => recent.includes(stock.id));
+            ? stockList.filter((stock) => likes.includes(stock.id))
+            : stockList.filter((stock) => recent.includes(stock.id));
 
     const openThemePanel = (selectedTheme) => {
         setThemePanel(selectedTheme);
@@ -313,18 +319,17 @@ const InvestmentInformation = () => {
             alert('담을 종목을 선택해주세요.');
             return;
         }
-
         setCart((prev) => [...new Set([...prev, ...detailSelected])]);
         detailSelected.forEach((id) => addRecent(id));
         alert(`${detailSelected.length}개 종목이 장바구니에 담겼습니다!`);
         setDetailSelected([]);
     };
 
+    // 💡 테마 모달의 목록은 전체 종목이 아니라 '해당 테마에 속한 종목'들만 정렬하여 보여줍니다.
     const detailStocks = sortStocks(
-        MOCK_STOCKS,
+        themePanel ? themePanel.stocks : [],
         detailSort === '거래대금' ? '거래대금' : detailSort === '수익률 상승' ? '급상승' : '급하락'
     );
-
     const detailVisible = detailShowAll ? detailStocks : detailStocks.slice(0, 6);
 
     const openDivPanel = (selectedDividend) => {
@@ -342,10 +347,19 @@ const InvestmentInformation = () => {
             alert('담을 종목을 선택해주세요.');
             return;
         }
-
         alert(`${divSelected.length}개 종목이 장바구니에 담겼습니다!`);
         setDivSelected([]);
     };
+
+    if (isLoading) {
+        return (
+            <div className={styles.wrap} style={{justifyContent: 'center', alignItems: 'center'}}>
+                <div style={{fontSize: '18px', fontWeight: 'bold', color: 'var(--color-primary)'}}>
+                    실시간 투자 정보를 불러오는 중입니다...
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.wrap}>
@@ -361,13 +375,14 @@ const InvestmentInformation = () => {
                 </div>
 
                 <div className={styles.idxGrid}>
-                    {MOCK_INDEX.map((item) => (
+                    {indices.map((item) => (
                         <div key={item.label} className={styles.idxCard}>
                             <span className={styles.idxLabel}>{item.label}</span>
                             <span className={styles.idxVal}>{item.value}</span>
                             <div className={styles.idxBot}>
                                 <span className={item.pos ? styles.idxPos : styles.idxNeg}>{item.change}</span>
-                                <span className={item.pos ? styles.idxBadgePos : styles.idxBadgeNeg}>{item.changeRate}</span>
+                                <span
+                                    className={item.pos ? styles.idxBadgePos : styles.idxBadgeNeg}>{item.changeRate}</span>
                             </div>
                             <Spark data={item.chart} pos={item.pos}/>
                         </div>
@@ -528,17 +543,19 @@ const InvestmentInformation = () => {
                     </div>
 
                     <div className={styles.themeGrid}>
-                        {MOCK_THEMES.map((themeItem) => (
-                            <div key={themeItem.name} className={`${styles.tc} ${themePanel === themeItem ? styles.tcActive : ''}`}>
+                        {themeList.map((themeItem) => (
+                            <div key={themeItem.name}
+                                 className={`${styles.tc} ${themePanel === themeItem ? styles.tcActive : ''}`}>
                                 <div className={styles.tcTop}>
                                     <span className={styles.tcName}>{themeItem.name}</span>
-                                    <span className={themeItem.pos ? styles.tcBadgePos : styles.tcBadgeNeg}>{themeItem.avg} 평균</span>
+                                    <span
+                                        className={themeItem.pos ? styles.tcBadgePos : styles.tcBadgeNeg}>{themeItem.avg} 평균</span>
                                 </div>
 
-                                {themeItem.stocks.map((stock) => (
-                                    <div key={stock.n} className={styles.tcRow}>
-                                        <span className={styles.tcSn}>{stock.n}</span>
-                                        <span className={stock.p ? styles.tcSp : styles.tcSng}>{stock.c}</span>
+                                {themeItem.stocks.slice(0, 3).map((stock) => (
+                                    <div key={stock.id || stock.name} className={styles.tcRow}>
+                                        <span className={styles.tcSn}>{stock.name}</span>
+                                        <span className={stock.pos ? styles.tcSp : styles.tcSng}>{stock.chg}</span>
                                     </div>
                                 ))}
 
@@ -554,11 +571,12 @@ const InvestmentInformation = () => {
                     <span className={styles.secTitle}>배당금 TOP 10</span>
 
                     <div className={styles.divGrid}>
-                        {MOCK_DIVIDEND.map((dividend) => (
-                            <div key={dividend.title} className={`${styles.dc} ${divPanel === dividend ? styles.dcActive : ''}`}>
+                        {divList.map((dividend) => (
+                            <div key={dividend.title}
+                                 className={`${styles.dc} ${divPanel === dividend ? styles.dcActive : ''}`}>
                                 <div className={styles.dcHead}>{dividend.title}</div>
 
-                                {dividend.list.map((item) => (
+                                {dividend.list.slice(0, 4).map((item) => (
                                     <div key={item.id} className={styles.dcRow}>
                                         <span className={styles.dcN}>{item.name}</span>
                                         <span className={styles.dcY}>{item.yield}</span>
@@ -662,7 +680,8 @@ const InvestmentInformation = () => {
                                     className={`${styles.tpStockRow} ${detailSelected.includes(stock.id) ? styles.tpStockRowOn : ''}`}
                                     onClick={() => toggleDetailSelect(stock.id)}
                                 >
-                                    <div className={`${styles.tpCheckbox} ${detailSelected.includes(stock.id) ? styles.tpCheckboxOn : ''}`}>
+                                    <div
+                                        className={`${styles.tpCheckbox} ${detailSelected.includes(stock.id) ? styles.tpCheckboxOn : ''}`}>
                                         {detailSelected.includes(stock.id) && <span>✓</span>}
                                     </div>
 
@@ -678,9 +697,9 @@ const InvestmentInformation = () => {
                             ))}
                         </div>
 
-                        {!detailShowAll && MOCK_STOCKS.length > 6 && (
+                        {!detailShowAll && detailStocks.length > 6 && (
                             <button className={styles.tpMoreBtn} onClick={() => setDetailShowAll(true)}>
-                                전체 종목 보기 ({MOCK_STOCKS.length}개) →
+                                전체 종목 보기 ({detailStocks.length}개) →
                             </button>
                         )}
 
@@ -725,7 +744,8 @@ const InvestmentInformation = () => {
                                     className={`${styles.tpDivRow} ${divSelected.includes(item.id) ? styles.tpStockRowOn : ''}`}
                                     onClick={() => toggleDivSelect(item.id)}
                                 >
-                                    <div className={`${styles.tpCheckbox} ${divSelected.includes(item.id) ? styles.tpCheckboxOn : ''}`}>
+                                    <div
+                                        className={`${styles.tpCheckbox} ${divSelected.includes(item.id) ? styles.tpCheckboxOn : ''}`}>
                                         {divSelected.includes(item.id) && <span>✓</span>}
                                     </div>
 
