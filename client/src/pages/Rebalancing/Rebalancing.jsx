@@ -1,5 +1,7 @@
 import React, {useState, useRef} from 'react';
 import styles from './Rebalancing.module.css';
+import {searchAssetsApi, analyzeRebalanceApi} from "../../api/rebalanceApi.js";
+import {ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from "recharts";
 
 const LOGO_MAP = {
     '005930': 'samsung.com', '000660': 'skhynix.com', 'NVDA': 'nvidia.com',
@@ -8,7 +10,7 @@ const LOGO_MAP = {
     'MU': 'micron.com', 'MSFT': 'microsoft.com', 'TSLA': 'tesla.com',
 };
 
-const STOCK_LIST = [
+/*const STOCK_LIST = [
     {id: 1, name: '삼성전자', ticker: '005930', market: '국내', price: '78,400원', chg: '+2.61%', pos: true},
     {id: 2, name: 'SK하이닉스', ticker: '000660', market: '국내', price: '198,500원', chg: '-0.88%', pos: false},
     {id: 3, name: 'NVIDIA', ticker: 'NVDA', market: '해외', price: '$1,208.88', chg: '+3.14%', pos: true},
@@ -21,21 +23,22 @@ const STOCK_LIST = [
     {id: 10, name: '마이크론', ticker: 'MU', market: '해외', price: '$132.50', chg: '+0.74%', pos: true},
     {id: 11, name: 'Microsoft', ticker: 'MSFT', market: '해외', price: '$420.21', chg: '+0.32%', pos: true},
     {id: 12, name: 'Tesla', ticker: 'TSLA', market: '해외', price: '$178.82', chg: '-2.14%', pos: false},
-];
+];*/
 
-const searchStocks = (query) => {
+/*const searchStocks = (query) => {
     if (!query.trim()) return [];
     const q = query.toLowerCase();
     return STOCK_LIST.filter(s =>
         s.name.toLowerCase().includes(q) || s.ticker.toLowerCase().includes(q)
     );
-};
+};*/
 
 // 💡 종목 구분을 위한 다양한 배지 컬러 테마는 유지
 const BADGE_COLORS = ['#E8F0FE', '#EDFAF4', '#FFF0EE', '#FAEEDA', '#F0F4FF', '#FEF0F8', '#EEF8FF', '#F5F0FF'];
 const BADGE_TEXT = ['#1B5ED9', '#1A7A45', '#C0392B', '#B47D0C', '#2E5CD9', '#C03980', '#0C7CD9', '#7B3FA0'];
 
 const getBadge = (ticker) => {
+    if (!ticker) return {bg: BADGE_COLORS[0], color: BADGE_TEXT[0]};
     const idx = ticker.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % BADGE_COLORS.length;
     return {bg: BADGE_COLORS[idx], color: BADGE_TEXT[idx]};
 };
@@ -47,21 +50,50 @@ const StockLogo = ({ticker, name}) => {
 
     if (!domain || failed) return (
         <div className={styles.logoBadge} style={{background: badge.bg, color: badge.color}}>
-            {name.charAt(0)}
+            {name ? name.charAt(0) : '?'}
         </div>
     );
     return <img className={styles.logoImg} src={`https://logo.clearbit.com/${domain}`}
                 alt={name} onError={() => setFailed(true)}/>;
 };
 
-const MOCK_RESULT = (investAmount) => ({
+/*const MOCK_RESULT = (investAmount) => ({
     achievementRate: 74,
     finalAmount: Math.round(Number(investAmount) * 1.38),
     avgReturnRate: 11.2,
     maxDrawdown: -15.4,
     minAnnualReturn: -6.8,
     maxAnnualReturn: 29.3,
-});
+});*/
+
+const CustomTooltip = ({active, payload, label, currency}) => {
+    if (active && payload && payload.length) {
+        return (
+            <div style={{
+                background: '#fff',
+                padding: '12px 16px',
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}>
+                <p style={{margin: '0 0 8px 0', fontSize: '14px', fontWeight: 'bold', color: 'var(--color-text-main)'}}>
+                    {label}개월 차
+                </p>
+                {/* 예상 자산 (Area) */}
+                <p style={{margin: 0, fontSize: '14px', color: 'var(--color-primary)', fontWeight: '600'}}>
+                    예상 자산: {payload[0]?.value?.toLocaleString()} {currency}
+                </p>
+                {/* 목표 자산 (Line) - 있는 경우에만 표시 */}
+                {payload[1] && (
+                    <p style={{margin: '4px 0 0 0', fontSize: '13px', color: 'var(--color-text-muted)'}}>
+                        목표 자산: {payload[1]?.value?.toLocaleString()} {currency}
+                    </p>
+                )}
+            </div>
+        );
+    }
+    return null;
+};
 
 const Rebalancing = () => {
     const resultRef = useRef(null);
@@ -82,17 +114,31 @@ const Rebalancing = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (!searchQuery.trim()) return;
-        setSearchResults(searchStocks(searchQuery));
+        try {
+            const data = await searchAssetsApi(searchQuery);
+            setSearchResults(data);
+        } catch (error) {
+            console.error('검색 실패:', error);
+            alert('종목 검색에 실패했습니다.');
+        }
     };
 
     const handleAdd = (stock) => {
-        if (stocks.find(s => s.ticker === stock.ticker)) {
+        const targetTicker = stock.symbol || stock.ticker;
+        if (stocks.find(s => s.ticker === targetTicker)) {
             alert('이미 추가된 종목입니다.');
             return;
         }
-        const newStocks = [...stocks, {...stock, weight: 0}];
+        const newStock = {
+            ticker: targetTicker,
+            name: stock.assetName,
+            market: stock.market,
+            assetType: stock.assetType || 'STOCK',
+            weight: 0
+        };
+        const newStocks = [...stocks, newStock];
         const eq = Math.floor(100 / newStocks.length);
         const rem = 100 - eq * newStocks.length;
         setStocks(newStocks.map((s, i) => ({...s, weight: i === 0 ? eq + rem : eq})));
@@ -123,25 +169,69 @@ const Rebalancing = () => {
 
     const handleRebalance = async () => {
         if (!investAmount || !startDate || !endDate || !goalAmount) {
-            alert('투자 금액, 기간, 목표 금액을 모두 입력해주세요.');
-            return;
+            return alert('투자 금액, 기간, 목표 금액을 모두 입력해주세요.');
         }
-        if (!stocks.length) {
-            alert('최소 1개 이상의 종목을 추가해주세요.');
-            return;
-        }
-        if (totalWeight !== 100) {
-            alert(`비중 합계가 ${totalWeight}%입니다. 100%가 되어야 합니다.`);
-            return;
+        if (!stocks.length) return alert('최소 1개 이상의 종목을 추가해주세요.');
+        if (totalWeight !== 100) return alert(`비중 합계가 ${totalWeight}%입니다. 100%가 되어야 합니다.`);
+
+        // 백엔드 제약조건(최소 100만원) 프론트엔드에서 사전 차단
+        if (Number(goalAmount) < 1000000) {
+            return alert('목표 금액은 최소 1,000,000원 이상이어야 합니다.');
         }
 
         setLoading(true);
+        setResult(null);
+
+        // 기간 계산 (startDate ~ endDate) -> years, months
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const totalMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+
+        if (totalMonths <= 0) {
+            setLoading(false);
+            return alert('목표일은 시작일보다 미래여야 합니다.');
+        }
+
+        let years = Math.floor(totalMonths / 12);
+        let months = totalMonths % 12;
+
+        // 💡 [핵심 우회 로직] 백엔드의 @Min(1) 에러 피하기
+        // 딱 맞아떨어지는 N년 0개월인 경우, (N-1)년 12개월로 변환합니다.
+        if (months === 0 && years > 0) {
+            years -= 1;
+            months = 12;
+        }
+        // 혹시 1년 미만(예: 6개월) 투자일 경우 백엔드 에러 방지를 위해 강제로 1년 세팅
+        if (years === 0) years = 1;
+
+        const cycleMap = {'없음': 'NONE', '매달': 'MONTHLY', '매분기': 'QUARTERLY', '매년': 'YEARLY'};
+
+        const requestData = {
+            goalName: "나의 커스텀 포트폴리오",
+            currentAmount: Number(investAmount),
+            monthlyInvestment: addPeriod === '없음' ? 0 : Number(addAmount || 0),
+            targetAmount: Number(goalAmount),
+            investmentYears: years,    // 💡 1 이상 보장
+            investmentMonths: months,  // 💡 1 이상 보장
+            rebalanceCycle: cycleMap[addPeriod],
+            selectedAssets: stocks.map(st => ({
+                symbol: st.ticker,
+                assetName: st.name,
+                assetType: st.assetType || 'STOCK',
+                market: st.market || 'KOSPI',
+                targetWeight: st.weight
+            }))
+        };
+
         try {
-            await new Promise(res => setTimeout(res, 1000));
-            setResult(MOCK_RESULT(investAmount));
+            const data = await analyzeRebalanceApi(requestData);
+            setResult(data);
             setTimeout(() => resultRef.current?.scrollIntoView({behavior: 'smooth', block: 'start'}), 100);
-        } catch {
-            alert('리밸런싱 확인 중 오류가 발생했습니다.');
+        } catch (error) {
+            console.error('시뮬레이션 실패:', error);
+            // 백엔드가 내려주는 진짜 에러 메시지 확인하기
+            const errorMsg = error.response?.data?.message || '입력값을 다시 확인해주세요.';
+            alert(`분석 실패: ${errorMsg}`);
         } finally {
             setLoading(false);
         }
@@ -160,7 +250,6 @@ const Rebalancing = () => {
                     </div>
                 </div>
 
-                {/* 2단 레이아웃 */}
                 <div className={styles.layout}>
 
                     {/* ── 왼쪽: 입력 폼 ── */}
@@ -292,21 +381,79 @@ const Rebalancing = () => {
                                     <div className={styles.chartTop}>
                                         <span className={styles.chartLabel}>포트폴리오 성장 시뮬레이션</span>
                                         <div className={styles.chartLegend}>
-                                            <span className={styles.legendBlue}>─ 리밸런싱 후</span>
-                                            <span className={styles.legendGray}>- - 리밸런싱 전</span>
+                                            {/* 범례 표시 */}
+                                            <span style={{
+                                                color: 'var(--color-primary)',
+                                                fontWeight: '600',
+                                                marginRight: '12px'
+                                            }}>■ 예상 자산</span>
+                                            <span style={{color: '#888', fontWeight: '600'}}>--- 목표 자산</span>
                                         </div>
                                     </div>
-                                    {/* 💡 차트 인라인 스타일 컬러를 글로벌 변수로 대체 */}
-                                    <svg width="100%" height="200" viewBox="0 0 600 180" preserveAspectRatio="none"
-                                         className={styles.chartSvg}>
-                                        <polyline points="0,160 75,135 150,115 225,90 300,68 375,48 450,28 525,14 600,4"
-                                                  fill="none" stroke="var(--color-primary)" strokeWidth="3"
-                                                  strokeLinecap="round" strokeLinejoin="round"/>
-                                        <polyline
-                                            points="0,160 75,155 150,158 225,148 300,145 375,140 450,132 525,125 600,118"
-                                            fill="none" stroke="var(--color-border)" strokeWidth="2"
-                                            strokeDasharray="6,6"/>
-                                    </svg>
+
+                                    <div style={{width: '100%', height: 260, marginTop: '20px'}}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <ComposedChart
+                                                data={result.chartData}
+                                                // 💡 1. right 여백을 늘리고, left를 음수로 당겨서 중앙 밸런스를 맞춥니다.
+                                                margin={{top: 10, right: 30, left: -15, bottom: 0}}
+                                            >
+                                                <defs>
+                                                    <linearGradient id="colorMedian" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="var(--color-primary)"
+                                                              stopOpacity={0.3}/>
+                                                        <stop offset="95%" stopColor="var(--color-primary)"
+                                                              stopOpacity={0}/>
+                                                    </linearGradient>
+                                                </defs>
+
+                                                <XAxis
+                                                    dataKey="month"
+                                                    tickFormatter={(tick) => `${tick}개월`}
+                                                    // 💡 2. 축 선을 숨겨서 더 깔끔하게 만듭니다.
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    tick={{fill: 'var(--color-text-muted)', fontSize: 12}}
+                                                    tickMargin={10}
+                                                />
+
+                                                <YAxis
+                                                    tickFormatter={(tick) => currency === '원화' ? `${(tick / 10000).toLocaleString()}만` : tick.toLocaleString()}
+                                                    // 💡 3. Y축 여백을 80에서 55로 줄이고, 선을 숨깁니다.
+                                                    width={55}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    tick={{fill: 'var(--color-text-muted)', fontSize: 12}}
+                                                />
+
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false}
+                                                               stroke="var(--color-border-light)"/>
+
+                                                <Tooltip content={<CustomTooltip currency={currency}/>}
+                                                         cursor={{stroke: '#e4eaf5', strokeWidth: 1}}/>
+
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="medianAmount"
+                                                    stroke="var(--color-primary)"
+                                                    fillOpacity={1}
+                                                    fill="url(#colorMedian)"
+                                                    strokeWidth={3}
+                                                    name="예상 자산"
+                                                />
+
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="targetAmount"
+                                                    stroke="#94a3b8"
+                                                    strokeWidth={2}
+                                                    name="목표 자산"
+                                                    strokeDasharray="5 5"
+                                                    dot={false}
+                                                />
+                                            </ComposedChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
 
                                 <div className={styles.achieveCard}>
@@ -314,10 +461,13 @@ const Rebalancing = () => {
                                     <div className={styles.achieveRow}>
                                         <div className={styles.achieveTrack}>
                                             <div className={styles.achieveFill}
-                                                 style={{width: `${result.achievementRate}%`}}/>
+                                                 style={{width: `${result.successProbability}%`}}/>
                                         </div>
-                                        <span className={styles.achieveVal}>{result.achievementRate}%</span>
+                                        <span className={styles.achieveVal}>{result.successProbability}%</span>
                                     </div>
+                                    <p style={{marginTop: '10px', fontSize: '13px', color: 'var(--color-text-muted)'}}>
+                                        {result.goalAchievementMessage}
+                                    </p>
                                 </div>
 
                                 <div className={styles.statsGrid}>
@@ -328,7 +478,9 @@ const Rebalancing = () => {
                                     </div>
                                     <div className={styles.statItem}>
                                         <p className={styles.statLabel}>연평균 수익률</p>
-                                        <p className={`${styles.statVal} ${styles.pos}`}>+{result.avgReturnRate}%</p>
+                                        <p className={`${styles.statVal} ${result.annualizedReturn >= 0 ? styles.pos : styles.neg}`}>
+                                            {result.annualizedReturn > 0 ? '+' : ''}{result.annualizedReturn}%
+                                        </p>
                                     </div>
                                     <div className={styles.statItem}>
                                         <p className={styles.statLabel}>최대 낙폭</p>
@@ -336,11 +488,13 @@ const Rebalancing = () => {
                                     </div>
                                     <div className={styles.statItem}>
                                         <p className={styles.statLabel}>최고 연수익률</p>
-                                        <p className={`${styles.statVal} ${styles.pos}`}>+{result.maxAnnualReturn}%</p>
+                                        <p className={`${styles.statVal} ${result.bestAnnualReturn >= 0 ? styles.pos : styles.neg}`}>
+                                            {result.bestAnnualReturn > 0 ? '+' : ''}{result.bestAnnualReturn}%
+                                        </p>
                                     </div>
                                     <div className={styles.statItem}>
                                         <p className={styles.statLabel}>최저 연수익률</p>
-                                        <p className={`${styles.statVal} ${styles.neg}`}>{result.minAnnualReturn}%</p>
+                                        <p className={`${styles.statVal} ${styles.neg}`}>{result.worstAnnualReturn}%</p>
                                     </div>
                                 </div>
                             </>
@@ -368,19 +522,18 @@ const Rebalancing = () => {
                             {searchResults.length === 0 ? (
                                 <p className={styles.searchMsg}>{searchQuery ? '검색 결과가 없습니다' : '종목명이나 티커를 입력하세요'}</p>
                             ) : searchResults.map(st => {
-                                const inList = stocks.find(s => s.ticker === st.ticker);
+                                const targetTicker = st.symbol || st.ticker;
+                                const inList = stocks.find(s => s.ticker === targetTicker);
                                 return (
-                                    <div key={st.ticker} className={styles.resultItem}>
+                                    <div key={targetTicker} className={styles.resultItem}>
                                         <div className={styles.resultLeft}>
-                                            <StockLogo ticker={st.ticker} name={st.name}/>
+                                            <StockLogo ticker={targetTicker} name={st.assetName}/>
                                             <div>
-                                                <p className={styles.resultName}>{st.name}</p>
-                                                <p className={styles.resultInfo}>{st.ticker} · {st.market} · {st.price}</p>
+                                                <p className={styles.resultName}>{st.assetName}</p>
+                                                <p className={styles.resultInfo}>{targetTicker} · {st.market}</p>
                                             </div>
                                         </div>
                                         <div className={styles.resultRight}>
-                                            <span
-                                                className={st.pos ? styles.resultPos : styles.resultNeg}>{st.chg}</span>
                                             <button className={`${styles.addBtn} ${inList ? styles.addBtnDone : ''}`}
                                                     onClick={() => !inList && handleAdd(st)} disabled={!!inList}>
                                                 {inList ? '추가됨 ✓' : '+ 추가'}
