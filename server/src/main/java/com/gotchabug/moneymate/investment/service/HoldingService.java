@@ -78,6 +78,21 @@ public class HoldingService {
     }
 
     /**
+     * 수량 직접 수정
+     * holdingId + memberId 동시 검증 → 타인 데이터 수정 방지
+     */
+    @Transactional
+    public HoldingDto updateQuantity(Long memberId, Long holdingId, int quantity) {
+        InvestmentHolding holding = holdingRepository.findById(holdingId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 보유 종목입니다. holdingId=" + holdingId));
+        if (!holding.getMember().getMemberId().equals(memberId)) {
+            throw new IllegalArgumentException("본인의 종목만 수정할 수 있습니다.");
+        }
+        holding.setQuantity(quantity);
+        return toDto(holdingRepository.save(holding));
+    }
+
+    /**
      * 보유 종목 삭제
      * holdingId + memberId 동시 검증 → 타인 데이터 삭제 방지
      */

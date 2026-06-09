@@ -128,6 +128,56 @@ public class HoldingController {
     }
 
     @Operation(
+            summary = "보유 종목 수량 수정",
+            description = "로그인한 사용자의 특정 보유 종목 수량을 직접 수정합니다."
+    )
+    @PatchMapping("/{holdingId}/quantity")
+    public HoldingDto updateQuantity(
+
+            @Parameter(description = "수량을 수정할 보유 종목 ID", required = true)
+            @PathVariable
+            Long holdingId,
+
+            @Parameter(description = "변경할 수량 { \"quantity\": 3 }", required = true)
+            @RequestBody
+            Map<String, Object> body,
+
+            @Parameter(hidden = true)
+            HttpSession session
+    ) {
+
+        Object rawQty = body.get("quantity");
+
+        if (rawQty == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "quantity 는 필수입니다."
+            );
+        }
+
+        int quantity;
+        try {
+            quantity = Integer.parseInt(rawQty.toString());
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "quantity 형식이 올바르지 않습니다."
+            );
+        }
+
+        if (quantity < 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "quantity 는 1 이상이어야 합니다."
+            );
+        }
+
+        Long memberId = getLoginUser(session).getMemberId();
+
+        return holdingService.updateQuantity(memberId, holdingId, quantity);
+    }
+
+    @Operation(
             summary = "보유 종목 삭제",
             description = "로그인한 사용자의 투자 보유 종목에서 특정 종목을 삭제합니다."
     )
