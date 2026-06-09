@@ -14,13 +14,13 @@ public class MarketDataSyncController {
     private final YahooFinancePriceSyncService yahooFinancePriceSyncService;
 
     @GetMapping("/yahoo-prices")
-    public Map<String, String> syncYahooPrices() {
+    public Map<String, Object> syncYahooPrices() {
 
-        yahooFinancePriceSyncService.syncFiveYearPrices();
+        int savedCount = yahooFinancePriceSyncService.syncFiveYearPrices();
 
         return Map.of(
-                "message",
-                "Yahoo Finance 5년 가격 데이터 수집 완료"
+                "message", "Yahoo Finance 5년 가격 데이터 수집 완료",
+                "savedCount", savedCount
         );
     }
 }

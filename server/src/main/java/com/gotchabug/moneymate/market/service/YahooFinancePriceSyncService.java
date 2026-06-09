@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -28,56 +31,78 @@ public class YahooFinancePriceSyncService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Transactional
-    public void syncFiveYearPrices() {
+    public int syncFiveYearPrices() {
 
         List<Asset> assets =
-                assetRepository.findAllByAssetTypeIn(
-                        List.of("STOCK", "ETF")
-                );
+                assetRepository.findAllByAssetTypeIn(List.of("STOCK", "ETF"));
+
+        System.out.println("[수집 대상 개수] " + assets.size());
+
+        int totalSavedCount = 0;
 
         for (Asset asset : assets) {
             try {
-                syncAssetPrice(asset);
+                int savedCount = syncAssetPrice(asset);
+                totalSavedCount += savedCount;
+
+                System.out.println("[수집 성공] "
+                        + asset.getTicker()
+                        + " / 저장 "
+                        + savedCount
+                        + "건");
+
             } catch (Exception e) {
-                System.out.println("[Yahoo Finance 수집 실패] "
+                System.out.println("[수집 실패] "
                         + asset.getTicker()
                         + " / "
                         + e.getMessage());
+                e.printStackTrace();
             }
         }
+
+        return totalSavedCount;
     }
 
-    private void syncAssetPrice(Asset asset) throws Exception {
+    private int syncAssetPrice(Asset asset) throws Exception {
 
-        String yahooTicker =
-                convertToYahooTicker(asset);
-
-        long period2 =
-                Instant.now().getEpochSecond();
-
-        long period1 =
-                Instant.now()
-                        .minusSeconds(60L * 60 * 24 * 365 * 5)
-                        .getEpochSecond();
+        String yahooTicker = convertToYahooTicker(asset);
 
         String url =
                 "https://query1.finance.yahoo.com/v8/finance/chart/"
                         + yahooTicker
-                        + "?period1="
-                        + period1
-                        + "&period2="
-                        + period2
-                        + "&interval=1d";
+                        + "?interval=1d&range=5y";
+
+        System.out.println("[Yahoo URL] " + url);
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.set(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/137.0 Safari/537.36"
+        );
+
+        HttpEntity<String> entity =
+                new HttpEntity<>(headers);
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        String.class
+                );
 
         String response =
-                restTemplate.getForObject(url, String.class);
+                responseEntity.getBody();
 
         if (response == null || response.isBlank()) {
-            return;
+            System.out.println("[응답 없음] " + yahooTicker);
+            return 0;
         }
 
-        JsonNode root =
-                objectMapper.readTree(response);
+        System.out.println("[Yahoo 응답 앞부분] "
+                + response.substring(0, Math.min(300, response.length())));
+
+        JsonNode root = objectMapper.readTree(response);
 
         JsonNode result =
                 root.path("chart")
@@ -85,38 +110,36 @@ public class YahooFinancePriceSyncService {
                         .get(0);
 
         if (result == null || result.isMissingNode()) {
-            return;
+            System.out.println("[result 없음] " + yahooTicker);
+            return 0;
         }
 
-        JsonNode timestamps =
-                result.path("timestamp");
+        JsonNode timestamps = result.path("timestamp");
 
         JsonNode quote =
                 result.path("indicators")
                         .path("quote")
                         .get(0);
 
-        if (timestamps == null
-                || !timestamps.isArray()
-                || quote == null
-                || quote.isMissingNode()) {
-            return;
+        if (timestamps == null || !timestamps.isArray()) {
+            System.out.println("[timestamp 없음] " + yahooTicker);
+            return 0;
         }
 
-        JsonNode opens =
-                quote.path("open");
+        if (quote == null || quote.isMissingNode()) {
+            System.out.println("[quote 없음] " + yahooTicker);
+            return 0;
+        }
 
-        JsonNode highs =
-                quote.path("high");
+        JsonNode opens = quote.path("open");
+        JsonNode highs = quote.path("high");
+        JsonNode lows = quote.path("low");
+        JsonNode closes = quote.path("close");
+        JsonNode volumes = quote.path("volume");
 
-        JsonNode lows =
-                quote.path("low");
+        System.out.println("[timestamp 개수] " + timestamps.size());
 
-        JsonNode closes =
-                quote.path("close");
-
-        JsonNode volumes =
-                quote.path("volume");
+        int savedCount = 0;
 
         for (int i = 0; i < timestamps.size(); i++) {
 
@@ -127,12 +150,11 @@ public class YahooFinancePriceSyncService {
                 continue;
             }
 
-            long unixTime =
-                    timestamps.get(i).asLong();
+            long unixTime = timestamps.get(i).asLong();
 
             LocalDate priceDate =
                     Instant.ofEpochSecond(unixTime)
-                            .atZone(ZoneId.systemDefault())
+                            .atZone(ZoneId.of("Asia/Seoul"))
                             .toLocalDate();
 
             if (assetPriceRepository.existsByAssetAssetIdAndPriceDate(
@@ -142,20 +164,12 @@ public class YahooFinancePriceSyncService {
                 continue;
             }
 
-            BigDecimal openPrice =
-                    BigDecimal.valueOf(opens.get(i).asDouble());
+            BigDecimal openPrice = BigDecimal.valueOf(opens.get(i).asDouble());
+            BigDecimal highPrice = BigDecimal.valueOf(highs.get(i).asDouble());
+            BigDecimal lowPrice = BigDecimal.valueOf(lows.get(i).asDouble());
+            BigDecimal closePrice = BigDecimal.valueOf(closes.get(i).asDouble());
 
-            BigDecimal highPrice =
-                    BigDecimal.valueOf(highs.get(i).asDouble());
-
-            BigDecimal lowPrice =
-                    BigDecimal.valueOf(lows.get(i).asDouble());
-
-            BigDecimal closePrice =
-                    BigDecimal.valueOf(closes.get(i).asDouble());
-
-            Long volume =
-                    0L;
+            Long volume = 0L;
 
             if (volumes != null
                     && volumes.isArray()
@@ -175,13 +189,13 @@ public class YahooFinancePriceSyncService {
             assetPrice.setVolume(volume);
 
             assetPriceRepository.save(assetPrice);
+            savedCount++;
         }
+
+        return savedCount;
     }
 
-    private boolean isInvalidPriceNode(
-            JsonNode node,
-            int index
-    ) {
+    private boolean isInvalidPriceNode(JsonNode node, int index) {
         return node == null
                 || !node.isArray()
                 || node.get(index) == null
@@ -190,11 +204,8 @@ public class YahooFinancePriceSyncService {
 
     private String convertToYahooTicker(Asset asset) {
 
-        String ticker =
-                asset.getTicker();
-
-        String market =
-                asset.getMarket();
+        String ticker = asset.getTicker();
+        String market = asset.getMarket();
 
         if ("KOSPI".equalsIgnoreCase(market)) {
             return ticker + ".KS";

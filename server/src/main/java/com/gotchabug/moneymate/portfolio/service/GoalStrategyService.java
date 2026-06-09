@@ -15,11 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +24,7 @@ import java.util.Random;
 public class GoalStrategyService {
 
     private static final int SIMULATION_COUNT = 1000;
+    private static final int TRADING_DAYS_PER_YEAR = 252;
 
     private final GoalStrategyResultRepository goalStrategyResultRepository;
     private final MemberRepository memberRepository;
@@ -107,6 +105,9 @@ public class GoalStrategyService {
             long simulationSeed
     ) {
 
+        Map<String, MarketStat> marketStatMap =
+                createMarketStatMap(request.getSelectedAssets());
+
         Random random = new Random(simulationSeed);
         long[] finalAmounts = new long[SIMULATION_COUNT];
         long[][] monthlyAmounts = new long[SIMULATION_COUNT][totalMonths + 1];
@@ -120,7 +121,8 @@ public class GoalStrategyService {
                     totalMonths,
                     monthlyInvestment,
                     rebalanceCycle,
-                    random
+                    random,
+                    marketStatMap
             );
 
             finalAmounts[i] = result.finalAmount();
@@ -147,7 +149,8 @@ public class GoalStrategyService {
             int totalMonths,
             long monthlyInvestment,
             RebalanceCycle rebalanceCycle,
-            Random random
+            Random random,
+            Map<String, MarketStat> marketStatMap
     ) {
 
         double[] assetAmounts = initializeAssetAmounts(request);
@@ -175,7 +178,8 @@ public class GoalStrategyService {
                     request.getSelectedAssets(),
                     assetAmounts,
                     monthlyInvestment,
-                    random
+                    random,
+                    marketStatMap
             );
 
             portfolioIndex *= portfolioGrowthFactor;
@@ -239,7 +243,8 @@ public class GoalStrategyService {
             List<SelectedAssetRequest> assets,
             double[] assetAmounts,
             long monthlyInvestment,
-            Random random
+            Random random,
+            Map<String, MarketStat> marketStatMap
     ) {
 
         double totalBeforeGrowth = Arrays.stream(assetAmounts).sum();
@@ -252,7 +257,13 @@ public class GoalStrategyService {
             SelectedAssetRequest asset = assets.get(i);
 
             MarketStat stat =
-                    calculateMarketStat(asset);
+                    marketStatMap.getOrDefault(
+                            normalizeTicker(asset.getSymbol()),
+                            new MarketStat(
+                                    asset.getExpectedAnnualReturn(),
+                                    asset.getAnnualVolatility()
+                            )
+                    );
 
             double monthlyExpectedReturn =
                     Math.pow(
@@ -293,16 +304,35 @@ public class GoalStrategyService {
         return portfolioGrowthFactor;
     }
 
+    private Map<String, MarketStat> createMarketStatMap(
+            List<SelectedAssetRequest> assets
+    ) {
+
+        Map<String, MarketStat> statMap = new HashMap<>();
+
+        for (SelectedAssetRequest asset : assets) {
+            String ticker = normalizeTicker(asset.getSymbol());
+
+            if (!statMap.containsKey(ticker)) {
+                statMap.put(ticker, calculateMarketStat(asset));
+            }
+        }
+
+        return statMap;
+    }
+
     private MarketStat calculateMarketStat(
             SelectedAssetRequest asset
     ) {
+
+        String ticker = normalizeTicker(asset.getSymbol());
 
         LocalDate startDate =
                 LocalDate.now().minusYears(5);
 
         List<AssetPrice> prices =
                 assetPriceRepository.findPriceHistoryByTicker(
-                        asset.getSymbol(),
+                        ticker,
                         startDate
                 );
 
@@ -339,6 +369,37 @@ public class GoalStrategyService {
             );
         }
 
+        AssetPrice firstPrice = prices.get(0);
+        AssetPrice lastPrice = prices.get(prices.size() - 1);
+
+        double firstClose =
+                firstPrice.getClosePrice().doubleValue();
+
+        double lastClose =
+                lastPrice.getClosePrice().doubleValue();
+
+        if (firstClose <= 0 || lastClose <= 0) {
+            return new MarketStat(
+                    asset.getExpectedAnnualReturn(),
+                    asset.getAnnualVolatility()
+            );
+        }
+
+        long days =
+                Math.max(
+                        1,
+                        ChronoUnit.DAYS.between(
+                                firstPrice.getPriceDate(),
+                                lastPrice.getPriceDate()
+                        )
+                );
+
+        double years =
+                Math.max(1.0 / 365.0, days / 365.0);
+
+        double annualReturn =
+                Math.pow(lastClose / firstClose, 1.0 / years) - 1.0;
+
         double avgDailyReturn =
                 dailyReturns.stream()
                         .mapToDouble(Double::doubleValue)
@@ -356,16 +417,31 @@ public class GoalStrategyService {
         double dailyVolatility =
                 Math.sqrt(variance);
 
-        double annualReturn =
-                Math.pow(1.0 + avgDailyReturn, 252.0) - 1.0;
-
         double annualVolatility =
-                dailyVolatility * Math.sqrt(252.0);
+                dailyVolatility * Math.sqrt(TRADING_DAYS_PER_YEAR);
+
+        annualReturn = clampDouble(annualReturn, -0.80, 1.00);
+        annualVolatility = clampDouble(annualVolatility, 0.01, 1.20);
 
         return new MarketStat(
                 annualReturn,
                 annualVolatility
         );
+    }
+
+    private String normalizeTicker(String symbol) {
+
+        if (symbol == null) {
+            return "";
+        }
+
+        String ticker = symbol.trim().toUpperCase(Locale.ROOT);
+
+        if (ticker.endsWith(".KS") || ticker.endsWith(".KQ")) {
+            return ticker.substring(0, ticker.length() - 3);
+        }
+
+        return ticker;
     }
 
     private void rebalanceAssets(
@@ -763,6 +839,10 @@ public class GoalStrategyService {
     }
 
     private int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private double clampDouble(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
 
