@@ -35,3 +35,10 @@ export const resetPasswordApi = async (loginId, email, newPassword, newPasswordC
     });
     return response.data;
 }
+
+export const checkLoginIdApi = async (loginId) => {
+   const response = await axiosInstance.get('/auth/check-login-id', {
+       params: { loginId }
+   });
+   return response.data;
+};

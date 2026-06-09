@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './SignUp.module.css';
 import {TermsContent, PrivacyContent} from '../../components/Policies/PolicyContents';
-import {signupApi} from "../../api/authApi.js";
+import {signupApi, checkLoginIdApi} from "../../api/authApi.js";
 
 function SignUp() {
     const navigate = useNavigate();
@@ -16,7 +16,7 @@ function SignUp() {
     const [isLoading, setIsLoading] = useState(false);
     const [idChecked, setIdChecked] = useState(false);
     const [idCheckMessage, setIdCheckMessage] = useState('');
-    const [idCheckStatus, setIdCheckStatus] = useState(null); // 'success' | 'error' | null
+    const [idCheckStatus, setIdCheckStatus] = useState(null);
 
     const handleChange = (e) => {
         const {name, value, type, checked} = e.target;
@@ -33,16 +33,28 @@ function SignUp() {
         }));
     };
 
-    const handleCheckId = () => {
+    const handleCheckId = async () => {
         if (!formData.loginId.trim()) {
             setIdCheckMessage('아이디를 입력해주세요.');
             setIdCheckStatus('error');
             return;
         }
-        // TODO: 백엔드 API 연결 후 실제 중복확인으로 교체
-        setIdChecked(true);
-        setIdCheckMessage('사용 가능한 아이디입니다.');
-        setIdCheckStatus('success');
+        try {
+            const res = await checkLoginIdApi(formData.loginId);
+            if (res.data === true) {
+                setIdChecked(true);
+                setIdCheckMessage(res.message);
+                setIdCheckStatus('success');
+            } else {
+                setIdChecked(false);
+                setIdCheckMessage(res.message);
+                setIdCheckStatus('error');
+            }
+        } catch (e) {
+            setIdChecked(false);
+            setIdCheckMessage('중복확인 중 오류가 발생했습니다.');
+            setIdCheckStatus('error');
+        }
     };
 
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}[\]:;"'<>,.?/\\]).{8,}$/;
@@ -86,7 +98,6 @@ function SignUp() {
                 <h2 className={styles.title}>회원가입</h2>
 
                 <form onSubmit={handleSignup} className={styles.form}>
-                    {/* 아이디 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>아이디</label>
                         <div className={styles.actionRow}>
@@ -114,7 +125,6 @@ function SignUp() {
                         )}
                     </div>
 
-                    {/* 비밀번호 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>비밀번호</label>
                         <input type="password" name="password" value={formData.password} onChange={handleChange}
@@ -124,7 +134,6 @@ function SignUp() {
                         </div>
                     </div>
 
-                    {/* 비밀번호 확인 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>비밀번호 확인</label>
                         <input type="password" name="passwordConfirm" value={formData.passwordConfirm}
@@ -136,7 +145,6 @@ function SignUp() {
                         )}
                     </div>
 
-                    {/* 이름 & 생년월일 */}
                     <div className={styles.halfRow}>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>이름</label>
@@ -150,14 +158,12 @@ function SignUp() {
                         </div>
                     </div>
 
-                    {/* 이메일 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>이메일</label>
                         <input type="email" name="email" value={formData.email} onChange={handleChange}
                                className={styles.input} placeholder="example@email.com" required/>
                     </div>
 
-                    {/* 약관 동의 */}
                     <div className={styles.termsBox}>
                         <div className={styles.termsLabelWrap}>
                             <input type="checkbox" id="agreeCheckbox" name="agreeTerms" checked={formData.agreeTerms}
