@@ -7,7 +7,6 @@ import {signupApi} from "../../api/authApi.js";
 function SignUp() {
     const navigate = useNavigate();
 
-    // 폼 상태 관리
     const [formData, setFormData] = useState({
         loginId: '', password: '', passwordConfirm: '', name: '',
         birthDate: '', email: '', agreeTerms: false,
@@ -15,23 +14,43 @@ function SignUp() {
 
     const [modalType, setModalType] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [idChecked, setIdChecked] = useState(false);
+    const [idCheckMessage, setIdCheckMessage] = useState('');
+    const [idCheckStatus, setIdCheckStatus] = useState(null); // 'success' | 'error' | null
 
     const handleChange = (e) => {
         const {name, value, type, checked} = e.target;
+
+        if (name === 'loginId') {
+            setIdChecked(false);
+            setIdCheckMessage('');
+            setIdCheckStatus(null);
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
+    const handleCheckId = () => {
+        if (!formData.loginId.trim()) {
+            setIdCheckMessage('아이디를 입력해주세요.');
+            setIdCheckStatus('error');
+            return;
+        }
+        // TODO: 백엔드 API 연결 후 실제 중복확인으로 교체
+        setIdChecked(true);
+        setIdCheckMessage('사용 가능한 아이디입니다.');
+        setIdCheckStatus('success');
+    };
+
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}[\]:;"'<>,.?/\\]).{8,}$/;
     const isPasswordValid = passwordRegex.test(formData.password);
 
-    // const handleCheckId = () => alert('사용 가능한 아이디입니다.');
-    // const handleSendAuthCode = () => alert('인증번호가 발송되었습니다.');
-
     const handleSignup = async (e) => {
         e.preventDefault();
+        if (!idChecked) return alert('아이디 중복확인을 해주세요.');
         if (!isPasswordValid) return alert('비밀번호 형식을 확인해 주세요.');
         if (formData.password !== formData.passwordConfirm) return alert('비밀번호가 일치하지 않습니다.');
         if (!formData.agreeTerms) return alert('이용약관 및 개인정보 처리방침에 동의해 주세요.');
@@ -49,8 +68,13 @@ function SignUp() {
             navigate('/signup-complete', {state: {userName: formData.name}});
         } catch (error) {
             console.error('회원가입 실패', error);
-            const errorMsg = error.response?.data?.message || '회원가입에 실패했습니다. 아이디/이메일 중복 여부를 확인해주세요.';
-            alert(errorMsg);
+            const status = error.response?.status;
+            if (status === 409) {
+                alert('이미 사용 중인 아이디 또는 이메일입니다.');
+            } else {
+                const errorMsg = error.response?.data?.message || '회원가입에 실패했습니다.';
+                alert(errorMsg);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -65,9 +89,29 @@ function SignUp() {
                     {/* 아이디 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>아이디</label>
-                        {/* 💡 중복확인 버튼 및 actionRow 제거. 단일 input으로 변경 */}
-                        <input type="text" name="loginId" value={formData.loginId} onChange={handleChange}
-                               className={styles.input} placeholder="아이디 입력" required/>
+                        <div className={styles.actionRow}>
+                            <input
+                                type="text"
+                                name="loginId"
+                                value={formData.loginId}
+                                onChange={handleChange}
+                                className={styles.input}
+                                placeholder="아이디 입력"
+                                required
+                            />
+                            <button
+                                type="button"
+                                className={styles.checkBtn}
+                                onClick={handleCheckId}
+                            >
+                                중복확인
+                            </button>
+                        </div>
+                        {idCheckMessage && (
+                            <div className={`${styles.statusBox} ${idCheckStatus === 'success' ? styles.statusSuccess : styles.statusError}`}>
+                                {idCheckStatus === 'success' ? `✓ ${idCheckMessage}` : `✕ ${idCheckMessage}`}
+                            </div>
+                        )}
                     </div>
 
                     {/* 비밀번호 */}
@@ -75,8 +119,7 @@ function SignUp() {
                         <label className={styles.label}>비밀번호</label>
                         <input type="password" name="password" value={formData.password} onChange={handleChange}
                                className={styles.input} placeholder="비밀번호 입력" required/>
-                        <div
-                            className={`${styles.statusBox} ${isPasswordValid ? styles.statusSuccess : styles.statusWarning}`}>
+                        <div className={`${styles.statusBox} ${isPasswordValid ? styles.statusSuccess : styles.statusWarning}`}>
                             {isPasswordValid ? '✓ 사용 가능한 비밀번호입니다.' : '! 영문, 숫자, 특수문자 포함 8자 이상'}
                         </div>
                     </div>
@@ -87,8 +130,7 @@ function SignUp() {
                         <input type="password" name="passwordConfirm" value={formData.passwordConfirm}
                                onChange={handleChange} className={styles.input} placeholder="비밀번호 재입력" required/>
                         {formData.passwordConfirm && (
-                            <div
-                                className={`${styles.statusBox} ${formData.password === formData.passwordConfirm ? styles.statusSuccess : styles.statusError}`}>
+                            <div className={`${styles.statusBox} ${formData.password === formData.passwordConfirm ? styles.statusSuccess : styles.statusError}`}>
                                 {formData.password === formData.passwordConfirm ? '✓ 비밀번호가 일치합니다.' : '✕ 비밀번호가 일치하지 않습니다.'}
                             </div>
                         )}
@@ -134,7 +176,6 @@ function SignUp() {
                 </form>
             </div>
 
-            {/* ── 약관 확인 모달 ── */}
             {modalType && (
                 <div className={styles.modalOverlay} onClick={() => setModalType(null)}>
                     <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
