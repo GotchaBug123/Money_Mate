@@ -42,7 +42,7 @@ public class GoalStrategyService {
         SimulationSummary summary = runScenario(
                 request,
                 request.totalInvestmentMonths(),
-                request.safeMonthlyInvestment(),
+                request.effectiveMonthlyInvestment(),
                 request.getRebalanceCycle(),
                 simulationSeed
         );
@@ -75,6 +75,7 @@ public class GoalStrategyService {
                 .shortageAmount(summary.shortageAmount())
                 .recommendedMonthlyInvestment(recommendedMonthlyInvestment)
                 .annualizedReturn(summary.annualizedReturn())
+                .totalReturn(summary.totalReturn())
                 .maxDrawdown(summary.maxDrawdown())
                 .bestAnnualReturn(summary.bestAnnualReturn())
                 .worstAnnualReturn(summary.worstAnnualReturn())
@@ -169,7 +170,7 @@ public class GoalStrategyService {
         double bestAnnualReturn = Double.NEGATIVE_INFINITY;
         double worstAnnualReturn = Double.POSITIVE_INFINITY;
 
-        monthlyAmounts[0] = request.safeCurrentAmount();
+        monthlyAmounts[0] = request.effectiveCurrentAmount();
         indexHistory[0] = portfolioIndex;
 
         for (int month = 1; month <= totalMonths; month++) {
@@ -232,8 +233,8 @@ public class GoalStrategyService {
         double[] assetAmounts = new double[assets.size()];
 
         for (int i = 0; i < assets.size(); i++) {
-            assetAmounts[i] =
-                    assets.get(i).allocationFrom(request.safeCurrentAmount());
+                    assetAmounts[i] =
+                    assets.get(i).allocationFrom(request.effectiveCurrentAmount());
         }
 
         return assetAmounts;
@@ -515,6 +516,7 @@ public class GoalStrategyService {
                 median,
                 pessimistic,
                 calculateAnnualizedReturn(request, median),
+                calculateTotalReturn(request, median),
                 summarizeMetricAsPercent(maxDrawdowns),
                 summarizeMetricAsPercent(bestAnnualReturns),
                 summarizeMetricAsPercent(worstAnnualReturns),
@@ -554,6 +556,24 @@ public class GoalStrategyService {
                 ) - 1.0;
 
         return roundOne(annualizedReturn * 100.0);
+    }
+
+    private Double calculateTotalReturn(
+            GoalStrategyRequest request,
+            long finalAmount
+    ) {
+
+        long totalContribution = request.estimatedTotalContribution();
+
+        if (totalContribution <= 0) {
+            return 0.0;
+        }
+
+        double totalReturn =
+                ((double) finalAmount - totalContribution)
+                        / totalContribution;
+
+        return roundOne(totalReturn * 100.0);
     }
 
     private Double summarizeMetricAsPercent(
@@ -754,7 +774,7 @@ public class GoalStrategyService {
     ) {
 
         if (summary.pessimisticAmount() >= request.getTargetAmount()) {
-            return request.safeMonthlyInvestment();
+            return request.effectiveMonthlyInvestment();
         }
 
         int totalMonths =
@@ -766,7 +786,7 @@ public class GoalStrategyService {
                         request.getTargetAmount() - summary.pessimisticAmount()
                 );
 
-        return request.safeMonthlyInvestment()
+        return request.effectiveMonthlyInvestment()
                 + (long) Math.ceil((double) conservativeShortage / totalMonths);
     }
 
@@ -781,8 +801,8 @@ public class GoalStrategyService {
                 GoalStrategyResult.builder()
                         .member(member)
                         .goalName(request.safeGoalName())
-                        .currentAmount(request.safeCurrentAmount())
-                        .monthlyInvestment(request.safeMonthlyInvestment())
+                        .currentAmount(request.effectiveCurrentAmount())
+                        .monthlyInvestment(request.effectiveMonthlyInvestment())
                         .targetAmount(request.getTargetAmount())
                         .investmentYears(request.storageInvestmentYears())
                         .rebalanceCycle(request.getRebalanceCycle())
@@ -806,8 +826,8 @@ public class GoalStrategyService {
 
         long seed = 1469598103934665603L;
 
-        seed = mix(seed, request.safeCurrentAmount());
-        seed = mix(seed, request.safeMonthlyInvestment());
+        seed = mix(seed, request.effectiveCurrentAmount());
+        seed = mix(seed, request.effectiveMonthlyInvestment());
         seed = mix(seed, request.getTargetAmount());
         seed = mix(seed, request.totalInvestmentMonths());
 
@@ -854,6 +874,7 @@ public class GoalStrategyService {
             long medianAmount,
             long pessimisticAmount,
             Double annualizedReturn,
+            Double totalReturn,
             Double maxDrawdown,
             Double bestAnnualReturn,
             Double worstAnnualReturn,
