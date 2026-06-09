@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useLocation} from 'react-router-dom';
 import styles from './Login.module.css';
 import {loginApi} from "../../api/authApi.js";
 import {useAuthStore} from "../../store/useAuthStore.js";
 
 function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from ?? '/';
 
     const [loginId, setLoginId] = useState('');
     const [password, setPassword] = useState('');
@@ -31,8 +33,7 @@ function Login() {
 
                 alert(response.message || `${response.data.name}님 환영합니다!`);
 
-                if (response.data.role === 'ADMIN') navigate('/admin');
-                else navigate('/');
+                navigate(from, {replace: true});
             } else alert(response.message || '로그인에 실패했습니다.');
         } catch (error) {
             console.error('로그인 에러: ', error);

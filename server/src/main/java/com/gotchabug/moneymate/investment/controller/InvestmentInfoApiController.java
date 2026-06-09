@@ -33,6 +33,7 @@ public class InvestmentInfoApiController {
 
         return InvestmentInfoResponse.builder()
                 .selectedMarket(market)
+                .latestPriceDate(investmentInfoService.getLatestPriceDate())
                 .assetList(assetList)
                 .kospi(investmentInfoService.getMarketIndex("069500"))
                 .kosdaq(investmentInfoService.getMarketIndex("229200"))
@@ -57,6 +58,7 @@ public class InvestmentInfoApiController {
     @Builder
     public static class InvestmentInfoResponse {
         private String selectedMarket;
+        private java.time.LocalDate latestPriceDate;
         private List<AssetSummaryDto> assetList;
 
         private Object kospi;

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './InvestmentDiagnosis.module.css';
+import {submitRiskSurveyApi, saveRiskProfileApi} from '../../../api/riskSurveyApi.js';
 
 const questions = [
     {
@@ -72,6 +73,7 @@ const InvestmentQuestions = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(0);
     const [answers, setAnswers] = useState(Array(questions.length).fill(null));
+    const [submitting, setSubmitting] = useState(false);
 
     const handleSelect = (idx) => {
         const q = questions[step];
@@ -88,12 +90,34 @@ const InvestmentQuestions = () => {
         setAnswers(newAns);
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (step < questions.length - 1) {
             setStep((p) => p + 1);
-        } else {
-            const resultData = calculateResult();
-            navigate('/investment/result', {state: resultData});
+            return;
+        }
+        const {selectedThemes} = calculateResult();
+        setSubmitting(true);
+        try {
+            const toVal = (idx) => idx !== null ? idx + 1 : undefined;
+            const surveyData = await submitRiskSurveyApi({
+                ageGroup: toVal(answers[0]),
+                incomeRange: toVal(answers[1]),
+                investmentPurpose: toVal(answers[2]),
+                investmentHorizon: toVal(answers[3]),
+                experienceLevel: toVal(answers[4]),
+                lossTolerance: toVal(answers[5]),
+                preferredThemes: selectedThemes,
+            });
+            // risk_profile 테이블에 최신 성향 저장 (실패해도 결과 화면 진행)
+            saveRiskProfileApi(surveyData.totalScore).catch((e) =>
+                console.warn('risk_profile 저장 실패:', e)
+            );
+            navigate('/investment/result', {state: {surveyData, selectedThemes}});
+        } catch (error) {
+            console.error('투자성향 설문 제출 실패:', error);
+            alert('결과 분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -201,11 +225,11 @@ const InvestmentQuestions = () => {
                                 <button className={styles.prevBtn} onClick={handlePrev}>← 이전 질문</button>
                             )}
                             <button
-                                className={`${styles.nextBtn} ${!isAnswered ? styles.nextBtnDisabled : ''}`}
+                                className={`${styles.nextBtn} ${(!isAnswered || submitting) ? styles.nextBtnDisabled : ''}`}
                                 onClick={handleNext}
-                                disabled={!isAnswered}
+                                disabled={!isAnswered || submitting}
                             >
-                                {step === questions.length - 1 ? '결과 보기 →' : '다음 질문 →'}
+                                {submitting ? '분석 중...' : step === questions.length - 1 ? '결과 보기 →' : '다음 질문 →'}
                             </button>
                         </div>
 

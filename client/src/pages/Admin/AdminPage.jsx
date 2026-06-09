@@ -1,80 +1,46 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
 import Header from '../../components/common/Header';
 import MemberManagePage from './MemberManagePage';
 import InvestmentManagePage from './InvestmentManagePage';
 import CommunityManagePage from './CommunityManagePage';
 import CustomerInquiryManagePage from './CustomerInquiryManagePage';
-import {useInquiryStore} from '../../store/useInquiryStore';
-
+import {getAdminDashboardApi} from '../../api/adminApi.js';
+import {getAdminInvestmentSummaryApi} from '../../api/adminApi.js';
+import {useAuthStore} from '../../store/useAuthStore.js';
 import styles from './AdminPage.module.css';
 
-function AdminPage({
-                       onLogout,
-                       posts: externalPosts,
-                       onUpdatePost,
-                       onDeletePost,
-                   }) {
-    const navigate = useNavigate();
+function AdminPage() {
+    const {logout} = useAuthStore();
     const [activeMenu, setActiveMenu] = useState('dashboard');
+    const [dashboard, setDashboard] = useState({
+        memberCount: 0,
+        postCount: 0,
+        waitingInquiryCount: 0,
+    });
 
-    const inquiries = useInquiryStore((state) => state.inquiries);
-    const answerInquiry = useInquiryStore((state) => state.answerInquiry);
-    const deleteInquiry = useInquiryStore((state) => state.deleteInquiry);
+    useEffect(() => {
+        if (activeMenu !== 'dashboard') return;
+        const loadDashboard = async () => {
+            try {
+                const [dash, invest] = await Promise.all([
+                    getAdminDashboardApi(),
+                    getAdminInvestmentSummaryApi().catch(() => ({})),
+                ]);
+                setDashboard({
+                    memberCount: dash.userCount ?? 0,
+                    postCount: invest.memberCount ?? 0,
+                    waitingInquiryCount: dash.waitingInquiryCount ?? 0,
+                });
+            } catch (error) {
+                console.error('대시보드 조회 실패:', error);
+            }
+        };
+        loadDashboard();
+    }, [activeMenu]);
 
-    const [members, setMembers] = useState([
-        {
-            memberNo: '1', userId: 'admin01', name: '김관리', birthDate: '1998-03-15',
-            joinedAt: '2026-05-01', phone: '010-1234-5678', email: 'admin01@moneymate.com',
-        },
-        {
-            memberNo: '2', userId: 'user01', name: '이회원', birthDate: '2000-07-22',
-            joinedAt: '2026-05-10', phone: '010-2222-3333', email: 'user01@moneymate.com',
-        },
-    ]);
-
-    const [posts, setPosts] = useState(externalPosts || []);
-
-    const waitingInquiryCount = inquiries.filter(
-        (inq) => inq.status === '대기' || inq.status === '답변 대기'
-    ).length;
-
-    const handleDeleteMember = () => {
-        /* 기존 로직 유지 */
-    };
-
-    const handleUpdateMember = () => {
-        /* 기존 로직 유지 */
-    };
-
-    const handleUpdatePost = (updatedPost) => {
-        if (onUpdatePost) {
-            onUpdatePost(updatedPost);
-            return;
-        }
-
-        setPosts((prevPosts) =>
-            prevPosts.map((post) =>
-                post.id === updatedPost.id ? {...post, ...updatedPost} : post
-            )
-        );
-    };
-
-    const handleDeletePost = (postId) => {
-        if (onDeletePost) {
-            onDeletePost(postId);
-            return;
-        }
-
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-    };
-
-    const handleAnswerInquiry = (updatedInquiry) => {
-        answerInquiry(updatedInquiry);
-    };
-
-    const handleDeleteInquiry = (inquiryNo) => {
-        deleteInquiry(inquiryNo);
+    const handleLogout = () => {
+        logout();
+        // AdminRoute가 user 변경을 감지해 자동 리다이렉트하므로 별도 navigate 불필요
     };
 
     const adminMenuItems = [
@@ -83,25 +49,18 @@ function AdminPage({
         {label: '투자관리', onClick: () => setActiveMenu('investmentManage')},
         {label: '커뮤니티관리', onClick: () => setActiveMenu('communityManage')},
         {label: '고객문의관리', onClick: () => setActiveMenu('customerInquiryManage')},
+        {label: '일반 페이지', to: '/'},
     ];
 
     const adminRightButtons = [
-        {
-            label: '관리자 로그아웃',
-            secondary: true,
-            onClick: () => {
-                if (onLogout) onLogout();
-                else navigate('/login');
-            }
-        }
+        {label: '관리자 로그아웃', secondary: true, onClick: handleLogout},
     ];
 
     return (
         <div className={styles.pageWrapper}>
-
             <Header
                 logoTo="/admin"
-                logoOnClick={() => setActiveMenu('dashboard')}
+                logoOnClick={activeMenu !== 'dashboard' ? () => setActiveMenu('dashboard') : undefined}
                 menuItems={adminMenuItems}
                 rightButtons={adminRightButtons}
             />
@@ -118,76 +77,41 @@ function AdminPage({
                     </section>
 
                     <section className={styles.cardGrid}>
-                        <button
-                            className={styles.dashboardCard}
-                            onClick={() => setActiveMenu('memberManage')}
-                        >
+                        <button className={styles.dashboardCard} onClick={() => setActiveMenu('memberManage')}>
                             <span className={styles.cardIcon}>👥</span>
                             <h2 className={styles.cardTitle}>회원관리</h2>
                             <p className={styles.cardDesc}>전체 회원 목록 조회, 상세 정보 수정 및 탈퇴 처리를 관리합니다.</p>
-                            <strong className={styles.cardHighlight}>총 {members.length}명</strong>
+                            <strong className={styles.cardHighlight}>총 {dashboard.memberCount}명</strong>
                         </button>
 
-                        <button
-                            className={styles.dashboardCard}
-                            onClick={() => setActiveMenu('investmentManage')}
-                        >
+                        <button className={styles.dashboardCard} onClick={() => setActiveMenu('investmentManage')}>
                             <span className={styles.cardIcon}>📈</span>
                             <h2 className={styles.cardTitle}>투자관리</h2>
                             <p className={styles.cardDesc}>투자 상품, 포트폴리오 성과 및 수익률 통계를 모니터링합니다.</p>
                             <strong className={styles.cardHighlight}>활성 상품 현황</strong>
                         </button>
 
-                        <button
-                            className={styles.dashboardCard}
-                            onClick={() => setActiveMenu('communityManage')}
-                        >
+                        <button className={styles.dashboardCard} onClick={() => setActiveMenu('communityManage')}>
                             <span className={styles.cardIcon}>💬</span>
                             <h2 className={styles.cardTitle}>커뮤니티관리</h2>
                             <p className={styles.cardDesc}>게시글 모니터링, 부적절한 콘텐츠 블라인드 및 삭제를 진행합니다.</p>
-                            <strong className={styles.cardHighlight}>게시글 {posts.length}개</strong>
+                            <strong className={styles.cardHighlight}>게시글 {dashboard.postCount}개</strong>
                         </button>
 
-                        <button
-                            className={styles.dashboardCard}
-                            onClick={() => setActiveMenu('customerInquiryManage')}
-                        >
+                        <button className={styles.dashboardCard} onClick={() => setActiveMenu('customerInquiryManage')}>
                             <span className={styles.cardIcon}>🎧</span>
                             <h2 className={styles.cardTitle}>고객문의관리</h2>
                             <p className={styles.cardDesc}>문의 답변, 삭제 조치, 처리 상태를 관리합니다.</p>
-                            <strong className={styles.cardHighlight}>대기 {waitingInquiryCount}건</strong>
+                            <strong className={styles.cardHighlight}>대기 {dashboard.waitingInquiryCount}건</strong>
                         </button>
                     </section>
                 </main>
             )}
 
-            {activeMenu === 'memberManage' && (
-                <MemberManagePage
-                    members={members}
-                    onDeleteMember={handleDeleteMember}
-                    onUpdateMember={handleUpdateMember}
-                />
-            )}
-
-            {activeMenu === 'investmentManage' && (
-                <InvestmentManagePage/>
-            )}
-
-            {activeMenu === 'communityManage' && (
-                <CommunityManagePage
-                    posts={posts}
-                    onUpdatePost={handleUpdatePost}
-                    onDeletePost={handleDeletePost}
-                />
-            )}
-
-            {activeMenu === 'customerInquiryManage' && (
-                <CustomerInquiryManagePage
-                    inquiries={inquiries}
-                    onAnswerInquiry={handleAnswerInquiry}
-                    onDeleteInquiry={handleDeleteInquiry}
-                />
-            )}
+            {activeMenu === 'memberManage' && <MemberManagePage/>}
+            {activeMenu === 'investmentManage' && <InvestmentManagePage/>}
+            {activeMenu === 'communityManage' && <CommunityManagePage/>}
+            {activeMenu === 'customerInquiryManage' && <CustomerInquiryManagePage/>}
         </div>
     );
 }

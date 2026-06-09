@@ -13,7 +13,7 @@ function Header({
                 }) {
     const navigate = useNavigate();
 
-    const {isLoggedIn, user, logout} = useAuthStore();
+    const {isLoggedIn, user, logout, openLoginModal} = useAuthStore();
 
     const userName = user?.name || '회원';
 
@@ -36,6 +36,7 @@ function Header({
         {label: '투자정보', to: '/investment-information'},
         {label: '커뮤니티', to: '/community'},
         {label: '고객센터', to: '/customer-service'},
+        ...(user?.role === 'ADMIN' ? [{label: '관리자 페이지', to: '/admin', admin: true}] : []),
     ];
 
     const finalMenuItems = menuItems || defaultMenuItems;
@@ -91,9 +92,13 @@ function Header({
 
         return (
             <>
-                <Link to="/login" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
+                <button
+                    type="button"
+                    onClick={() => openLoginModal()}
+                    className={`${styles.actionBtn} ${styles.secondaryBtn}`}
+                >
                     로그인
-                </Link>
+                </button>
                 <Link to="/signup" className={`${styles.actionBtn} ${styles.primaryBtn}`}>
                     회원가입
                 </Link>
@@ -118,7 +123,11 @@ function Header({
                         {finalMenuItems.map((item) => {
                             if (item.to) {
                                 return (
-                                    <Link key={item.label} to={item.to} className={styles.navItem}>
+                                    <Link
+                                        key={item.label}
+                                        to={item.to}
+                                        className={styles.navItem}
+                                    >
                                         {item.label}
                                     </Link>
                                 );

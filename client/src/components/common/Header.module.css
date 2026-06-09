@@ -64,6 +64,7 @@
     color: var(--color-primary); /* 호버 시 파란색 포인트 */
 }
 
+
 /* 오른쪽: 액션 버튼 영역 */
 .rightSection {
     display: flex;

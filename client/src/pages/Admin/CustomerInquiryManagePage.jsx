@@ -1,61 +1,53 @@
-import React, {useState} from 'react';
-import styles from './CustomerInquiryManagePage.module.css'; // 💡 모듈 CSS 적용
+import React, {useState, useEffect} from 'react';
+import styles from './CustomerInquiryManagePage.module.css';
+import {getAdminInquiriesApi, answerAdminInquiryApi} from '../../api/adminApi.js';
 
-function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}) {
+function CustomerInquiryManagePage() {
+    const [inquiries, setInquiries] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [mode, setMode] = useState('list');
     const [searchType, setSearchType] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
-    const [answerForm, setAnswerForm] = useState({
-        inquiryNo: '',
-        title: '',
-        writerId: '',
-        writerName: '',
-        email: '',
-        createdAt: '',
-        status: '',
-        content: '',
-        attachmentName: '',
-        attachmentUrl: '',
-        answer: '',
-    });
+    const [answerForm, setAnswerForm] = useState({});
 
-    const filteredInquiries = inquiries.filter((inquiry) => {
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            try {
+                const data = await getAdminInquiriesApi();
+                setInquiries(Array.isArray(data) ? data : (data.inquiries ?? []));
+            } catch (error) {
+                console.error('문의 목록 조회 실패:', error);
+                alert('문의 목록을 불러오는 데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, []);
+
+    const filteredInquiries = inquiries.filter((inq) => {
         if (!searchKeyword) return true;
-
-        const inquiryNo = inquiry.inquiryNo.toLowerCase();
-        const title = inquiry.title.toLowerCase();
-        const writerId = inquiry.writerId.toLowerCase();
-        const writerName = inquiry.writerName.toLowerCase();
-        const email = inquiry.email.toLowerCase();
-        const status = inquiry.status.toLowerCase();
-
-        if (searchType === 'inquiryNo') return inquiryNo.includes(searchKeyword);
+        const no = String(inq.inquiryId ?? '').toLowerCase();
+        const title = (inq.title ?? '').toLowerCase();
+        const memberName = (inq.memberName ?? '').toLowerCase();
+        const status = (inq.status ?? '').toLowerCase();
+        if (searchType === 'inquiryNo') return no.includes(searchKeyword);
         if (searchType === 'title') return title.includes(searchKeyword);
-        if (searchType === 'writerId') return writerId.includes(searchKeyword);
-        if (searchType === 'writerName') return writerName.includes(searchKeyword);
-        if (searchType === 'email') return email.includes(searchKeyword);
+        if (searchType === 'writerName') return memberName.includes(searchKeyword);
         if (searchType === 'status') return status.includes(searchKeyword);
-
-        return (
-            inquiryNo.includes(searchKeyword) ||
-            title.includes(searchKeyword) ||
-            writerId.includes(searchKeyword) ||
-            writerName.includes(searchKeyword) ||
-            email.includes(searchKeyword) ||
-            status.includes(searchKeyword)
-        );
+        return no.includes(searchKeyword) || title.includes(searchKeyword) ||
+            memberName.includes(searchKeyword) || status.includes(searchKeyword);
     });
 
-    // 💡 요약 통계 계산
     const totalCount = inquiries.length;
-    const waitingCount = inquiries.filter(inq => inq.status === '대기' || inq.status === '답변 대기').length;
-    const completedCount = inquiries.filter(inq => inq.status === '답변 완료').length;
-    const deletedCount = inquiries.filter(inq => inq.status === '삭제 조치').length;
+    const waitingCount = inquiries.filter(i => (i.status ?? '').includes('대기')).length;
+    const completedCount = inquiries.filter(i => (i.status ?? '').includes('완료')).length;
+    const deletedCount = inquiries.filter(i => (i.status ?? '').includes('삭제')).length;
 
-    // 💡 핸들러
-    const handleSearchSubmit = (event) => {
-        event.preventDefault();
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
         setSearchKeyword(searchInput.trim().toLowerCase());
     };
 
@@ -65,52 +57,47 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
         setSearchKeyword('');
     };
 
-    const handleOpenInquiry = (inquiry) => {
-        setAnswerForm({...inquiry});
+    const handleOpenInquiry = (inq) => {
+        setAnswerForm({...inq, answer: inq.answer ?? ''});
         setMode('answer');
     };
 
     const handleCloseInquiry = () => {
-        setAnswerForm({
-            inquiryNo: '', title: '', writerId: '', writerName: '', email: '',
-            createdAt: '', status: '', content: '', attachmentName: '', attachmentUrl: '', answer: '',
-        });
+        setAnswerForm({});
         setMode('list');
     };
 
-    const handleAnswerChange = (event) => {
-        setAnswerForm((prev) => ({...prev, answer: event.target.value}));
-    };
-
-    const handleAnswerSubmit = (event) => {
-        event.preventDefault();
-        if (onAnswerInquiry) {
-            onAnswerInquiry({...answerForm, status: '답변 완료'});
-        }
-        alert('답변이 등록되었습니다.');
-        setMode('list');
-    };
-
-    const handleDeleteClick = (inquiryNo) => {
-        const isConfirm = window.confirm('정말 이 문의를 삭제(숨김 조치)하시겠습니까?');
-        if (isConfirm) {
-            if (onDeleteInquiry) onDeleteInquiry(inquiryNo);
-            alert('문의가 삭제 조치되었습니다.');
+    const handleAnswerSubmit = async (e) => {
+        e.preventDefault();
+        const inquiryId = answerForm.inquiryId;
+        try {
+            await answerAdminInquiryApi(inquiryId, answerForm.answer);
+            setInquiries(prev => prev.map(i =>
+                (i.inquiryId ?? i.inquiryNo) === inquiryId
+                    ? {...i, answer: answerForm.answer, status: '답변 완료'}
+                    : i
+            ));
+            alert('답변이 등록되었습니다.');
+            setMode('list');
+        } catch (error) {
+            console.error('답변 등록 실패:', error);
+            alert('답변 등록에 실패했습니다.');
         }
     };
 
-    // 상태에 따른 배지 스타일 결정
+    const handleDeleteClick = () => {
+        alert('문의 삭제 기능은 현재 지원되지 않습니다.');
+    };
+
     const getStatusBadge = (status) => {
-        if (status.includes('대기')) return styles.statusPending;
-        if (status.includes('완료')) return styles.statusCompleted;
-        if (status.includes('삭제')) return styles.statusDeleted;
+        if ((status ?? '').includes('대기')) return styles.statusPending;
+        if ((status ?? '').includes('완료')) return styles.statusCompleted;
+        if ((status ?? '').includes('삭제')) return styles.statusDeleted;
         return '';
     };
 
     return (
         <main className={styles.container}>
-
-            {/* 상단 헤더 영역 */}
             <div className={styles.header}>
                 <div>
                     <h2 className={styles.title}>고객 문의 관리</h2>
@@ -118,7 +105,6 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
                 </div>
             </div>
 
-            {/* 통계 요약 그리드 */}
             <div className={styles.summaryGrid}>
                 <article className={styles.summaryCard}>
                     <span className={styles.summaryLabel}>전체 문의</span>
@@ -138,16 +124,11 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
                 </article>
             </div>
 
-            {/* 리스트 모드 */}
             {mode === 'list' && (
                 <>
                     <div className={styles.toolbar}>
                         <form className={styles.searchBox} onSubmit={handleSearchSubmit}>
-                            <select
-                                className={styles.select}
-                                value={searchType}
-                                onChange={(e) => setSearchType(e.target.value)}
-                            >
+                            <select className={styles.select} value={searchType} onChange={(e) => setSearchType(e.target.value)}>
                                 <option value="all">전체</option>
                                 <option value="inquiryNo">문의 번호</option>
                                 <option value="title">제목</option>
@@ -155,17 +136,10 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
                                 <option value="email">이메일</option>
                                 <option value="status">상태</option>
                             </select>
-
-                            <input
-                                type="text"
-                                className={styles.input}
-                                value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
-                                placeholder="검색어를 입력하세요"
-                            />
+                            <input type="text" className={styles.input} value={searchInput}
+                                   onChange={(e) => setSearchInput(e.target.value)} placeholder="검색어를 입력하세요"/>
                             <button type="submit" className={styles.primaryBtn}>검색</button>
-                            <button type="button" className={styles.secondaryBtn} onClick={handleSearchReset}>초기화
-                            </button>
+                            <button type="button" className={styles.secondaryBtn} onClick={handleSearchReset}>초기화</button>
                         </form>
                     </div>
 
@@ -178,39 +152,29 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
                             <span>상태</span>
                             <span>관리</span>
                         </div>
-
-                        {filteredInquiries.length > 0 ? (
-                            filteredInquiries.map((inquiry) => (
-                                <div className={styles.tableRow} key={inquiry.inquiryNo}>
-                                    <span>{inquiry.inquiryNo}</span>
-                                    <span>
-                                        {inquiry.writerName}<br/>
-                                        <small style={{color: 'var(--color-text-muted)'}}>({inquiry.writerId})</small>
+                        {loading ? (
+                            <div style={{padding: '60px', textAlign: 'center', color: 'var(--color-text-muted)'}}>불러오는 중...</div>
+                        ) : filteredInquiries.length > 0 ? (
+                            filteredInquiries.map((inq) => (
+                                <div className={styles.tableRow} key={inq.inquiryId}>
+                                    <span>{inq.inquiryId}</span>
+                                    <span>{inq.memberName ?? '-'}</span>
+                                    <span className={styles.colTitle} onClick={() => handleOpenInquiry(inq)}>
+                                        {inq.title}
                                     </span>
-                                    <span
-                                        className={styles.colTitle}
-                                        onClick={() => handleOpenInquiry(inquiry)}
-                                    >
-                                        {inquiry.title}
-                                    </span>
-                                    <span>{inquiry.createdAt}</span>
+                                    <span>{String(inq.createdAt ?? '').slice(0, 10)}</span>
                                     <span>
-                                        <span className={`${styles.statusBadge} ${getStatusBadge(inquiry.status)}`}>
-                                            {inquiry.status}
+                                        <span className={`${styles.statusBadge} ${getStatusBadge(inq.status)}`}>
+                                            {inq.status ?? '대기'}
                                         </span>
                                     </span>
                                     <div className={styles.actionGroup}>
-                                        <button
-                                            className={styles.actionBtn}
-                                            onClick={() => handleOpenInquiry(inquiry)}
-                                        >
+                                        <button className={styles.actionBtn} onClick={() => handleOpenInquiry(inq)}>
                                             상세/답변
                                         </button>
-                                        <button
-                                            className={styles.dangerBtn}
-                                            onClick={() => handleDeleteClick(inquiry.inquiryNo)}
-                                            disabled={inquiry.status === '삭제 조치'}
-                                        >
+                                        <button className={styles.dangerBtn}
+                                                onClick={() => handleDeleteClick(inq.inquiryId)}
+                                                disabled={(inq.status ?? '').includes('삭제')}>
                                             삭제
                                         </button>
                                     </div>
@@ -225,29 +189,27 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
                 </>
             )}
 
-            {/* 답변/상세 모드 */}
             {mode === 'answer' && (
                 <div className={styles.tableWrapper} style={{padding: '32px'}}>
                     <div className={styles.header} style={{marginBottom: '24px'}}>
                         <h2 className={styles.title}>문의 상세 및 답변 등록</h2>
                     </div>
-
                     <div className={styles.detailGrid}>
                         <div className={styles.detailField}>
                             <span className={styles.detailLabel}>문의 번호</span>
-                            <span className={styles.detailValue}>{answerForm.inquiryNo}</span>
+                            <span className={styles.detailValue}>{answerForm.inquiryId ?? answerForm.inquiryNo}</span>
                         </div>
                         <div className={styles.detailField}>
                             <span className={styles.detailLabel}>작성일</span>
-                            <span className={styles.detailValue}>{answerForm.createdAt}</span>
+                            <span className={styles.detailValue}>{(answerForm.createdAt ?? '').slice(0, 10)}</span>
                         </div>
                         <div className={styles.detailField}>
-                            <span className={styles.detailLabel}>작성자 (ID)</span>
-                            <span className={styles.detailValue}>{answerForm.writerName} ({answerForm.writerId})</span>
+                            <span className={styles.detailLabel}>작성자</span>
+                            <span className={styles.detailValue}>{answerForm.memberName ?? '-'}</span>
                         </div>
                         <div className={styles.detailField}>
-                            <span className={styles.detailLabel}>이메일</span>
-                            <span className={styles.detailValue}>{answerForm.email}</span>
+                            <span className={styles.detailLabel}>처리 상태</span>
+                            <span className={styles.detailValue}>{answerForm.status ?? '대기'}</span>
                         </div>
                         <div className={`${styles.detailField} ${styles.full}`}>
                             <span className={styles.detailLabel}>문의 제목</span>
@@ -256,46 +218,37 @@ function CustomerInquiryManagePage({inquiries, onAnswerInquiry, onDeleteInquiry}
                         <div className={`${styles.detailField} ${styles.full}`}>
                             <span className={styles.detailLabel}>문의 내용</span>
                             <div className={styles.detailValue} style={{
-                                padding: '16px',
-                                background: '#fff',
-                                border: '1px solid var(--color-border)',
-                                borderRadius: '8px',
-                                minHeight: '100px',
-                                whiteSpace: 'pre-wrap'
+                                padding: '16px', background: '#fff', border: '1px solid var(--color-border)',
+                                borderRadius: '8px', minHeight: '100px', whiteSpace: 'pre-wrap'
                             }}>
                                 {answerForm.content}
                             </div>
                         </div>
                     </div>
-
                     <form onSubmit={handleAnswerSubmit}>
                         <div className={styles.formGroup}>
                             <label className={styles.formLabel}>관리자 답변</label>
                             <textarea
                                 name="answer"
-                                value={answerForm.answer || ''}
-                                onChange={handleAnswerChange}
+                                value={answerForm.answer}
+                                onChange={(e) => setAnswerForm(prev => ({...prev, answer: e.target.value}))}
                                 placeholder="고객에게 안내할 답변 내용을 입력해주세요."
                                 className={styles.textarea}
                                 required
-                                readOnly={answerForm.status === '삭제 조치'}
+                                readOnly={(answerForm.status ?? '').includes('삭제')}
                             />
                         </div>
-
                         <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px'}}>
                             <button type="button" className={styles.secondaryBtn} onClick={handleCloseInquiry}>
                                 취소 / 목록으로
                             </button>
-                            {answerForm.status !== '삭제 조치' && (
-                                <button type="submit" className={styles.primaryBtn}>
-                                    답변 등록/수정
-                                </button>
+                            {!(answerForm.status ?? '').includes('삭제') && (
+                                <button type="submit" className={styles.primaryBtn}>답변 등록/수정</button>
                             )}
                         </div>
                     </form>
                 </div>
             )}
-
         </main>
     );
 }

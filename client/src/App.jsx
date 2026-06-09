@@ -1,5 +1,7 @@
-import React from 'react';
-import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
+import React, {useEffect} from 'react';
+import {BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {useAuthStore} from './store/useAuthStore.js';
+import LoginModal from './components/common/LoginModal.jsx';
 
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
@@ -47,6 +49,33 @@ import Privacy from "./pages/Terms/Privacy.jsx";
 import './styles/common.css';
 import './App.css';
 
+function PrivateRoute({children}) {
+    const {user, openLoginModal} = useAuthStore();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!user) {
+            openLoginModal(location.pathname);
+            navigate('/', {replace: true});
+        }
+    }, [user]);
+
+    if (!user) return null;
+    return children;
+}
+
+function AdminRoute({children}) {
+    const {user} = useAuthStore();
+    const location = useLocation();
+
+    if (!user || user.role !== 'ADMIN') {
+        const from = location.state?.from ?? '/';
+        return <Navigate to={from} replace/>;
+    }
+    return children;
+}
+
 function AppContent() {
     const location = useLocation();
     const isAdminPage = location.pathname.startsWith('/admin');
@@ -54,11 +83,12 @@ function AppContent() {
     return (
         <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
             {!isAdminPage && <Header/>}
+            <LoginModal/>
 
             <main style={{minHeight: 'calc(100vh - 60px)'}}>
                 <Routes>
                     <Route path="/" element={<Home/>}/>
-                    <Route path="/mypage" element={<MyPage/>}/>
+                    <Route path="/mypage" element={<PrivateRoute><MyPage/></PrivateRoute>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<SignUp/>}/>
                     <Route path="/signup-complete" element={<SignUpComplete/>}/>
@@ -70,22 +100,22 @@ function AppContent() {
                     <Route path="/faq" element={<FAQ/>}/>
                     <Route path="/stock-guide" element={<StockGuide/>}/>
                     <Route path="/customer-feedback" element={<CustomerFeedback/>}/>
-                    <Route path="/inquiry-write" element={<InquiryWrite/>}/>
-                    <Route path="/inquiry-list" element={<InquiryList/>}/>
-                    <Route path="/asset" element={<MyAsset/>}/>
-                    <Route path="/asset-detail" element={<AssetDetail/>}/>
-                    <Route path="/financial/input" element={<FinancialInput/>}/>
-                    <Route path="/financial/result" element={<FinancialResult/>}/>
-                    <Route path="/investment/questions" element={<InvestmentQuestions/>}/>
-                    <Route path="/investment/result" element={<InvestmentResult/>}/>
-                    <Route path="/portfolio" element={<PortfolioMain/>}/>
-                    <Route path="/portfolio/auto" element={<PortfolioAuto/>}/>
-                    <Route path="/portfolio/result" element={<PortfolioResult/>}/>
-                    <Route path="/portfolio/direct" element={<PortfolioDirect/>}/>
-                    <Route path="/rebalancing" element={<Rebalancing/>}/>
+                    <Route path="/inquiry-write" element={<PrivateRoute><InquiryWrite/></PrivateRoute>}/>
+                    <Route path="/inquiry-list" element={<PrivateRoute><InquiryList/></PrivateRoute>}/>
+                    <Route path="/asset" element={<PrivateRoute><MyAsset/></PrivateRoute>}/>
+                    <Route path="/asset-detail" element={<PrivateRoute><AssetDetail/></PrivateRoute>}/>
+                    <Route path="/financial/input" element={<PrivateRoute><FinancialInput/></PrivateRoute>}/>
+                    <Route path="/financial/result" element={<PrivateRoute><FinancialResult/></PrivateRoute>}/>
+                    <Route path="/investment/questions" element={<PrivateRoute><InvestmentQuestions/></PrivateRoute>}/>
+                    <Route path="/investment/result" element={<PrivateRoute><InvestmentResult/></PrivateRoute>}/>
+                    <Route path="/portfolio" element={<PrivateRoute><PortfolioMain/></PrivateRoute>}/>
+                    <Route path="/portfolio/auto" element={<PrivateRoute><PortfolioAuto/></PrivateRoute>}/>
+                    <Route path="/portfolio/result" element={<PrivateRoute><PortfolioResult/></PrivateRoute>}/>
+                    <Route path="/portfolio/direct" element={<PrivateRoute><PortfolioDirect/></PrivateRoute>}/>
+                    <Route path="/rebalancing" element={<PrivateRoute><Rebalancing/></PrivateRoute>}/>
                     <Route path="/investment-information" element={<InvestmentInformation/>}/>
                     <Route path="/community" element={<UserCommunityPage/>}/>
-                    <Route path="/admin" element={<AdminPage/>}/>
+                    <Route path="/admin" element={<AdminRoute><AdminPage/></AdminRoute>}/>
                     <Route path="/terms" element={<Terms/>}/>
                     <Route path="/privacy" element={<Privacy/>}/>
                 </Routes>

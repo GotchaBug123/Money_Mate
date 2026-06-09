@@ -1,311 +1,112 @@
-import React, {useState} from 'react';
-import styles from './userCommunity.module.css'; // 💡 모듈 CSS 적용
+import React, {useState, useEffect} from 'react';
+import styles from './userCommunity.module.css';
+import {useAuthStore} from '../../store/useAuthStore.js';
+import {
+    getCommunityMainApi,
+    getCommunityPostsApi,
+    createCommunityPostApi,
+    updateCommunityPostApi,
+    deleteCommunityPostApi,
+    likeCommunityPostApi,
+    unlikeCommunityPostApi,
+    getCommunityCommentsApi,
+    createCommunityCommentApi,
+    getMyPostsApi,
+} from '../../api/communityApi.js';
 
-const themes = ['반도체', 'ETF', '배당주', '성장주'];
-const interestStocks = ['삼성전자', 'SK하이닉스', 'TIGER 미국S&P500'];
+const renderStockLogo = (name) => (
+    <span className={styles.stockLogoBox}>
+        <span className={styles.stockLogoFallback}>{name ? name.slice(0, 1) : '?'}</span>
+    </span>
+);
 
-const defaultPosts = [
-    {
-        postNo: '1',
-        title: '삼성전자 장기투자 어떻게 생각하시나요?',
-        writerId: 'user01',
-        writerName: '이회원',
-        createdAt: '2026-05-20',
-        content: '삼성전자를 장기적으로 담아가려고 하는데 다른 분들은 어떻게 생각하시나요?',
-        attachmentName: 'samsung-analysis.pdf',
-        attachmentUrl: '',
-        theme: '반도체',
-        stockName: '삼성전자',
-        likes: 18,
-        likedUserIds: [],
-        comments: [
-            {
-                commentNo: '1',
-                writerName: '김회원',
-                content: '저도 장기 관점이면 괜찮다고 봅니다.',
-                createdAt: '2026-05-20',
-                replies: [],
-            },
-        ],
-    },
-    {
-        postNo: '2',
-        title: 'ETF 중심 포트폴리오 공유합니다',
-        writerId: 'etf100',
-        writerName: '정ETF',
-        createdAt: '2026-05-21',
-        content: '저는 국내 주식보다 ETF 비중을 높게 가져가고 있습니다.',
-        attachmentName: '',
-        attachmentUrl: '',
-        theme: 'ETF',
-        stockName: 'TIGER 미국S&P500',
-        likes: 24,
-        likedUserIds: [],
-        comments: [],
-    },
-    {
-        postNo: '3',
-        title: '요즘 반도체 주식 흐름 괜찮나요?',
-        writerId: 'stock77',
-        writerName: '한주식',
-        createdAt: '2026-05-22',
-        content: '반도체 관련 종목들이 다시 올라오는 것 같아서 의견을 듣고 싶습니다.',
-        attachmentName: 'semiconductor.png',
-        attachmentUrl: '',
-        theme: '반도체',
-        stockName: 'SK하이닉스',
-        likes: 31,
-        likedUserIds: [],
-        comments: [],
-    },
-];
+function UserCommunityPage() {
+    const {user, openLoginModal} = useAuthStore();
 
-const stockProfiles = {
-    삼성전자: {name: '삼성전자', shortName: '삼', description: '국내 대표 반도체·전자 기업'},
-    SK하이닉스: {name: 'SK하이닉스', shortName: 'SK', description: '메모리 반도체 대표 기업'},
-    'TIGER 미국S&P500': {name: 'TIGER 미국S&P500', shortName: 'T', description: '미국 대표 지수 ETF'},
-    KODEX: {name: 'KODEX', shortName: 'K', description: '국내 ETF 브랜드'},
-    NAVER: {name: 'NAVER', shortName: 'N', description: '국내 대표 플랫폼 기업'},
-    카카오: {name: '카카오', shortName: '카', description: '국내 대표 플랫폼 기업'},
-    현대차: {name: '현대차', shortName: '현', description: '국내 대표 자동차 기업'},
-    애플: {name: '애플', shortName: 'A', description: '글로벌 대표 기술 기업'},
-    마이크로소프트: {name: '마이크로소프트', shortName: 'M', description: '글로벌 소프트웨어 기업'},
-    테슬라: {name: '테슬라', shortName: 'T', description: '전기차·AI 성장주'},
-    엔비디아: {name: '엔비디아', shortName: 'N', description: 'AI 반도체 대표 기업'},
-    구글: {name: '구글', shortName: 'G', description: '글로벌 플랫폼 기업'},
-};
+    const [themes, setThemes] = useState([]);
+    const [mainData, setMainData] = useState(null);
+    const [posts, setPosts] = useState([]);
+    const [myPosts, setMyPosts] = useState([]);
+    const [comments, setComments] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-function UserCommunityPage({
-                               posts: externalPosts,
-                               currentUser: externalCurrentUser,
-                               onCreatePost,
-                               onUpdatePost,
-                               onLikePost,
-                               onAddComment,
-                               onAddReply,
-                           }) {
-    const [internalPosts, setInternalPosts] = useState(defaultPosts);
     const [view, setView] = useState('home');
-    const [selectedTheme, setSelectedTheme] = useState('반도체');
+    const [selectedTheme, setSelectedTheme] = useState(null);
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
+
     const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
-    const [selectedCommentPost, setSelectedCommentPost] = useState(null);
+    const [commentPost, setCommentPost] = useState(null);
     const [commentInput, setCommentInput] = useState('');
-    const [replyingCommentNo, setReplyingCommentNo] = useState(null);
-    const [replyInput, setReplyInput] = useState('');
-
-    const posts = externalPosts || internalPosts;
-
-    const currentUser = externalCurrentUser || (
-        localStorage.getItem('isLoggedIn') === 'true'
-            ? {
-                userId: localStorage.getItem('role') === 'admin' ? 'admin' : 'test',
-                name: localStorage.getItem('role') === 'admin' ? '관리자' : '테스트회원',
-            }
-            : null
-    );
 
     const [writeForm, setWriteForm] = useState({
-        title: '',
-        content: '',
-        theme: '반도체',
-        stockName: '삼성전자',
-        attachmentName: '',
-        attachmentUrl: '',
+        themeId: '', category: 'STOCK', title: '', content: '', stockName: '', stockSymbol: '',
     });
 
-    const getCommentsCount = (post) => Array.isArray(post.comments) ? post.comments.length : 0;
-    const getRepliesCount = (comment) => Array.isArray(comment.replies) ? comment.replies.length : 0;
-
-    const isLikedPost = (post) => {
-        if (!currentUser) return false;
-        return (post.likedUserIds || []).includes(currentUser.userId);
-    };
-
-    const getStockProfile = (stockName) => {
-        return stockProfiles[stockName] || {
-            name: stockName,
-            shortName: String(stockName).slice(0, 1),
-            description: '투자 종목 커뮤니티',
+    // 홈 데이터 로드
+    useEffect(() => {
+        const loadMain = async () => {
+            setLoading(true);
+            try {
+                const data = await getCommunityMainApi();
+                setMainData(data);
+                const fetchedThemes = data.themes || [];
+                setThemes(fetchedThemes);
+                if (fetchedThemes.length > 0) setSelectedTheme(fetchedThemes[0]);
+            } catch (error) {
+                console.error('커뮤니티 메인 조회 실패:', error);
+            } finally {
+                setLoading(false);
+            }
         };
-    };
+        loadMain();
+    }, []);
 
-    const renderStockLogo = (stockName) => {
-        const profile = getStockProfile(stockName);
-        return (
-            <span className={styles.stockLogoBox}>
-                <span className={styles.stockLogoFallback}>
-                    {profile.shortName}
-                </span>
-            </span>
-        );
-    };
+    // 게시판 뷰 게시글 로드
+    useEffect(() => {
+        if (view !== 'board') return;
+        const loadPosts = async () => {
+            setLoading(true);
+            try {
+                const data = await getCommunityPostsApi({
+                    themeId: selectedTheme?.themeId,
+                    keyword: searchKeyword || undefined,
+                    size: 20,
+                });
+                setPosts(data.posts || []);
+            } catch (error) {
+                console.error('게시글 조회 실패:', error);
+                alert('게시글을 불러오는 데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadPosts();
+    }, [view, selectedTheme, searchKeyword]);
 
-    const filteredPosts = posts.filter((post) => {
-        const matchesSearch =
-            !searchKeyword ||
-            String(post.title).toLowerCase().includes(searchKeyword) ||
-            String(post.content).toLowerCase().includes(searchKeyword) ||
-            String(post.writerName).toLowerCase().includes(searchKeyword) ||
-            String(post.stockName).toLowerCase().includes(searchKeyword);
-
-        const matchesTheme = view !== 'board' || post.theme === selectedTheme;
-        return matchesSearch && matchesTheme;
-    });
-
-    const popularPosts = [...posts]
-        .sort((a, b) => (b.likes + getCommentsCount(b)) - (a.likes + getCommentsCount(a)))
-        .slice(0, 4);
-
-    const popularThemes = themes
-        .map((theme) => {
-            const themePosts = posts.filter((post) => post.theme === theme);
-            const score = themePosts.reduce((sum, post) => sum + post.likes + getCommentsCount(post), 0);
-            return {name: theme, count: themePosts.length, score};
-        })
-        .sort((a, b) => b.score - a.score);
-
-    const myPosts = currentUser ? posts.filter((post) => post.writerId === currentUser.userId) : [];
-    const interestPosts = currentUser ? posts.filter((post) => interestStocks.includes(post.stockName)) : [];
-    const latestSelectedCommentPost = selectedCommentPost ? posts.find((post) => post.postNo === selectedCommentPost.postNo) : null;
-
-    const updateInternalPost = (updatedPost) => {
-        setInternalPosts((prevPosts) =>
-            prevPosts.map((post) => post.postNo === updatedPost.postNo ? updatedPost : post)
-        );
-    };
+    // 내 게시글 로드
+    useEffect(() => {
+        if (view !== 'myPosts') return;
+        const loadMyPosts = async () => {
+            setLoading(true);
+            try {
+                const data = await getMyPostsApi();
+                setMyPosts(data.posts || []);
+            } catch (error) {
+                console.error('내 게시글 조회 실패:', error);
+                alert('내 게시글을 불러오는 데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadMyPosts();
+    }, [view]);
 
     const goCommunityHome = () => {
         setView('home');
         setSearchInput('');
         setSearchKeyword('');
-        setSelectedTheme('반도체');
-    };
-
-    const goBackToBoard = () => {
-        setView('board');
-        setSearchInput('');
-        setSearchKeyword('');
-    };
-
-    const handleSearchSubmit = (event) => {
-        event.preventDefault();
-        setSearchKeyword(searchInput.trim().toLowerCase());
-    };
-
-    const openWriteModal = () => {
-        if (!currentUser) return alert('게시글 작성은 로그인한 회원만 가능합니다.');
-        setWriteForm({
-            title: '', content: '', theme: selectedTheme,
-            stockName: selectedTheme === 'ETF' ? 'TIGER 미국S&P500' : '삼성전자',
-            attachmentName: '', attachmentUrl: '',
-        });
-        setIsWriteModalOpen(true);
-    };
-
-    const handleWriteChange = (event) => {
-        const {name, value} = event.target;
-        setWriteForm((prev) => ({...prev, [name]: value}));
-    };
-
-    const handleEditChange = (event) => {
-        const {name, value} = event.target;
-        setEditingPost((prev) => ({...prev, [name]: value}));
-    };
-
-    const handleCreateSubmit = (event) => {
-        event.preventDefault();
-        if (!writeForm.title.trim() || !writeForm.content.trim()) return alert('게시글 제목과 내용을 입력해주세요.');
-
-        const newPost = {
-            ...writeForm, postNo: String(posts.length + 1), writerId: currentUser.userId,
-            writerName: currentUser.name, createdAt: new Date().toISOString().slice(0, 10),
-            likes: 0, likedUserIds: [], comments: [],
-        };
-
-        if (onCreatePost) onCreatePost(newPost);
-        else setInternalPosts((prev) => [newPost, ...prev]);
-
-        setIsWriteModalOpen(false);
-        setView('board');
-        setSelectedTheme(writeForm.theme);
-    };
-
-    const handleEditSubmit = (event) => {
-        event.preventDefault();
-        if (onUpdatePost) onUpdatePost(editingPost);
-        else updateInternalPost(editingPost);
-
-        setEditingPost(null);
-        setView('board');
-        setSelectedTheme(editingPost.theme);
-    };
-
-    const handleLikeClick = (post) => {
-        if (!currentUser) return alert('좋아요는 로그인한 회원만 가능합니다.');
-        if (isLikedPost(post)) return alert('이미 좋아요를 누른 게시글입니다.');
-
-        if (onLikePost) {
-            onLikePost(post.postNo, currentUser.userId);
-            return;
-        }
-        updateInternalPost({
-            ...post, likes: post.likes + 1, likedUserIds: [...(post.likedUserIds || []), currentUser.userId],
-        });
-    };
-
-    const handleReplyButtonClick = (commentNo) => {
-        if (!currentUser) return alert('답글 작성은 로그인한 회원만 가능합니다.');
-        setReplyingCommentNo((prev) => prev === commentNo ? null : commentNo);
-        setReplyInput('');
-    };
-
-    const handleCommentSubmit = (event) => {
-        event.preventDefault();
-        if (!currentUser) return alert('댓글 작성은 로그인한 회원만 가능합니다.');
-        if (!commentInput.trim()) return alert('댓글 내용을 입력해주세요.');
-
-        if (onAddComment) {
-            onAddComment(latestSelectedCommentPost.postNo, commentInput.trim());
-        } else {
-            updateInternalPost({
-                ...latestSelectedCommentPost,
-                comments: [...(latestSelectedCommentPost.comments || []), {
-                    commentNo: String((latestSelectedCommentPost.comments || []).length + 1),
-                    writerName: currentUser.name, content: commentInput.trim(),
-                    createdAt: new Date().toISOString().slice(0, 10), replies: [],
-                }],
-            });
-        }
-        setCommentInput('');
-    };
-
-    const handleReplySubmit = (event, commentNo) => {
-        event.preventDefault();
-        if (!currentUser) return alert('답글 작성은 로그인한 회원만 가능합니다.');
-        if (!replyInput.trim()) return alert('답글 내용을 입력해주세요.');
-
-        if (onAddReply) {
-            onAddReply(latestSelectedCommentPost.postNo, commentNo, replyInput.trim());
-        } else {
-            updateInternalPost({
-                ...latestSelectedCommentPost,
-                comments: (latestSelectedCommentPost.comments || []).map((comment) => {
-                    if (comment.commentNo !== commentNo) return comment;
-                    return {
-                        ...comment, replies: [...(comment.replies || []), {
-                            replyNo: String((comment.replies || []).length + 1),
-                            writerName: currentUser.name, content: replyInput.trim(),
-                            createdAt: new Date().toISOString().slice(0, 10),
-                        }],
-                    };
-                }),
-            });
-        }
-        setReplyingCommentNo(null);
-        setReplyInput('');
     };
 
     const goBoardByTheme = (theme) => {
@@ -316,8 +117,137 @@ function UserCommunityPage({
     };
 
     const requireLogin = (nextView) => {
-        if (!currentUser) return alert('로그인한 회원만 사용할 수 있습니다.');
+        if (!user) return openLoginModal();
         setView(nextView);
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setSearchKeyword(searchInput.trim());
+    };
+
+    // 게시글 작성
+    const openWriteModal = () => {
+        if (!user) return openLoginModal();
+        setWriteForm({
+            themeId: selectedTheme?.themeId || themes[0]?.themeId || '',
+            category: 'STOCK', title: '', content: '', stockName: '', stockSymbol: '',
+        });
+        setIsWriteModalOpen(true);
+    };
+
+    const handleWriteChange = (e) => {
+        const {name, value} = e.target;
+        setWriteForm(prev => ({...prev, [name]: value}));
+    };
+
+    const handleEditChange = (e) => {
+        const {name, value} = e.target;
+        setEditingPost(prev => ({...prev, [name]: value}));
+    };
+
+    const handleCreateSubmit = async (e) => {
+        e.preventDefault();
+        if (!writeForm.title.trim() || !writeForm.content.trim()) return alert('제목과 내용을 입력해주세요.');
+        try {
+            await createCommunityPostApi({
+                themeId: writeForm.themeId || undefined,
+                category: writeForm.category,
+                title: writeForm.title,
+                content: writeForm.content,
+                stockName: writeForm.stockName || undefined,
+                stockSymbol: writeForm.stockSymbol || undefined,
+            });
+            setIsWriteModalOpen(false);
+            setView('board');
+            setSearchKeyword('');
+        } catch (error) {
+            console.error('게시글 작성 실패:', error);
+            alert('게시글 작성에 실패했습니다.');
+        }
+    };
+
+    const handleUpdateSubmit = async (e) => {
+        e.preventDefault();
+        if (!editingPost.title?.trim() || !editingPost.content?.trim()) return alert('제목과 내용을 입력해주세요.');
+        try {
+            await updateCommunityPostApi(editingPost.postId, {
+                category: editingPost.category || 'STOCK',
+                title: editingPost.title,
+                content: editingPost.content,
+                stockName: editingPost.stockName || undefined,
+            });
+            setPosts(prev => prev.map(p => p.postId === editingPost.postId
+                ? {...p, title: editingPost.title, content: editingPost.contentPreview}
+                : p
+            ));
+            setMyPosts(prev => prev.map(p => p.postId === editingPost.postId
+                ? {...p, title: editingPost.title}
+                : p
+            ));
+            setEditingPost(null);
+        } catch (error) {
+            console.error('게시글 수정 실패:', error);
+            alert('게시글 수정에 실패했습니다.');
+        }
+    };
+
+    const handleDeletePost = async (postId) => {
+        if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
+        try {
+            await deleteCommunityPostApi(postId);
+            setMyPosts(prev => prev.filter(p => p.postId !== postId));
+            setPosts(prev => prev.filter(p => p.postId !== postId));
+        } catch (error) {
+            console.error('게시글 삭제 실패:', error);
+            alert('게시글 삭제에 실패했습니다.');
+        }
+    };
+
+    // 좋아요
+    const handleLikeClick = async (post) => {
+        if (!user) return openLoginModal();
+        try {
+            if (post.liked) {
+                await unlikeCommunityPostApi(post.postId);
+                setPosts(prev => prev.map(p => p.postId === post.postId
+                    ? {...p, liked: false, likeCount: p.likeCount - 1} : p));
+            } else {
+                await likeCommunityPostApi(post.postId);
+                setPosts(prev => prev.map(p => p.postId === post.postId
+                    ? {...p, liked: true, likeCount: p.likeCount + 1} : p));
+            }
+        } catch (error) {
+            console.error('좋아요 처리 실패:', error);
+            alert('좋아요 처리에 실패했습니다.');
+        }
+    };
+
+    // 댓글
+    const handleOpenComments = async (post) => {
+        setCommentPost(post);
+        setCommentInput('');
+        try {
+            const data = await getCommunityCommentsApi(post.postId);
+            setComments(data || []);
+        } catch (error) {
+            console.error('댓글 조회 실패:', error);
+            setComments([]);
+        }
+    };
+
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if (!user) return openLoginModal();
+        if (!commentInput.trim()) return alert('댓글 내용을 입력해주세요.');
+        try {
+            const newComment = await createCommunityCommentApi(commentPost.postId, commentInput.trim());
+            setComments(prev => [...prev, newComment]);
+            setCommentInput('');
+        } catch (error) {
+            console.error('댓글 작성 실패:', error);
+            alert('댓글 작성에 실패했습니다.');
+        }
     };
 
     return (
@@ -325,11 +255,9 @@ function UserCommunityPage({
             <main className={styles.mainContainer}>
                 {view !== 'home' && (
                     <div className={styles.toolbar}>
-                        <button type="button" className={styles.toolbarBtn} onClick={goCommunityHome}>
-                            커뮤니티 홈
-                        </button>
+                        <button type="button" className={styles.toolbarBtn} onClick={goCommunityHome}>커뮤니티 홈</button>
                         <button type="button" className={styles.toolbarBtn}
-                                onClick={view === 'myPosts' ? goBackToBoard : goCommunityHome}>
+                                onClick={view === 'myPosts' ? () => setView('board') : goCommunityHome}>
                             뒤로가기
                         </button>
                     </div>
@@ -338,25 +266,19 @@ function UserCommunityPage({
                 <section className={styles.topArea}>
                     <form className={styles.searchBox} onSubmit={handleSearchSubmit}>
                         <input
-                            type="text"
-                            className={styles.searchInput}
-                            value={searchInput}
+                            type="text" className={styles.searchInput} value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             placeholder="종목명 / 제목 / 작성자 검색"
                         />
                         <button type="submit" className={styles.searchBtn}>검색</button>
                     </form>
-
                     <div className={styles.quickActions}>
-                        <button type="button" className={styles.secondaryBtn} onClick={() => requireLogin('myPosts')}>
-                            내 게시글
-                        </button>
-                        <button type="button" className={styles.primaryBtn} onClick={openWriteModal}>
-                            글쓰기
-                        </button>
+                        <button type="button" className={styles.secondaryBtn} onClick={() => requireLogin('myPosts')}>내 게시글</button>
+                        <button type="button" className={styles.primaryBtn} onClick={openWriteModal}>글쓰기</button>
                     </div>
                 </section>
 
+                {/* ── 홈 뷰 ── */}
                 {view === 'home' && (
                     <>
                         <section className={styles.heroSection}>
@@ -364,199 +286,164 @@ function UserCommunityPage({
                             <p className={styles.heroDesc}>관심 종목, 인기 게시글, 테마별 커뮤니티를 한 화면에서 빠르게 확인할 수 있어요.</p>
                             <div className={styles.quickActions}>
                                 <button type="button" className={styles.secondaryBtn}
-                                        onClick={() => goBoardByTheme('반도체')}>게시글 둘러보기
+                                        onClick={() => {
+                                            if (themes.length > 0) goBoardByTheme(themes[0]);
+                                            else setView('board');
+                                        }}>
+                                    게시글 둘러보기
                                 </button>
-                                <button type="button" className={styles.primaryBtn} onClick={openWriteModal}>게시글 작성
-                                </button>
+                                <button type="button" className={styles.primaryBtn} onClick={openWriteModal}>게시글 작성</button>
                             </div>
                         </section>
 
                         <section className={styles.themeChips}>
                             {themes.map((theme) => (
-                                <button type="button" key={theme} className={styles.chipBtn}
+                                <button type="button" key={theme.themeId} className={styles.chipBtn}
                                         onClick={() => goBoardByTheme(theme)}>
-                                    {theme}
+                                    {theme.themeName}
                                 </button>
                             ))}
                         </section>
 
-                        <section className={styles.rankSection}>
-                            <article className={styles.rankPanel}>
-                                <div className={styles.sectionTitleRow}>
-                                    <div>
+                        {loading ? (
+                            <p style={{color: 'var(--color-text-muted)', textAlign: 'center', padding: '40px 0'}}>불러오는 중...</p>
+                        ) : mainData && (
+                            <section className={styles.rankSection}>
+                                <article className={styles.rankPanel}>
+                                    <div className={styles.sectionTitleRow}>
                                         <h2>인기 글</h2>
+                                        <small>좋아요 기준</small>
                                     </div>
-                                    <small>좋아요 + 댓글 기준</small>
-                                </div>
-                                <div className={styles.rankList}>
-                                    {popularPosts.map((post, index) => (
-                                        <button type="button" className={styles.rankItem} key={post.postNo}
-                                                onClick={() => goBoardByTheme(post.theme)}>
-                                            <strong>{index + 1}</strong>
-                                            {renderStockLogo(post.stockName)}
-                                            <div className={styles.rankText}>
-                                                <b>{post.title}</b>
-                                                <small>{post.stockName} · 좋아요 {post.likes} ·
-                                                    댓글 {getCommentsCount(post)}</small>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </article>
+                                    <div className={styles.rankList}>
+                                        {(mainData.popularPosts || []).map((post, index) => (
+                                            <button type="button" className={styles.rankItem} key={post.postId}
+                                                    onClick={() => {
+                                                        const t = themes.find(th => String(th.themeId) === String(post.themeId));
+                                                        goBoardByTheme(t || themes[0]);
+                                                    }}>
+                                                <strong>{index + 1}</strong>
+                                                {renderStockLogo(post.stockName)}
+                                                <div className={styles.rankText}>
+                                                    <b>{post.title}</b>
+                                                    <small>{post.stockName} · 좋아요 {post.likeCount}</small>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </article>
 
-                            <article className={styles.rankPanel}>
-                                <div className={styles.sectionTitleRow}>
-                                    <div>
+                                <article className={styles.rankPanel}>
+                                    <div className={styles.sectionTitleRow}>
                                         <h2>인기 커뮤니티</h2>
+                                        <small>활동 많은 테마</small>
                                     </div>
-                                    <small>활동 많은 테마</small>
-                                </div>
-                                <div className={styles.rankList}>
-                                    {popularThemes.map((theme, index) => (
-                                        <button type="button" className={styles.rankItem} key={theme.name}
-                                                onClick={() => goBoardByTheme(theme.name)}>
-                                            <strong>{index + 1}</strong>
-                                            <div className={styles.rankText}>
-                                                <b>{theme.name}</b>
-                                                <small>게시글 {theme.count}개 · 반응 {theme.score}</small>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </article>
-                        </section>
+                                    <div className={styles.rankList}>
+                                        {(mainData.popularCommunities || []).map((theme, index) => (
+                                            <button type="button" className={styles.rankItem} key={theme.themeId}
+                                                    onClick={() => goBoardByTheme(theme)}>
+                                                <strong>{index + 1}</strong>
+                                                <div className={styles.rankText}>
+                                                    <b>{theme.themeName}</b>
+                                                    <small>{theme.description}</small>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </article>
+                            </section>
+                        )}
 
-                        <section className={styles.themeGrid}>
-                            {themes.slice(0, 3).map((theme) => {
-                                const themePosts = posts.filter((post) => post.theme === theme).slice(0, 3);
-                                return (
-                                    <article className={styles.themeCard} key={theme}>
+                        {mainData && (
+                            <section className={styles.themeGrid}>
+                                {themes.slice(0, 3).map((theme) => (
+                                    <article className={styles.themeCard} key={theme.themeId}>
                                         <div className={styles.themeCardHeader}>
-                                            <div>
-                                                <h3>{theme}</h3>
-                                            </div>
-                                            <button type="button"
-                                                    onClick={() => goBoardByTheme(theme)}>더보기 &gt;</button>
+                                            <h3>{theme.themeName}</h3>
+                                            <button type="button" onClick={() => goBoardByTheme(theme)}>더보기 &gt;</button>
                                         </div>
-                                        {themePosts.length > 0 ? (
-                                            themePosts.map((post) => (
-                                                <button type="button" className={styles.postPreview} key={post.postNo}
-                                                        onClick={() => goBoardByTheme(post.theme)}>
-                                                    {renderStockLogo(post.stockName)}
-                                                    <div>
-                                                        <strong>{post.stockName}</strong>
-                                                        <span>{post.title}</span>
-                                                    </div>
-                                                </button>
-                                            ))
-                                        ) : (
-                                            <div className={styles.emptyState}>아직 게시글이 없습니다.</div>
-                                        )}
+                                        <div className={styles.emptyState} style={{cursor: 'pointer'}}
+                                             onClick={() => goBoardByTheme(theme)}>
+                                            게시글 보러가기 →
+                                        </div>
                                     </article>
-                                );
-                            })}
-                        </section>
+                                ))}
+                            </section>
+                        )}
                     </>
                 )}
 
+                {/* ── 게시판 뷰 ── */}
                 {view === 'board' && (
                     <section className={styles.boardLayout}>
                         <aside className={styles.themeSelect}>
                             <h2>테마 선택</h2>
                             {themes.map((theme) => (
-                                <button type="button" key={theme}
-                                        className={`${styles.themeSelectBtn} ${selectedTheme === theme ? styles.active : ''}`}
+                                <button type="button" key={theme.themeId}
+                                        className={`${styles.themeSelectBtn} ${selectedTheme?.themeId === theme.themeId ? styles.active : ''}`}
                                         onClick={() => goBoardByTheme(theme)}>
-                                    {theme}
+                                    {theme.themeName}
                                 </button>
                             ))}
                         </aside>
 
                         <section className={styles.boardMain}>
                             <div className={styles.boardTop}>
-                                <div>
-                                    <h2 className={styles.boardTitle}>{selectedTheme} 게시글</h2>
-                                </div>
+                                <h2 className={styles.boardTitle}>{selectedTheme?.themeName} 게시글</h2>
                                 <div className={styles.quickActions}>
                                     <button type="button" className={styles.secondaryBtn}
                                             onClick={() => requireLogin('myPosts')}>내 게시글
                                     </button>
-                                    <button type="button" className={styles.primaryBtn} onClick={openWriteModal}>게시글
-                                        작성
-                                    </button>
+                                    <button type="button" className={styles.primaryBtn} onClick={openWriteModal}>게시글 작성</button>
                                 </div>
                             </div>
 
-                            {filteredPosts.length > 0 ? (
-                                filteredPosts.map((post) => {
-                                    const profile = getStockProfile(post.stockName);
-                                    const isLiked = isLikedPost(post);
-                                    return (
-                                        <article className={styles.postCard} key={post.postNo}>
-                                            <div className={styles.postStockRow}>
-                                                {renderStockLogo(post.stockName)}
-                                                <div>
-                                                    <strong>{post.stockName}</strong>
-                                                    <small>{profile.description}</small>
-                                                </div>
-                                                <span className={styles.themeBadge}>{post.theme}</span>
-                                            </div>
-                                            <div className={styles.postBody}>
-                                                <h3>{post.title}</h3>
-                                                <p>{post.content}</p>
-                                                <span>{post.writerName} · 좋아요 {post.likes} · 댓글 {getCommentsCount(post)}</span>
-                                            </div>
-                                            <div className={styles.postActions}>
-                                                <button type="button"
-                                                        className={`${styles.actionBtn} ${isLiked ? styles.likedBtn : ''}`}
-                                                        onClick={() => handleLikeClick(post)}>
-                                                    {isLiked ? '♥ 좋아요 완료' : '♡ 좋아요'}
-                                                </button>
-                                                <button type="button" className={styles.actionBtn} onClick={() => {
-                                                    setSelectedCommentPost(post);
-                                                    setCommentInput('');
-                                                }}>
-                                                    댓글 보기
-                                                </button>
-                                            </div>
-                                        </article>
-                                    );
-                                })
-                            ) : (
-                                <div className={`${styles.postCard} ${styles.emptyState}`}>
-                                    게시글이 없습니다.
-                                </div>
-                            )}
-                        </section>
-
-                        <aside className={styles.interestSection}>
-                            <h2>관심 종목</h2>
-                            {currentUser ? (
-                                interestPosts.length > 0 ? (
-                                    interestPosts.map((post) => (
-                                        <div className={styles.postPreview} key={post.postNo}>
+                            {loading ? (
+                                <p style={{color: 'var(--color-text-muted)', padding: '20px 0'}}>불러오는 중...</p>
+                            ) : posts.length > 0 ? (
+                                posts.map((post) => (
+                                    <article className={styles.postCard} key={post.postId}>
+                                        <div className={styles.postStockRow}>
                                             {renderStockLogo(post.stockName)}
                                             <div>
-                                                <strong>{post.stockName}</strong>
-                                                <span>{post.title}</span>
+                                                <strong>{post.stockName || '종목 없음'}</strong>
+                                                <small>{post.themeName}</small>
                                             </div>
+                                            <span className={styles.themeBadge}>{post.category}</span>
                                         </div>
-                                    ))
-                                ) : (
-                                    <p className={styles.emptyState} style={{padding: 0}}>관심 종목 게시글이 없습니다.</p>
-                                )
+                                        <div className={styles.postBody}>
+                                            <h3>{post.title}</h3>
+                                            <p>{post.contentPreview}</p>
+                                            <span>{post.authorName} · 좋아요 {post.likeCount} · 조회 {post.viewCount}</span>
+                                        </div>
+                                        <div className={styles.postActions}>
+                                            <button
+                                                type="button"
+                                                className={`${styles.actionBtn} ${post.liked ? styles.likedBtn : ''}`}
+                                                onClick={() => handleLikeClick(post)}
+                                            >
+                                                {post.liked ? '♥ 좋아요 완료' : '♡ 좋아요'}
+                                            </button>
+                                            <button type="button" className={styles.actionBtn}
+                                                    onClick={() => handleOpenComments(post)}>
+                                                댓글 보기
+                                            </button>
+                                        </div>
+                                    </article>
+                                ))
                             ) : (
-                                <p className={styles.emptyState} style={{padding: 0}}>로그인한 회원만 확인할 수 있습니다.</p>
+                                <div className={`${styles.postCard} ${styles.emptyState}`}>게시글이 없습니다.</div>
                             )}
-                        </aside>
+                        </section>
                     </section>
                 )}
 
+                {/* ── 내 게시글 뷰 ── */}
                 {view === 'myPosts' && (
                     <section className={styles.myPostsSection}>
                         <div className={styles.myPostsHeader}>
                             <h2 className={styles.heroTitle}>내 게시글</h2>
-                            <button type="button" className={styles.secondaryBtn} onClick={goBackToBoard}>돌아가기</button>
+                            <button type="button" className={styles.secondaryBtn}
+                                    onClick={() => setView('board')}>돌아가기</button>
                         </div>
                         <div className={styles.myPostsTable}>
                             <div className={styles.myPostsHead}>
@@ -565,16 +452,21 @@ function UserCommunityPage({
                                 <span>내용 요약</span>
                                 <span>관리</span>
                             </div>
-                            {myPosts.length > 0 ? (
-                                myPosts.map((post) => (
-                                    <div className={styles.myPostsRow} key={post.postNo}>
-                                        <span>{post.postNo}</span>
+                            {loading ? (
+                                <div className={styles.emptyState}>불러오는 중...</div>
+                            ) : myPosts.length > 0 ? (
+                                myPosts.map((post, idx) => (
+                                    <div className={styles.myPostsRow} key={post.postId}>
+                                        <span>{idx + 1}</span>
                                         <span className={styles.myPostTitle}>{post.title}</span>
-                                        <span className={styles.myPostContent}>{post.content}</span>
-                                        <button type="button" className={styles.toolbarBtn}
-                                                onClick={() => setEditingPost({...post})}>
-                                            수정
-                                        </button>
+                                        <span className={styles.myPostContent}>{post.contentPreview}</span>
+                                        <div style={{display: 'flex', gap: '6px'}}>
+                                            <button type="button" className={styles.toolbarBtn}
+                                                    onClick={() => setEditingPost({...post, content: post.content ?? post.contentPreview ?? ''})}>수정</button>
+                                            <button type="button" className={styles.toolbarBtn}
+                                                    onClick={() => handleDeletePost(post.postId)}
+                                                    style={{color: 'var(--color-error)'}}>삭제</button>
+                                        </div>
                                     </div>
                                 ))
                             ) : (
@@ -592,43 +484,44 @@ function UserCommunityPage({
                         <div className={styles.modalHeader}>
                             <h2 className={styles.modalTitle}>{isWriteModalOpen ? '게시글 작성' : '게시글 수정'}</h2>
                             <button type="button" className={styles.modalCloseBtn}
-                                    onClick={isWriteModalOpen ? () => setIsWriteModalOpen(false) : () => setEditingPost(null)}>✕
-                            </button>
+                                    onClick={isWriteModalOpen ? () => setIsWriteModalOpen(false) : () => setEditingPost(null)}>✕</button>
                         </div>
-                        <form onSubmit={isWriteModalOpen ? handleCreateSubmit : handleEditSubmit}
+                        <form onSubmit={isWriteModalOpen ? handleCreateSubmit : handleUpdateSubmit}
                               className={styles.modalForm}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>테마</label>
+                                <select name="themeId" className={styles.select}
+                                        value={isWriteModalOpen ? writeForm.themeId : (editingPost?.themeId || '')}
+                                        onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}>
+                                    <option value="">테마 없음</option>
+                                    {themes.map(t => <option key={t.themeId} value={t.themeId}>{t.themeName}</option>)}
+                                </select>
+                            </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>게시글 제목</label>
                                 <input type="text" name="title" className={styles.input}
-                                       value={isWriteModalOpen ? writeForm.title : editingPost.title}
+                                       value={isWriteModalOpen ? writeForm.title : editingPost?.title}
                                        onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}/>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>테마</label>
-                                <select name="theme" className={styles.select}
-                                        value={isWriteModalOpen ? writeForm.theme : editingPost.theme}
-                                        onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}>
-                                    {themes.map((theme) => <option key={theme} value={theme}>{theme}</option>)}
-                                </select>
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>종목명</label>
                                 <input type="text" name="stockName" className={styles.input}
-                                       value={isWriteModalOpen ? writeForm.stockName : editingPost.stockName}
-                                       onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}/>
+                                       value={isWriteModalOpen ? writeForm.stockName : (editingPost?.stockName || '')}
+                                       onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}
+                                       placeholder="삼성전자, AAPL 등 (선택)"/>
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>내용</label>
                                 <textarea name="content" className={styles.textarea}
-                                          value={isWriteModalOpen ? writeForm.content : editingPost.content}
+                                          value={isWriteModalOpen ? writeForm.content : editingPost?.content}
                                           onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}/>
                             </div>
                             <div className={styles.modalActions}>
                                 <button type="button" className={styles.secondaryBtn}
-                                        onClick={isWriteModalOpen ? () => setIsWriteModalOpen(false) : () => setEditingPost(null)}>취소
+                                        onClick={isWriteModalOpen ? () => setIsWriteModalOpen(false) : () => setEditingPost(null)}>취소</button>
+                                <button type="submit" className={styles.primaryBtn}>
+                                    {isWriteModalOpen ? '올리기' : '수정하기'}
                                 </button>
-                                <button type="submit"
-                                        className={styles.primaryBtn}>{isWriteModalOpen ? '올리기' : '수정하기'}</button>
                             </div>
                         </form>
                     </section>
@@ -636,63 +529,33 @@ function UserCommunityPage({
             )}
 
             {/* 댓글 모달 */}
-            {latestSelectedCommentPost && (
+            {commentPost && (
                 <div className={styles.modalOverlay}>
                     <section className={styles.modalContent}>
                         <div className={styles.modalHeader}>
-                            <h2 className={styles.modalTitle}>댓글 ({getCommentsCount(latestSelectedCommentPost)})</h2>
+                            <h2 className={styles.modalTitle}>댓글 ({comments.length})</h2>
                             <button type="button" className={styles.modalCloseBtn}
-                                    onClick={() => setSelectedCommentPost(null)}>✕
-                            </button>
+                                    onClick={() => setCommentPost(null)}>✕</button>
                         </div>
                         <div className={styles.commentPostContent}>
-                            <strong
-                                className={styles.commentPostWriter}>{latestSelectedCommentPost.stockName} · {latestSelectedCommentPost.writerName}</strong>
-                            <p className={styles.commentPostTitle}>{latestSelectedCommentPost.title}</p>
-                            <p>{latestSelectedCommentPost.content}</p>
+                            <strong className={styles.commentPostWriter}>
+                                {commentPost.stockName} · {commentPost.authorName}
+                            </strong>
+                            <p className={styles.commentPostTitle}>{commentPost.title}</p>
+                            <p>{commentPost.contentPreview}</p>
                         </div>
 
                         <div className={styles.commentList}>
-                            {getCommentsCount(latestSelectedCommentPost) > 0 ? (
-                                latestSelectedCommentPost.comments.map((comment) => (
-                                    <article className={styles.commentItem} key={comment.commentNo}>
+                            {comments.length > 0 ? (
+                                comments.map((comment) => (
+                                    <article className={styles.commentItem} key={comment.commentId}>
                                         <div className={styles.commentMain}>
-                                            <strong className={styles.commentWriter}>{comment.writerName}</strong>
+                                            <strong className={styles.commentWriter}>{comment.authorName}</strong>
                                             <p>{comment.content}</p>
                                             <div className={styles.commentMetaRow}>
-                                                <span>{comment.createdAt}</span>
-                                                <button type="button" className={styles.actionBtn}
-                                                        style={{padding: '6px 12px', fontSize: '12px'}}
-                                                        onClick={() => handleReplyButtonClick(comment.commentNo)}>
-                                                    답글 달기
-                                                </button>
+                                                <span>{new Date(comment.createdAt).toLocaleDateString('ko-KR')}</span>
                                             </div>
                                         </div>
-                                        {getRepliesCount(comment) > 0 && (
-                                            <div className={styles.replyList}>
-                                                {comment.replies.map((reply) => (
-                                                    <div className={styles.replyItem} key={reply.replyNo}>
-                                                        <strong
-                                                            className={styles.replyWriter}>{reply.writerName}</strong>
-                                                        <p>{reply.content}</p>
-                                                        <span className={styles.replyDate}>{reply.createdAt}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {replyingCommentNo === comment.commentNo && (
-                                            <form onSubmit={(e) => handleReplySubmit(e, comment.commentNo)}
-                                                  className={styles.replyForm}>
-                                                <input type="text"
-                                                       className={`${styles.input} ${styles.replyFormInput}`}
-                                                       value={replyInput}
-                                                       onChange={(e) => setReplyInput(e.target.value)}
-                                                       placeholder="답글을 입력하세요."/>
-                                                <button type="submit"
-                                                        className={`${styles.primaryBtn} ${styles.replyBtnSmall}`}>등록
-                                                </button>
-                                            </form>
-                                        )}
                                     </article>
                                 ))
                             ) : (
@@ -701,11 +564,14 @@ function UserCommunityPage({
                         </div>
 
                         <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
-                            <input type="text" className={styles.input} value={commentInput}
-                                   onChange={(e) => setCommentInput(e.target.value)}
-                                   placeholder={currentUser ? '댓글을 입력하세요.' : '로그인 후 작성 가능합니다.'}
-                                   disabled={!currentUser}/>
-                            <button type="submit" className={styles.primaryBtn} style={{whiteSpace: 'nowrap'}}>댓글 등록
+                            <input
+                                type="text" className={styles.input} value={commentInput}
+                                onChange={(e) => setCommentInput(e.target.value)}
+                                placeholder={user ? '댓글을 입력하세요.' : '로그인 후 작성 가능합니다.'}
+                                disabled={!user}
+                            />
+                            <button type="submit" className={styles.primaryBtn} style={{whiteSpace: 'nowrap'}}>
+                                댓글 등록
                             </button>
                         </form>
                     </section>

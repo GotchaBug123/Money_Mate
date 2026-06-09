@@ -1,47 +1,71 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import styles from './MyAsset.module.css';
+import {getFinancialProfileApi, getFinanceDiagnosisApi} from '../../api/myPageApi.js';
+
+const chartPoints = [
+    {month: '1월', x: 70, y: 150},
+    {month: '2월', x: 185, y: 132},
+    {month: '3월', x: 300, y: 140},
+    {month: '4월', x: 415, y: 105},
+    {month: '5월', x: 530, y: 88},
+    {month: '6월', x: 650, y: 65},
+];
+
+const filterDescription = {
+    전체: '전체 재무 정보를 확인합니다.',
+    수입: '월 수입과 보유 현금을 확인합니다.',
+    지출: '월 고정지출과 월 변동지출을 확인합니다.',
+    부채: '현재 부채 정보를 확인합니다.',
+};
 
 function MyAsset() {
     const [activeFilter, setActiveFilter] = useState('전체');
+    const [profile, setProfile] = useState(null);
+    const [diagnosis, setDiagnosis] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const mockData = {
-        score: 85,
-        investableAmount: '5,000,000',
-        monthlyIncome: '3,000,000',
-        monthlyFixedExpense: '1,000,000',
-        monthlyVariableExpense: '800,000',
-        debt: '15,000,000',
-        cash: '2,000,000'
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [profileData, diagnosisData] = await Promise.all([
+                    getFinancialProfileApi(),
+                    getFinanceDiagnosisApi(),
+                ]);
+                setProfile(profileData);
+                setDiagnosis(diagnosisData);
+            } catch (error) {
+                console.error('자산 정보 조회 실패:', error);
+                alert('자산 정보를 불러오는 데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
 
-    const summaryItems = [
-        {category: '수입', label: '월 수입', value: `${mockData.monthlyIncome}원`},
-        {category: '지출', label: '월 고정지출', value: `${mockData.monthlyFixedExpense}원`},
-        {category: '지출', label: '월 변동지출', value: `${mockData.monthlyVariableExpense}원`},
-        {category: '부채', label: '부채', value: `${mockData.debt}원`},
-        {category: '수입', label: '보유 현금', value: `${mockData.cash}원`},
-    ];
-
-    const chartPoints = [
-        {month: '1월', x: 70, y: 150},
-        {month: '2월', x: 185, y: 132},
-        {month: '3월', x: 300, y: 140},
-        {month: '4월', x: 415, y: 105},
-        {month: '5월', x: 530, y: 88},
-        {month: '6월', x: 650, y: 65},
-    ];
+    const summaryItems = profile ? [
+        {category: '수입', label: '월 수입', value: `${Number(profile.monthlyIncome).toLocaleString()}원`},
+        {category: '지출', label: '월 고정지출', value: `${Number(profile.monthlyFixedExpense).toLocaleString()}원`},
+        {category: '지출', label: '월 변동지출', value: `${Number(profile.monthlyVariableExpense).toLocaleString()}원`},
+        {category: '부채', label: '부채', value: `${Number(profile.totalLiability).toLocaleString()}원`},
+        {category: '수입', label: '보유 현금', value: `${Number(profile.cashAsset).toLocaleString()}원`},
+    ] : [];
 
     const filteredSummaryItems = activeFilter === '전체'
         ? summaryItems
         : summaryItems.filter((item) => item.category === activeFilter);
 
-    const filterDescription = {
-        전체: '전체 재무 정보를 확인합니다.',
-        수입: '월 수입과 보유 현금을 확인합니다.',
-        지출: '월 고정지출과 월 변동지출을 확인합니다.',
-        부채: '현재 부채 정보를 확인합니다.',
-    };
+    if (loading) {
+        return (
+            <div className={styles.pageWrapper}>
+                <div className={styles.container}
+                     style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px'}}>
+                    <p style={{color: 'var(--color-text-muted)'}}>자산 정보를 불러오는 중...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.pageWrapper}>
@@ -61,7 +85,7 @@ function MyAsset() {
 
                     <div className={styles.scoreCard}>
                         <span className={styles.scoreLabel}>재무 평가 점수</span>
-                        <span className={styles.scoreValue}>{mockData.score}점</span>
+                        <span className={styles.scoreValue}>{diagnosis?.totalScore ?? '-'}점</span>
                     </div>
                 </section>
 
@@ -83,24 +107,9 @@ function MyAsset() {
 
                             {chartPoints.map((point) => (
                                 <g key={point.month}>
-                                    <circle
-                                        cx={point.x}
-                                        cy={point.y}
-                                        r="18"
-                                        className={styles.assetDotBg}
-                                    />
-                                    <circle
-                                        cx={point.x}
-                                        cy={point.y}
-                                        r="7"
-                                        className={styles.assetDot}
-                                    />
-                                    <text
-                                        x={point.x}
-                                        y="222"
-                                        textAnchor="middle"
-                                        className={styles.assetMonthText}
-                                    >
+                                    <circle cx={point.x} cy={point.y} r="18" className={styles.assetDotBg}/>
+                                    <circle cx={point.x} cy={point.y} r="7" className={styles.assetDot}/>
+                                    <text x={point.x} y="222" textAnchor="middle" className={styles.assetMonthText}>
                                         {point.month}
                                     </text>
                                 </g>
@@ -132,7 +141,9 @@ function MyAsset() {
                 <section className={styles.summaryCard}>
                     <div className={styles.investableRow}>
                         <span className={styles.investableLabel}>투자 가능 금액</span>
-                        <span className={styles.investableValue}>{mockData.investableAmount}원</span>
+                        <span className={styles.investableValue}>
+                            {profile ? `${Number(profile.investableAmount).toLocaleString()}원` : '-'}
+                        </span>
                     </div>
 
                     <div className={styles.summaryGrid}>

@@ -5,6 +5,12 @@
     position: relative;
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
+    padding-right: 0;
+    transition: padding-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wrapShifted {
+    padding-right: 300px;
 }
 
 /* ── 메인 (1200px 중앙 정렬 적용) ── */
@@ -17,12 +23,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    transition: margin-right 0.3s ease;
     min-width: 0;
-}
-
-.mainShifted {
-    margin-right: 280px;
 }
 
 .topBar {
@@ -65,16 +66,17 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
+    align-items: start;
 }
 
 .idxCard {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    padding: 20px;
+    padding: 18px 20px 14px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     transition: box-shadow 0.2s;
     box-shadow: var(--shadow-card);
 }
@@ -621,17 +623,17 @@
 .sidebar {
     position: fixed;
     right: 0;
-    top: 0;
+    top: 60px; /* 헤더 아래부터 시작 */
     bottom: 0;
-    width: 320px;
+    width: 300px;
     background: var(--color-bg-card);
     border-left: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 200;
-    box-shadow: var(--shadow-card);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.10);
 }
 
 .sidebarOpen {
@@ -639,42 +641,53 @@
 }
 
 .sbHeader {
-    padding: 24px 20px 16px;
-    border-bottom: 1px solid var(--color-border-light);
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .sbTitle {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--color-text-main);
 }
 
 .sbClose {
-    border: none;
-    background: none;
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-bg-page);
     cursor: pointer;
     color: var(--color-text-muted);
-    font-size: 20px;
-    padding: 4px;
-    transition: color 0.15s;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    line-height: 1;
 }
 
 .sbClose:hover {
+    border-color: var(--color-text-main);
     color: var(--color-text-main);
+    background: var(--color-bg-input);
 }
 
 .sbTabs {
     display: flex;
-    border-bottom: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    background: var(--color-bg-page);
 }
 
 .sbTab {
     flex: 1;
-    padding: 14px 4px;
-    font-size: 13px;
+    padding: 12px 4px;
+    font-size: 12px;
     text-align: center;
     cursor: pointer;
     color: var(--color-text-muted);
@@ -686,90 +699,108 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
+}
+
+.sbTab:hover {
+    color: var(--color-text-sub);
 }
 
 .sbTabOn {
-    color: var(--color-text-main);
-    border-bottom: 2px solid var(--color-text-main);
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+    background: var(--color-bg-card);
 }
 
 .sbBadge {
-    font-size: 11px;
-    background: var(--color-bg-input);
+    font-size: 10px;
+    background: var(--color-border);
     color: var(--color-text-muted);
-    padding: 2px 6px;
+    padding: 1px 5px;
     border-radius: 8px;
-    font-weight: 800;
+    font-weight: 700;
+    min-width: 18px;
+    text-align: center;
 }
 
 .sbBadgeOn {
-    background: var(--color-text-main);
+    background: var(--color-primary);
     color: #fff;
 }
 
 .sbBody {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .sbItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px;
+    padding: 12px;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: background 0.12s;
-    border: 1px solid var(--color-border-light);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
 }
 
 .sbItem:hover {
-    background: var(--color-bg-input);
-    border-color: var(--color-border);
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
 }
 
 .sbItemName {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--color-text-main);
 }
 
 .sbItemTicker {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--color-text-muted);
     margin-top: 2px;
 }
 
 .sbItemPrice {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text-main);
-    font-weight: 600;
+    font-weight: 700;
+    text-align: right;
 }
 
 .sbItemPos {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--color-success);
-    font-weight: 800;
+    font-weight: 700;
     text-align: right;
+    margin-top: 2px;
 }
 
 .sbItemNeg {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--color-error);
-    font-weight: 800;
+    font-weight: 700;
     text-align: right;
+    margin-top: 2px;
 }
 
 .sbEmpty {
-    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+    padding: 40px 20px;
     color: var(--color-text-muted);
+    font-size: 14px;
     text-align: center;
-    padding: 60px 0;
+    line-height: 1.6;
 }
 
 .logoImg {

@@ -33,6 +33,11 @@ public class InvestmentInfoService {
         return toDto(assetPriceRepository.findAllTop100());
     }
 
+    /** 가장 최근 가격 데이터 날짜 (없으면 null) — 프론트 데이터 최신 여부 판단용 */
+    public java.time.LocalDate getLatestPriceDate() {
+        return assetPriceRepository.findMaxPriceDate();
+    }
+
     public List<AssetSummaryDto> getKoreanList() {
         return toDto(assetPriceRepository.findKoreanStocksTop100());
     }

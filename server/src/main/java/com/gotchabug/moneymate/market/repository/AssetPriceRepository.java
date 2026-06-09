@@ -15,6 +15,10 @@ public interface AssetPriceRepository extends JpaRepository<AssetPrice, Long> {
     @Query("SELECT ap FROM AssetPrice ap WHERE ap.asset.assetId = :assetId ORDER BY ap.priceDate DESC")
     List<AssetPrice> findLatestByAssetId(@Param("assetId") Long assetId);
 
+    /** 전체 가격 데이터 중 가장 최근 거래일 (데이터 최신 여부 판단용) */
+    @Query("SELECT MAX(ap.priceDate) FROM AssetPrice ap")
+    LocalDate findMaxPriceDate();
+
     @Query(value = """
     SELECT ap.*
     FROM asset_price ap
