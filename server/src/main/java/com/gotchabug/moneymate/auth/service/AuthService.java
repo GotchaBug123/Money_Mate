@@ -65,6 +65,16 @@ public class AuthService {
         return member;
     }
 
+    @Transactional(readOnly = true)
+    public boolean checkLoginIdAvailable(String loginId) {
+
+        if (loginId == null || loginId.trim().isEmpty()) {
+            throw new IllegalArgumentException("아이디를 입력해주세요.");
+        }
+
+        return !memberRepository.existsByLoginId(loginId.trim());
+    }
+
     @Transactional
     public Member login(LoginRequest request) {
 

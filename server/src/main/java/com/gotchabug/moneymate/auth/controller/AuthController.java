@@ -132,6 +132,24 @@ public class AuthController {
             );
         }
     }
+
+    @Operation(summary = "아이디 중복 확인", description = "회원가입 전 아이디 사용 가능 여부를 확인합니다.")
+    @GetMapping("/check-login-id")
+    public ResponseEntity<ApiResponse<Boolean>> checkLoginId(
+            @RequestParam String loginId
+    ) {
+        boolean available = authService.checkLoginIdAvailable(loginId);
+
+        if (available) {
+            return ResponseEntity.ok(
+                    ApiResponse.success("사용 가능한 아이디입니다.", true)
+            );
+        }
+
+        return ResponseEntity.ok(
+                ApiResponse.success("이미 사용 중인 아이디입니다.", false)
+        );
+    }
     @Operation(summary = "아이디 찾기", description = "이름과 이메일을 통해 회원 아이디를 조회합니다.")
     @PostMapping("/find-id")
     public ResponseEntity<ApiResponse<String>> findId(
