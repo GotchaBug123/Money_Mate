@@ -3,6 +3,7 @@ import styles from './userCommunity.module.css';
 import {useAuthStore} from '../../store/useAuthStore.js';
 import {
     getCommunityMainApi,
+    getCommunityThemesApi,
     getCommunityPostsApi,
     createCommunityPostApi,
     updateCommunityPostApi,
@@ -19,6 +20,30 @@ const renderStockLogo = (name) => (
         <span className={styles.stockLogoFallback}>{name ? name.slice(0, 1) : '?'}</span>
     </span>
 );
+
+const getThemeName = (theme) => {
+    return theme?.themeName ?? theme?.name ?? theme?.title ?? '테마';
+};
+
+const extractThemes = (payload) => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (Array.isArray(payload?.themes)) {
+        return payload.themes;
+    }
+
+    if (Array.isArray(payload?.data?.themes)) {
+        return payload.data.themes;
+    }
+
+    if (Array.isArray(payload?.data)) {
+        return payload.data;
+    }
+
+    return [];
+};
 
 function UserCommunityPage() {
     const {user, openLoginModal} = useAuthStore();
@@ -51,7 +76,13 @@ function UserCommunityPage() {
             try {
                 const data = await getCommunityMainApi();
                 setMainData(data);
-                const fetchedThemes = data.themes || [];
+                let fetchedThemes = extractThemes(data);
+
+                if (fetchedThemes.length === 0) {
+                    const themeData = await getCommunityThemesApi();
+                    fetchedThemes = extractThemes(themeData);
+                }
+
                 setThemes(fetchedThemes);
                 if (fetchedThemes.length > 0) setSelectedTheme(fetchedThemes[0]);
             } catch (error) {
@@ -300,7 +331,7 @@ function UserCommunityPage() {
                             {themes.map((theme) => (
                                 <button type="button" key={theme.themeId} className={styles.chipBtn}
                                         onClick={() => goBoardByTheme(theme)}>
-                                    {theme.themeName}
+                                    {getThemeName(theme)}
                                 </button>
                             ))}
                         </section>
@@ -343,7 +374,7 @@ function UserCommunityPage() {
                                                     onClick={() => goBoardByTheme(theme)}>
                                                 <strong>{index + 1}</strong>
                                                 <div className={styles.rankText}>
-                                                    <b>{theme.themeName}</b>
+                                                    <b>{getThemeName(theme)}</b>
                                                     <small>{theme.description}</small>
                                                 </div>
                                             </button>
@@ -358,7 +389,7 @@ function UserCommunityPage() {
                                 {themes.slice(0, 3).map((theme) => (
                                     <article className={styles.themeCard} key={theme.themeId}>
                                         <div className={styles.themeCardHeader}>
-                                            <h3>{theme.themeName}</h3>
+                                            <h3>{getThemeName(theme)}</h3>
                                             <button type="button" onClick={() => goBoardByTheme(theme)}>더보기 &gt;</button>
                                         </div>
                                         <div className={styles.emptyState} style={{cursor: 'pointer'}}
@@ -381,14 +412,14 @@ function UserCommunityPage() {
                                 <button type="button" key={theme.themeId}
                                         className={`${styles.themeSelectBtn} ${selectedTheme?.themeId === theme.themeId ? styles.active : ''}`}
                                         onClick={() => goBoardByTheme(theme)}>
-                                    {theme.themeName}
+                                    {getThemeName(theme)}
                                 </button>
                             ))}
                         </aside>
 
                         <section className={styles.boardMain}>
                             <div className={styles.boardTop}>
-                                <h2 className={styles.boardTitle}>{selectedTheme?.themeName} 게시글</h2>
+                                <h2 className={styles.boardTitle}>{getThemeName(selectedTheme)} 게시글</h2>
                                 <div className={styles.quickActions}>
                                     <button type="button" className={styles.secondaryBtn}
                                             onClick={() => requireLogin('myPosts')}>내 게시글
@@ -406,7 +437,7 @@ function UserCommunityPage() {
                                             {renderStockLogo(post.stockName)}
                                             <div>
                                                 <strong>{post.stockName || '종목 없음'}</strong>
-                                                <small>{post.themeName}</small>
+                                                <small>{post.themeName ?? post.theme?.themeName ?? post.theme?.name ?? '테마'}</small>
                                             </div>
                                             <span className={styles.themeBadge}>{post.category}</span>
                                         </div>
@@ -494,7 +525,7 @@ function UserCommunityPage() {
                                         value={isWriteModalOpen ? writeForm.themeId : (editingPost?.themeId || '')}
                                         onChange={isWriteModalOpen ? handleWriteChange : handleEditChange}>
                                     <option value="">테마 없음</option>
-                                    {themes.map(t => <option key={t.themeId} value={t.themeId}>{t.themeName}</option>)}
+                                    {themes.map(t => <option key={t.themeId} value={t.themeId}>{getThemeName(t)}</option>)}
                                 </select>
                             </div>
                             <div className={styles.formGroup}>

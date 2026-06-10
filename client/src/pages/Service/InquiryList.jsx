@@ -1,26 +1,78 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {getMyInquiryList} from '../../api/customerServiceApi';
 import {useInquiryStore} from '../../store/useInquiryStore';
 import styles from './InquiryList.module.css';
+
+const extractInquiries = (payload) => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (Array.isArray(payload?.inquiries)) {
+        return payload.inquiries;
+    }
+
+    if (Array.isArray(payload?.data?.inquiries)) {
+        return payload.data.inquiries;
+    }
+
+    if (Array.isArray(payload?.data)) {
+        return payload.data;
+    }
+
+    return [];
+};
+
+const hasAnswer = (inquiry) => {
+    const answer =
+        inquiry?.answer ??
+        inquiry?.answerContent ??
+        inquiry?.reply ??
+        inquiry?.response ??
+        inquiry?.adminAnswer ??
+        inquiry?.answerText;
+
+    return answer != null && String(answer).trim() !== '';
+};
+
+const getInquiryStatus = (inquiry) => {
+    const rawStatus = inquiry?.status ?? inquiry?.answerStatus ?? inquiry?.state;
+    const normalizedStatus = String(rawStatus ?? '').replace(/\s+/g, '').toUpperCase();
+
+    if (hasAnswer(inquiry)) {
+        return '답변완료';
+    }
+
+    if (['ANSWERED', 'COMPLETED', 'DONE', 'ANSWER_COMPLETE', 'ANSWER_COMPLETED', '답변완료'].includes(normalizedStatus)) {
+        return '답변완료';
+    }
+
+    if (['WAITING', 'PENDING', '대기', '답변대기'].includes(normalizedStatus)) {
+        return '답변대기';
+    }
+
+    return rawStatus || '답변대기';
+};
 
 function InquiryList() {
     const navigate = useNavigate();
 
     const inquiries = useInquiryStore((state) => state.inquiries);
+    const setInquiries = useInquiryStore((state) => state.setInquiries);
 
-    const getInquiryStatus = (inquiry) => {
-        const status = inquiry.status ?? inquiry.answerStatus ?? inquiry.state;
+    useEffect(() => {
+        const fetchMyInquiries = async () => {
+            try {
+                const data = await getMyInquiryList();
+                setInquiries(extractInquiries(data));
+            } catch (error) {
+                console.error('문의 목록 조회 중 오류:', error);
+            }
+        };
 
-        if (status === 'ANSWERED' || status === 'COMPLETED' || status === '답변완료' || status === '답변 완료') {
-            return '답변완료';
-        }
-
-        if (status === 'WAITING' || status === 'PENDING' || status === '대기' || status === '답변대기' || status === '답변 대기') {
-            return '답변대기';
-        }
-
-        return status || '답변대기';
-    };
+        fetchMyInquiries();
+    }, [setInquiries]);
 
     const getInquiryType = (inquiry) => {
         return inquiry.type ?? inquiry.category ?? inquiry.categoryName ?? '기타';
@@ -47,7 +99,6 @@ function InquiryList() {
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
-
                 <section className={styles.heroSection}>
                     <h1 className={styles.title}>나의 문의 내역</h1>
                     <p className={styles.subtitle}>
@@ -79,7 +130,9 @@ function InquiryList() {
 
                     <div className={styles.statItem}>
                         <span className={styles.statLabel}>답변 대기</span>
-                        <span className={`${styles.statValue} ${styles.statHighlight}`}>{pendingCount}건</span>
+                        <span className={`${styles.statValue} ${styles.statHighlight}`}>
+                            {pendingCount}건
+                        </span>
                     </div>
 
                     <div className={styles.statItem}>
@@ -112,7 +165,7 @@ function InquiryList() {
                                     const status = getInquiryStatus(inquiry);
 
                                     return (
-                                        <tr key={inquiry.inquiryNo ?? inquiry.id ?? index}>
+                                        <tr key={inquiry.inquiryNo ?? inquiry.id ?? inquiry.inquiryId ?? index}>
                                             <td className={styles.td} style={{textAlign: 'center'}}>
                                                 {inquiries.length - index}
                                             </td>

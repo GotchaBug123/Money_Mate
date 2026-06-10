@@ -1,10 +1,34 @@
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 
+const extractInquiries = (payload) => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (Array.isArray(payload?.inquiries)) {
+        return payload.inquiries;
+    }
+
+    if (Array.isArray(payload?.data?.inquiries)) {
+        return payload.data.inquiries;
+    }
+
+    if (Array.isArray(payload?.data)) {
+        return payload.data;
+    }
+
+    return [];
+};
+
 export const useInquiryStore = create(
     persist(
         (set) => ({
             inquiries: [],
+
+            setInquiries: (payload) => set({
+                inquiries: extractInquiries(payload),
+            }),
 
             addInquiry: (inquiry) => set((state) => ({
                 inquiries: [
@@ -16,8 +40,8 @@ export const useInquiryStore = create(
                         category: inquiry.category,
                         title: inquiry.title,
                         content: inquiry.content,
-                        createdAt: new Date().toISOString().slice(0, 10),
-                        status: '대기',
+                        createdAt: new Date().toISOString(),
+                        status: 'WAITING',
                         answer: '',
                         attachmentName: '',
                         attachmentUrl: '',
@@ -28,22 +52,26 @@ export const useInquiryStore = create(
 
             answerInquiry: (updatedInquiry) => set((state) => ({
                 inquiries: state.inquiries.map((inquiry) =>
-                    inquiry.inquiryNo === updatedInquiry.inquiryNo
+                    (inquiry.inquiryNo ?? inquiry.inquiryId) === (updatedInquiry.inquiryNo ?? updatedInquiry.inquiryId)
                         ? {
                             ...inquiry,
                             ...updatedInquiry,
-                            status: '답변 완료',
+                            status: 'ANSWERED',
                         }
                         : inquiry
                 ),
             })),
 
             deleteInquiry: (inquiryNo) => set((state) => ({
-                inquiries: state.inquiries.filter((inquiry) => inquiry.inquiryNo !== inquiryNo),
+                inquiries: state.inquiries.filter((inquiry) =>
+                    (inquiry.inquiryNo ?? inquiry.inquiryId) !== inquiryNo
+                ),
             })),
         }),
         {
             name: 'inquiry-storage',
+            version: 2,
+            migrate: () => ({inquiries: []}),
         }
     )
 );
