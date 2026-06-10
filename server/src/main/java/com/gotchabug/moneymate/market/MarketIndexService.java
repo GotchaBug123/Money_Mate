@@ -14,6 +14,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,8 +133,11 @@ public class MarketIndexService {
                         .setScale(2, RoundingMode.HALF_UP);
             }
 
-            // 장 상태
-            String marketState = meta.path("marketState").asText("CLOSED");
+            // 장 상태 — Yahoo Finance 값 우선, 없거나 CLOSED이면 시간 기반으로 보정
+            String marketStateRaw = meta.path("marketState").asText("");
+            String marketState = marketStateRaw.isBlank()
+                    ? calcMarketState(yahooSymbol)
+                    : marketStateRaw;
 
             // 스파크라인 — null 값 제거 후 최대 80포인트만 사용
             List<Double> sparkline = new ArrayList<>();
@@ -201,6 +208,39 @@ public class MarketIndexService {
                 .marketState("CLOSED")
                 .sparkline(List.of())
                 .build();
+    }
+
+    /**
+     * 심볼별 거래소 운영 시간을 기준으로 장 상태 계산
+     *   KRX (한국): KST(UTC+9)  09:00 ~ 15:30  월~금
+     *   NYSE/NASDAQ: ET(UTC-5/-4) 09:30 ~ 16:00  월~금
+     *   FOREX (=X):  24시간 5일 → 항상 REGULAR
+     */
+    private String calcMarketState(String symbol) {
+        if (symbol.endsWith("=X")) return "REGULAR";
+
+        boolean isKorean = symbol.endsWith(".KS") || symbol.endsWith(".KQ");
+        ZoneId zone = isKorean
+                ? ZoneId.of("Asia/Seoul")
+                : ZoneId.of("America/New_York");
+
+        ZonedDateTime now = ZonedDateTime.now(zone);
+        DayOfWeek dow = now.getDayOfWeek();
+        if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) return "CLOSED";
+
+        LocalTime t = now.toLocalTime();
+        if (isKorean) {
+            // KRX: 09:00 ~ 15:30 (점심 없음)
+            if (t.isBefore(LocalTime.of(9, 0)))   return "PRE";
+            if (t.isAfter(LocalTime.of(15, 30)))  return "POST";
+            return "REGULAR";
+        } else {
+            // NYSE/NASDAQ: 09:30 ~ 16:00 ET
+            if (t.isBefore(LocalTime.of(4, 0)))   return "POST"; // 전날 장후
+            if (t.isBefore(LocalTime.of(9, 30)))  return "PRE";
+            if (t.isAfter(LocalTime.of(16, 0)))   return "POST";
+            return "REGULAR";
+        }
     }
 
     /** JsonNode → BigDecimal 안전 변환 */

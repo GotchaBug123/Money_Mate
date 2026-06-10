@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, Navigate, useLocation} from 'react-router-dom';
 import {useAuthStore} from './store/useAuthStore.js';
 import LoginModal from './components/common/LoginModal.jsx';
 
@@ -52,17 +52,28 @@ import './App.css';
 function PrivateRoute({children}) {
     const {user, openLoginModal} = useAuthStore();
     const location = useLocation();
-    const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) {
-            openLoginModal(location.pathname);
-            navigate('/', {replace: true});
-        }
-    }, [user]);
+        if (!user) openLoginModal(location.pathname);
+    }, []);
 
-    if (!user) return null;
-    return children;
+    if (!user) {
+        // 접근하려던 페이지를 블러 처리해 배경으로 표시
+        return (
+            <div style={{
+                filter: 'blur(8px)',
+                pointerEvents: 'none',
+                userSelect: 'none',
+                minHeight: 'calc(100vh - 60px)',
+                overflow: 'hidden',
+            }}>
+                {children}
+            </div>
+        );
+    }
+
+    // 로그인 완료 후 children을 새로 마운트해서 API를 재요청하도록 key 지정
+    return <div key={String(user.memberId)}>{children}</div>;
 }
 
 function AdminRoute({children}) {

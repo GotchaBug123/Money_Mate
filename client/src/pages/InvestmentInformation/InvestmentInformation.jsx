@@ -1,13 +1,40 @@
 import React, {useState, useEffect} from 'react';
 import styles from './InvestmentInformation.module.css';
-import {getInvestmentInfoApi, syncStockDataApi, syncDividendDataApi, getMarketIndexApi} from '../../api/investmentApi';
+import {getInvestmentInfoApi, syncStockDataApi, syncDividendDataApi, getMarketIndexApi, getHoldingListApi, addHoldingApi, updateHoldingQuantityApi, removeHoldingApi} from '../../api/investmentApi';
+import {useAuthStore} from '../../store/useAuthStore';
 
 const LOGO_MAP = {
-    '005930': 'samsung.com', '000660': 'skhynix.com', 'NVDA': 'nvidia.com',
-    'AAPL': 'apple.com', '360750': 'tigeretf.com', '005380': 'hyundai.com',
-    '373220': 'lgensol.com', '035720': 'kakao.com', 'TSM': 'tsmc.com',
-    'MU': 'micron.com', 'MSFT': 'microsoft.com', 'GOOGL': 'google.com',
-    'AMZN': 'amazon.com', 'META': 'meta.com', 'TSLA': 'tesla.com',
+    // 국내 (Google이 파비콘을 캐싱한 주요 기업만)
+    '005930': 'samsung.com',    // 삼성전자
+    '000660': 'skhynix.com',    // SK하이닉스
+    '005380': 'hyundai.com',    // 현대차
+    '000270': 'kia.com',        // 기아
+    '005490': 'posco.com',      // 포스코홀딩스
+    '066570': 'lg.com',         // LG전자
+    '035720': 'kakao.com',      // 카카오
+    '035420': 'naver.com',      // NAVER
+    '068270': 'celltrion.com',  // 셀트리온
+    '017670': 'sktelecom.com',  // SK텔레콤
+    '030200': 'kt.com',         // KT
+    '034020': 'doosan.com',     // 두산에너빌리티
+    '259960': 'krafton.com',    // 크래프톤
+    '323410': 'kakaobank.com',  // 카카오뱅크
+    '036570': 'ncsoft.com',     // 엔씨소프트
+    // 해외 대형주
+    'NVDA': 'nvidia.com', 'AAPL': 'apple.com', 'MSFT': 'microsoft.com',
+    'GOOGL': 'google.com', 'GOOG': 'google.com', 'AMZN': 'amazon.com',
+    'META': 'meta.com', 'TSLA': 'tesla.com', 'TSM': 'tsmc.com',
+    'MU': 'micron.com', 'AMD': 'amd.com', 'INTC': 'intel.com',
+    'AVGO': 'broadcom.com', 'QCOM': 'qualcomm.com', 'ASML': 'asml.com',
+    'JPM': 'jpmorganchase.com', 'BAC': 'bankofamerica.com',
+    'V': 'visa.com', 'MA': 'mastercard.com', 'WMT': 'walmart.com',
+    'JNJ': 'jnj.com', 'PFE': 'pfizer.com',
+    'XOM': 'exxonmobil.com', 'CVX': 'chevron.com', 'NKE': 'nike.com',
+    'DIS': 'disney.com', 'NFLX': 'netflix.com', 'SBUX': 'starbucks.com',
+    'COST': 'costco.com', 'HD': 'homedepot.com',
+    // ETF
+    'SPY': 'ssga.com', 'QQQ': 'invesco.com', 'VOO': 'vanguard.com',
+    'VTI': 'vanguard.com', 'SCHD': 'schwab.com',
 };
 
 const BADGE_COLORS = ['#E8F0FE', '#EDFAF4', '#FFF0EE', '#FAEEDA', '#F0F4FF', '#FEF0F8', '#EEF8FF', '#F5F0FF'];
@@ -46,7 +73,7 @@ const StockLogo = ({ticker, name, size = 36}) => {
         <img
             className={styles.logoImg}
             style={{width: size, height: size, borderRadius: '50%'}}
-            src={`https://logo.clearbit.com/${domain}`}
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
             alt={name}
             onError={() => setFailed(true)}
         />
@@ -210,9 +237,11 @@ const InvestmentInformation = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarTab, setSidebarTab] = useState('cart');
-    const [cart, setCart] = useState([]);
+    const [holdings, setHoldings] = useState([]); // [{holdingId, ticker, assetName, market, quantity}]
     const [likes, setLikes] = useState([]);
     const [recent, setRecent] = useState([]);
+
+    const {user, openLoginModal} = useAuthStore();
 
     const [themePanel, setThemePanel] = useState(null);
     const [detailPeriod, setDetailPeriod] = useState('1일');
@@ -264,11 +293,18 @@ const InvestmentInformation = () => {
                 }
 
                 // 2. 메인 주식 리스트 (TOP 100) 맵핑
+                // market 필드를 필터 버튼 값(국내/해외/ETF)으로 정규화
+                const normalizeMarket = (s) => {
+                    if (s.assetType === 'ETF') return 'ETF';
+                    if (s.market === 'KOSPI' || s.market === 'KOSDAQ') return '국내';
+                    return '해외';
+                };
                 const mappedStocks = (res.assetList || []).map(s => ({
                     id: s.assetId || s.symbol,
                     name: s.assetName,
                     ticker: s.ticker || s.symbol,
-                    market: s.market,
+                    market: normalizeMarket(s),
+                    rawMarket: s.market,
                     price: s.closePriceLabel || `${s.closePrice}`,
                     chg: s.dailyReturnLabel || `${s.dailyReturnPct > 0 ? '+' : ''}${s.dailyReturnPct}%`,
                     vol: s.tradingValueLabel || s.volumeLabel || '0',
@@ -339,6 +375,13 @@ const InvestmentInformation = () => {
         loadData();
     }, []);
 
+    useEffect(() => {
+        if (!user) { setHoldings([]); return; }
+        getHoldingListApi()
+            .then(data => setHoldings(data || []))
+            .catch(err => console.error('장바구니 불러오기 실패', err));
+    }, [user]);
+
     // 💡 필터 및 정렬 로직에 이제 MOCK_STOCKS 대신 백엔드에서 받은 stockList를 사용합니다.
     const filtered = sortStocks(
         stockList.filter((stock) =>
@@ -358,10 +401,53 @@ const InvestmentInformation = () => {
 
     const addRecent = (id) => setRecent((prev) => [id, ...prev.filter((item) => item !== id)].slice(0, 20));
 
-    const toggleCart = (event, id) => {
+    const handleRemoveHolding = async (holdingId) => {
+        try {
+            await removeHoldingApi(holdingId);
+            setHoldings(prev => prev.filter(h => h.holdingId !== holdingId));
+        } catch (e) {
+            console.error('장바구니 삭제 실패', e);
+        }
+    };
+
+    const handleQuantityChange = async (holdingId, newQty) => {
+        if (newQty < 1) { await handleRemoveHolding(holdingId); return; }
+        try {
+            const updated = await updateHoldingQuantityApi(holdingId, newQty);
+            setHoldings(prev => prev.map(h => h.holdingId === holdingId ? {...h, quantity: updated.quantity} : h));
+        } catch (e) {
+            console.error('수량 변경 실패', e);
+        }
+    };
+
+    const toggleCart = async (event, stock) => {
         event.stopPropagation();
-        setCart((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
-        addRecent(id);
+        if (!user) { openLoginModal(); return; }
+        const existing = holdings.find(h => h.ticker === stock.ticker);
+        if (existing) {
+            // 낙관적 삭제: UI 먼저 제거 후 API 호출
+            setHoldings(prev => prev.filter(h => h.holdingId !== existing.holdingId));
+            try {
+                await removeHoldingApi(existing.holdingId);
+            } catch (e) {
+                // API 실패 시 되돌리기
+                setHoldings(prev => [...prev, existing]);
+                alert('장바구니에서 제거하는데 실패했습니다.');
+            }
+        } else {
+            // 낙관적 추가: 임시 항목으로 UI 먼저 표시 후 API 호출
+            const tempId = Date.now();
+            const tempItem = {holdingId: tempId, ticker: stock.ticker, assetName: stock.name, market: stock.market || '', quantity: 1};
+            setHoldings(prev => [...prev, tempItem]);
+            try {
+                const result = await addHoldingApi({ticker: stock.ticker, assetName: stock.name, market: stock.market || '', buyPrice: 0});
+                setHoldings(prev => prev.map(h => h.holdingId === tempId ? result : h));
+            } catch (e) {
+                setHoldings(prev => prev.filter(h => h.holdingId !== tempId));
+                alert('장바구니 담기에 실패했습니다. 로그인 상태를 확인해주세요.');
+            }
+        }
+        addRecent(stock.id);
     };
 
     const toggleLike = (event, id) => {
@@ -370,8 +456,13 @@ const InvestmentInformation = () => {
         addRecent(id);
     };
 
+    const cartSidebarData = holdings.map(h => {
+        const stock = stockList.find(s => s.ticker === h.ticker);
+        return {holdingId: h.holdingId, id: h.holdingId, name: h.assetName, ticker: h.ticker, market: h.market || '', price: stock?.price || '-', chg: stock?.chg || '-', pos: stock?.pos ?? true, quantity: h.quantity};
+    });
+
     const sidebarData = sidebarTab === 'cart'
-        ? stockList.filter((stock) => cart.includes(stock.id))
+        ? cartSidebarData
         : sidebarTab === 'like'
             ? stockList.filter((stock) => likes.includes(stock.id))
             : stockList.filter((stock) => recent.includes(stock.id));
@@ -388,13 +479,20 @@ const InvestmentInformation = () => {
     const toggleDetailSelect = (id) =>
         setDetailSelected((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
 
-    const handleDetailCart = () => {
-        if (!detailSelected.length) {
-            alert('담을 종목을 선택해주세요.');
-            return;
+    const handleDetailCart = async () => {
+        if (!detailSelected.length) { alert('담을 종목을 선택해주세요.'); return; }
+        if (!user) { openLoginModal(); return; }
+        const selectedStocks = themePanel.stocks.filter(s => detailSelected.includes(s.id));
+        for (const stock of selectedStocks) {
+            if (holdings.some(h => h.ticker === stock.ticker)) continue;
+            try {
+                const result = await addHoldingApi({ticker: stock.ticker, assetName: stock.name, market: stock.market || '', buyPrice: 0});
+                setHoldings(prev => [...prev, result]);
+            } catch (e) {
+                console.error('장바구니 담기 실패', e);
+            }
         }
-        setCart((prev) => [...new Set([...prev, ...detailSelected])]);
-        detailSelected.forEach((id) => addRecent(id));
+        selectedStocks.forEach(s => addRecent(s.id));
         alert(`${detailSelected.length}개 종목이 장바구니에 담겼습니다!`);
         setDetailSelected([]);
     };
@@ -416,11 +514,20 @@ const InvestmentInformation = () => {
     const toggleDivSelect = (id) =>
         setDivSelected((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
 
-    const handleDivCart = () => {
-        if (!divSelected.length) {
-            alert('담을 종목을 선택해주세요.');
-            return;
+    const handleDivCart = async () => {
+        if (!divSelected.length) { alert('담을 종목을 선택해주세요.'); return; }
+        if (!user) { openLoginModal(); return; }
+        const selectedItems = divPanel.list.filter(s => divSelected.includes(s.id));
+        for (const item of selectedItems) {
+            if (holdings.some(h => h.ticker === item.ticker)) continue;
+            try {
+                const result = await addHoldingApi({ticker: item.ticker, assetName: item.name, market: '', buyPrice: 0});
+                setHoldings(prev => [...prev, result]);
+            } catch (e) {
+                console.error('장바구니 담기 실패', e);
+            }
         }
+        selectedItems.forEach(s => addRecent(s.id));
         alert(`${divSelected.length}개 종목이 장바구니에 담겼습니다!`);
         setDivSelected([]);
     };
@@ -455,8 +562,8 @@ const InvestmentInformation = () => {
                     <button className={styles.sidebarToggle} onClick={() => setSidebarOpen((open) => !open)}>
                         <span>🛒</span>
                         관심 주식
-                        {(cart.length + likes.length) > 0 && (
-                            <span className={styles.toggleBadge}>{cart.length + likes.length}</span>
+                        {(holdings.length + likes.length) > 0 && (
+                            <span className={styles.toggleBadge}>{holdings.length + likes.length}</span>
                         )}
                     </button>
                 </div>
@@ -545,7 +652,7 @@ const InvestmentInformation = () => {
                                     <StockLogo ticker={stock.ticker} name={stock.name} size={36}/>
                                     <div className={styles.si}>
                                         <div className={styles.sname}>{stock.name}</div>
-                                        <div className={styles.stick}>{stock.ticker} · {stock.market}</div>
+                                        <div className={styles.stick}>{stock.ticker} · {stock.rawMarket || stock.market}</div>
                                     </div>
                                 </div>
 
@@ -555,8 +662,8 @@ const InvestmentInformation = () => {
 
                                 <div className={styles.sbts}>
                                     <button
-                                        className={`${styles.sbt} ${cart.includes(stock.id) ? styles.sbtCartOn : ''}`}
-                                        onClick={(event) => toggleCart(event, stock.id)}
+                                        className={`${styles.sbt} ${holdings.some(h => h.ticker === stock.ticker) ? styles.sbtCartOn : ''}`}
+                                        onClick={(event) => toggleCart(event, stock)}
                                         title="장바구니"
                                     >
                                         🛒
@@ -694,7 +801,7 @@ const InvestmentInformation = () => {
                         >
                             {tab.icon} {tab.label}
                             <span className={`${styles.sbBadge} ${sidebarTab === tab.key ? styles.sbBadgeOn : ''}`}>
-                                {tab.key === 'cart' ? cart.length : tab.key === 'like' ? likes.length : recent.length}
+                                {tab.key === 'cart' ? holdings.length : tab.key === 'like' ? likes.length : recent.length}
                             </span>
                         </button>
                     ))}
@@ -722,7 +829,16 @@ const InvestmentInformation = () => {
 
                             <div style={{textAlign: 'right'}}>
                                 <div className={styles.sbItemPrice}>{stock.price}</div>
-                                <div className={stock.pos ? styles.sbItemPos : styles.sbItemNeg}>{stock.chg}</div>
+                                {sidebarTab === 'cart' ? (
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', justifyContent: 'flex-end'}}>
+                                        <button onClick={() => handleQuantityChange(stock.holdingId, stock.quantity - 1)} style={{width: 22, height: 22, border: '1px solid #ddd', borderRadius: 4, background: '#f5f5f5', cursor: 'pointer', fontSize: 14, lineHeight: 1}}>−</button>
+                                        <span style={{fontSize: '13px', fontWeight: 700, minWidth: '18px', textAlign: 'center'}}>{stock.quantity}</span>
+                                        <button onClick={() => handleQuantityChange(stock.holdingId, stock.quantity + 1)} style={{width: 22, height: 22, border: '1px solid #ddd', borderRadius: 4, background: '#f5f5f5', cursor: 'pointer', fontSize: 14, lineHeight: 1}}>+</button>
+                                        <button onClick={() => handleRemoveHolding(stock.holdingId)} style={{width: 22, height: 22, border: '1px solid #fca5a5', borderRadius: 4, background: '#fff1f1', cursor: 'pointer', fontSize: 13, color: '#E53E3E', lineHeight: 1}}>×</button>
+                                    </div>
+                                ) : (
+                                    <div className={stock.pos ? styles.sbItemPos : styles.sbItemNeg}>{stock.chg}</div>
+                                )}
                             </div>
                         </div>
                     ))}

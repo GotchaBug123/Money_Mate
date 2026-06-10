@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import styles from './MyAsset.module.css';
 import {getFinancialProfileApi, getFinanceDiagnosisApi} from '../../api/myPageApi.js';
+import {useAuthStore} from '../../store/useAuthStore.js';
 
 const chartPoints = [
     {month: '1월', x: 70, y: 150},
@@ -20,12 +21,17 @@ const filterDescription = {
 };
 
 function MyAsset() {
+    const {user} = useAuthStore();
     const [activeFilter, setActiveFilter] = useState('전체');
     const [profile, setProfile] = useState(null);
     const [diagnosis, setDiagnosis] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
         const fetchData = async () => {
             try {
                 const [profileData, diagnosisData] = await Promise.all([

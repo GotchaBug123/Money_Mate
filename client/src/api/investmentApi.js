@@ -29,3 +29,24 @@ export const syncDividendDataApi = async () => {
     const response = await axiosInstance.get('/stock/sync-dividend', {timeout: 180000});
     return response.data;
 };
+
+// 장바구니(보유 종목) API
+export const getHoldingListApi = async () => {
+    const response = await axiosInstance.get('/holding');
+    return response.data;
+};
+
+export const addHoldingApi = async (data) => {
+    const response = await axiosInstance.post('/holding', data);
+    return response.data;
+};
+
+export const updateHoldingQuantityApi = async (holdingId, quantity) => {
+    const response = await axiosInstance.patch(`/holding/${holdingId}/quantity`, {quantity});
+    return response.data;
+};
+
+export const removeHoldingApi = async (holdingId) => {
+    const response = await axiosInstance.delete(`/holding/${holdingId}`);
+    return response.data;
+};

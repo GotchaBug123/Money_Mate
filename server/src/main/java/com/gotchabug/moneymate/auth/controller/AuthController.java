@@ -68,8 +68,11 @@ public class AuthController {
     @Operation(summary = "로그아웃", description = "현재 로그인된 사용자의 세션을 만료합니다.")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
-        session.invalidate();
-
+        try {
+            session.invalidate();
+        } catch (IllegalStateException ignored) {
+            // 세션이 이미 만료된 경우 무시
+        }
         return ResponseEntity.ok(
                 ApiResponse.success("로그아웃 성공", null)
         );

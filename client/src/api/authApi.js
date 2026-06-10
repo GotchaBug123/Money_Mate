@@ -14,7 +14,7 @@ export const signupApi = async (userData) => {
 }
 
 export const logoutApi = async () => {
-    const response = await axiosInstance.get('/auth/logout');
+    const response = await axiosInstance.post('/auth/logout');
     return response.data;
 }
 

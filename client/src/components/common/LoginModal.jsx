@@ -12,10 +12,16 @@ function LoginModal() {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // 로그인 없이 닫기 — 보호된 페이지에서 왔으면 홈으로 이동
+    const handleClose = () => {
+        closeLoginModal();
+        if (loginRedirectTo) navigate('/');
+    };
+
     // ESC 키로 닫기
     useEffect(() => {
         if (!loginModalOpen) return;
-        const onKey = (e) => { if (e.key === 'Escape') closeLoginModal(); };
+        const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, [loginModalOpen]);
@@ -52,9 +58,9 @@ function LoginModal() {
     };
 
     return (
-        <div className={styles.backdrop} onClick={closeLoginModal}>
+        <div className={styles.backdrop} onClick={handleClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                <button type="button" className={styles.closeBtn} onClick={closeLoginModal}>✕</button>
+                <button type="button" className={styles.closeBtn} onClick={handleClose}>✕</button>
 
                 <div className={styles.header}>
                     <h2 className={styles.title}>로그인</h2>
