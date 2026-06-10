@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useInquiryStore} from '../../store/useInquiryStore';
 import styles from './InquiryList.module.css';
@@ -6,18 +6,12 @@ import styles from './InquiryList.module.css';
 function InquiryList() {
     const navigate = useNavigate();
     const inquiries = useInquiryStore((state) => state.inquiries);
+    const [selectedInquiry, setSelectedInquiry] = useState(null);
 
     const getInquiryStatus = (inquiry) => {
         const status = inquiry.status ?? inquiry.answerStatus ?? inquiry.state;
-
-        if (status === 'ANSWERED' || status === 'COMPLETED' || status === '답변완료' || status === '답변 완료') {
-            return '답변완료';
-        }
-
-        if (status === 'WAITING' || status === 'PENDING' || status === '대기' || status === '답변대기' || status === '답변 대기') {
-            return '답변대기';
-        }
-
+        if (status === 'ANSWERED' || status === 'COMPLETED' || status === '답변완료' || status === '답변 완료') return '답변완료';
+        if (status === 'WAITING' || status === 'PENDING' || status === '대기' || status === '답변대기' || status === '답변 대기') return '답변대기';
         return status || '답변대기';
     };
 
@@ -180,7 +174,7 @@ function InquiryList() {
                             {selectedInquiry.content || '내용 없음'}
                         </div>
 
-                        {selectedInquiry.answer && (
+                        {selectedInquiry.answer ? (
                             <div>
                                 <h4 style={{fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '8px'}}>
                                     관리자 답변
@@ -194,9 +188,7 @@ function InquiryList() {
                                     {selectedInquiry.answer}
                                 </div>
                             </div>
-                        )}
-
-                        {!selectedInquiry.answer && (
+                        ) : (
                             <div style={{
                                 padding: '16px', background: 'var(--color-bg-page)',
                                 borderRadius: 'var(--radius-md)', fontSize: '14px',
