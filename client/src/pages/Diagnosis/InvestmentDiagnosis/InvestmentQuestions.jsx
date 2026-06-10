@@ -2,6 +2,16 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './InvestmentDiagnosis.module.css';
 import {submitRiskSurveyApi, saveRiskProfileApi} from '../../../api/riskSurveyApi.js';
+import {useAuthStore} from '../../../store/useAuthStore.js';
+import {savePendingSurvey} from '../../../utils/pendingInvestmentSurvey.js';
+
+const typeDescriptions = {
+    '안정형': '원금 보전을 최우선으로 생각하며, 낮은 위험의 안정적인 상품을 선호합니다.',
+    '안정추구형': '예금보다 높은 수익을 원하지만, 위험은 최소화하려는 소극적 투자자입니다.',
+    '위험중립형': '수익과 위험의 균형을 추구하며, 중간 수준의 변동성을 수용합니다.',
+    '적극투자형': '높은 수익을 위해 일정 수준의 위험을 감수할 의향이 있습니다.',
+    '공격투자형': '최대 수익을 위해 높은 위험도 기꺼이 감수하는 공격적 투자자입니다.',
+};
 
 const questions = [
     {
@@ -71,6 +81,7 @@ const questions = [
 
 const InvestmentQuestions = () => {
     const navigate = useNavigate();
+    const {user} = useAuthStore();
     const [step, setStep] = useState(0);
     const [answers, setAnswers] = useState(Array(questions.length).fill(null));
     const [submitting, setSubmitting] = useState(false);
@@ -95,7 +106,23 @@ const InvestmentQuestions = () => {
             setStep((p) => p + 1);
             return;
         }
-        const {selectedThemes} = calculateResult();
+        const {totalScore, typeName, selectedThemes} = calculateResult();
+
+        // 비로그인: API 없이 로컬 결과로 바로 이동 (체험 모드)
+        if (!user) {
+            savePendingSurvey(answers, selectedThemes);
+            const guestSurveyData = {
+                totalScore,
+                resultType: typeName,
+                description: typeDescriptions[typeName],
+                recommendations: [],
+            };
+            navigate('/investment/result', {
+                state: {surveyData: guestSurveyData, selectedThemes, isGuest: true, rawAnswers: answers},
+            });
+            return;
+        }
+
         setSubmitting(true);
         try {
             const toVal = (idx) => idx !== null ? idx + 1 : undefined;
@@ -234,7 +261,9 @@ const InvestmentQuestions = () => {
                         </div>
 
                         <div className={styles.securityNote}>
-                            🔒 입력하신 정보는 안전하게 보호됩니다.
+                            {user
+                                ? '🔒 입력하신 정보는 안전하게 보호됩니다.'
+                                : '🔒 비회원 체험 모드 — 입력하신 정보는 서버에 저장되지 않습니다.'}
                         </div>
                     </div>
                 </div>

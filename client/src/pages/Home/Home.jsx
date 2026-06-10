@@ -285,7 +285,7 @@ const Home = () => {
                         현실적인 포트폴리오를 제안합니다.
                     </p>
                     <div className={styles.heroBtns}>
-                        <button className={styles.primaryButton} onClick={() => navigate('/financial/input')}>
+                        <button className={styles.primaryButton} onClick={() => navigate('/investment/questions')}>
                             무료 진단 시작하기 →
                         </button>
                         <button className={styles.guideButton} onClick={() => setGuideOpen(true)}>

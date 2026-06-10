@@ -1,7 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './FinancialDiagnosis.module.css';
 import {saveFinancialProfile, getFinancialDiagnosis} from '../../../api/financialDiagnosisApi.js';
+import {getFinancialProfileApi} from '../../../api/myPageApi.js';
+
+const toManwon = (won) => String(Math.round(Number(won) / 10000));
 
 const fields = [
     {
@@ -54,6 +57,22 @@ const FinancialInput = () => {
         income: '', fixedExpense: '', variableExpense: '', totalAsset: '', debt: '', cash: '',
     });
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        getFinancialProfileApi()
+            .then((data) => {
+                if (!data || Number(data.monthlyIncome) === 0) return;
+                setForm({
+                    income: toManwon(data.monthlyIncome),
+                    fixedExpense: toManwon(data.monthlyFixedExpense),
+                    variableExpense: toManwon(data.monthlyVariableExpense),
+                    totalAsset: toManwon(data.totalAsset),
+                    debt: toManwon(data.totalLiability),
+                    cash: toManwon(data.cashAsset),
+                });
+            })
+            .catch(() => {});
+    }, []);
 
     const handleChange = (key) => (e) => {
         const val = e.target.value.replace(/[^0-9]/g, '');

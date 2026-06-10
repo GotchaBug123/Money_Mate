@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import styles from './MyAsset.module.css';
 import {getFinancialProfileApi, getFinanceDiagnosisApi} from '../../api/myPageApi.js';
 import {useAuthStore} from '../../store/useAuthStore.js';
@@ -21,6 +21,7 @@ const filterDescription = {
 };
 
 function MyAsset() {
+    const navigate = useNavigate();
     const {user} = useAuthStore();
     const [activeFilter, setActiveFilter] = useState('전체');
     const [profile, setProfile] = useState(null);
@@ -28,27 +29,28 @@ function MyAsset() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!user) {
-            setLoading(false);
-            return;
-        }
+        if (!user) return; // 비로그인 시 API 호출 안 함 (PrivateRoute가 블러 처리)
         const fetchData = async () => {
             try {
-                const [profileData, diagnosisData] = await Promise.all([
+                const [profileRes, diagnosisRes] = await Promise.all([
                     getFinancialProfileApi(),
                     getFinanceDiagnosisApi(),
                 ]);
-                setProfile(profileData);
-                setDiagnosis(diagnosisData);
-            } catch (error) {
-                console.error('자산 정보 조회 실패:', error);
-                alert('자산 정보를 불러오는 데 실패했습니다.');
-            } finally {
+                setProfile(profileRes);
+                setDiagnosis(diagnosisRes);
                 setLoading(false);
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    // 재무진단 미완료 → 입력 페이지로 이동
+                    navigate('/financial/input', {replace: true});
+                } else {
+                    console.error('자산 정보 조회 실패:', error);
+                    setLoading(false);
+                }
             }
         };
         fetchData();
-    }, []);
+    }, [user]);
 
     const summaryItems = profile ? [
         {category: '수입', label: '월 수입', value: `${Number(profile.monthlyIncome).toLocaleString()}원`},
@@ -73,11 +75,19 @@ function MyAsset() {
         );
     }
 
+
+
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
 
                 <div className={styles.topNavWrapper}>
+                    <button
+                        onClick={() => navigate('/financial/input')}
+                        className={styles.topNavLink}
+                    >
+                        재무정보 수정하기 &gt;
+                    </button>
                     <Link to="/asset-detail" className={styles.topNavLink}>
                         상세 화면으로 이동 &gt;
                     </Link>

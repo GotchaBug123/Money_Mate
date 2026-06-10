@@ -100,12 +100,8 @@ public class FinancialProfileController {
             @Parameter(hidden = true)
             HttpSession session
     ) {
-
         Member loginUser = sessionMemberResolver.resolve(session);
-
-        return financialProfileService.getMyFinancialProfile(
-                loginUser
-        );
+        return financialProfileService.getMyFinancialProfile(loginUser);
     }
 
 }

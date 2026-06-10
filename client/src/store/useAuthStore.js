@@ -15,7 +15,7 @@ export const useAuthStore = create(
             logout: () => set({isLoggedIn: false, user: null}),
             updateUser: (newData) => set((state) => ({user: {...state.user, ...newData}})),
 
-            openLoginModal: (redirectTo = '/') => set({loginModalOpen: true, loginRedirectTo: redirectTo}),
+            openLoginModal: (redirectTo = null) => set({loginModalOpen: true, loginRedirectTo: redirectTo}),
             closeLoginModal: () => set({loginModalOpen: false, loginRedirectTo: '/'}),
         }),
         {

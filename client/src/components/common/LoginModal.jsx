@@ -3,6 +3,7 @@ import {useNavigate, Link} from 'react-router-dom';
 import styles from './LoginModal.module.css';
 import {useAuthStore} from '../../store/useAuthStore.js';
 import {loginApi} from '../../api/authApi.js';
+import {submitPendingSurvey} from '../../utils/pendingInvestmentSurvey.js';
 
 function LoginModal() {
     const {loginModalOpen, loginRedirectTo, closeLoginModal, login} = useAuthStore();
@@ -45,7 +46,10 @@ function LoginModal() {
             if (response.success) {
                 login(response.data);
                 closeLoginModal();
-                navigate(loginRedirectTo || '/');
+                // loginRedirectTo가 null이면 현재 페이지에 머물며 useEffect가 처리
+                if (loginRedirectTo) navigate(loginRedirectTo);
+                // 비회원 체험 중 저장된 진단 답변이 있으면 백엔드에 제출 (fire-and-forget)
+                submitPendingSurvey().catch(console.warn);
             } else {
                 alert(response.message || '로그인에 실패했습니다.');
             }

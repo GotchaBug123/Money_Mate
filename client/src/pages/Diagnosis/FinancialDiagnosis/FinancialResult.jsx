@@ -75,7 +75,8 @@ const FinancialResult = () => {
     const tip = feedbacks[1] ?? '정기적인 재무 점검을 통해 건전한 재무 상태를 유지하세요.';
     const extraFeedbacks = feedbacks.slice(2);
 
-    const investableManwon = toManwon(investableAmount ?? 0);
+    // 백엔드는 잉여금 전체를 반환 — 권장 투자 한도는 50%
+    const investableManwon = Math.round(toManwon(investableAmount ?? 0) / 2);
 
     return (
         <div className={styles.resultPage}>
@@ -132,13 +133,13 @@ const FinancialResult = () => {
                             {expenseRate != null && (
                                 <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '13px'}}>
                                     <span style={{color: 'var(--color-text-muted)'}}>소비율</span>
-                                    <span style={{fontWeight: 600}}>{(expenseRate * 100).toFixed(1)}%</span>
+                                    <span style={{fontWeight: 600}}>{Number(expenseRate).toFixed(1)}%</span>
                                 </div>
                             )}
                             {debtRate != null && (
                                 <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '13px'}}>
                                     <span style={{color: 'var(--color-text-muted)'}}>부채 비율</span>
-                                    <span style={{fontWeight: 600}}>{(debtRate * 100).toFixed(1)}%</span>
+                                    <span style={{fontWeight: 600}}>{Number(debtRate).toFixed(1)}%</span>
                                 </div>
                             )}
                             {liquidityMonths != null && (
@@ -223,8 +224,8 @@ const FinancialResult = () => {
                         <button className={styles.secBtn} onClick={() => navigate('/financial/input')}>
                             🔄 다시 입력하기
                         </button>
-                        <button className={styles.priBtn} onClick={() => navigate('/investment/questions')}>
-                            투자성향진단 →
+                        <button className={styles.priBtn} onClick={() => navigate('/asset')}>
+                            마이자산 확인하기 →
                         </button>
                     </div>
                 </div>

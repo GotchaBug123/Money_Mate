@@ -35,7 +35,6 @@ public class FinancialDiagnosisController {
             HttpSession session
     ) {
         Member loginUser = sessionMemberResolver.resolve(session);
-
         return financialDiagnosisService.diagnose(loginUser.getMemberId());
     }
 }

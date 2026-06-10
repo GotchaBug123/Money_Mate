@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import styles from './InvestmentDiagnosis.module.css';
+import {useAuthStore} from '../../../store/useAuthStore.js';
+import {submitPendingSurvey} from '../../../utils/pendingInvestmentSurvey.js';
 
 const typeInfo = {
     '안정형': {
@@ -28,8 +30,27 @@ const typeInfo = {
 const InvestmentResult = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const {user, openLoginModal} = useAuthStore();
 
-    const {surveyData, selectedThemes} = location.state ?? {};
+    const {surveyData: initialSurveyData, selectedThemes, isGuest} = location.state ?? {};
+    const [surveyData, setSurveyData] = useState(initialSurveyData);
+    const [guestMode, setGuestMode] = useState(isGuest || !user);
+    const [saving, setSaving] = useState(false);
+
+    // 결과 페이지에 있는 동안 로그인하면 즉시 백엔드에 제출하고 UI를 풀버전으로 전환
+    useEffect(() => {
+        if (!user || !guestMode) return;
+        setSaving(true);
+        submitPendingSurvey()
+            .then((result) => {
+                if (result) {
+                    setSurveyData(result);
+                    setGuestMode(false);
+                }
+            })
+            .catch(console.error)
+            .finally(() => setSaving(false));
+    }, [user]);
 
     if (!surveyData) {
         return (
@@ -153,27 +174,67 @@ const InvestmentResult = () => {
                             </div>
                         )}
 
-                        <div className={styles.ctaCard}>
-                            <h3 className={styles.ctaTitle}>자동 포트폴리오 구성</h3>
-                            <div className={styles.featureList}>
-                                {[
-                                    {icon: '🤖', title: 'AI 맞춤 추천', desc: '성향에 딱 맞는 종목 조합'},
-                                    {icon: '🔄', title: '정기 리밸런싱', desc: '시장 변화에 따라 자동 조정'},
-                                ].map(f => (
-                                    <div key={f.title} className={styles.featureItem}>
-                                        <span className={styles.featureIcon}>{f.icon}</span>
-                                        <div>
-                                            <p className={styles.featureTitle} style={{color}}>{f.title}</p>
-                                            <p className={styles.featureDesc}>{f.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                        {saving ? (
+                            <div className={styles.ctaCard} style={{textAlign: 'center', padding: '40px 24px'}}>
+                                <p style={{color: 'var(--color-text-muted)', fontSize: '14px'}}>
+                                    진단 결과를 저장하는 중입니다...
+                                </p>
                             </div>
-                            <button className={styles.ctaBtn} style={{background: color}}
-                                    onClick={() => navigate('/portfolio/auto', {state: {resultType, totalScore, selectedThemes, recommendations}})}>
-                                ✦ 포트폴리오 생성하러 가기 →
-                            </button>
-                        </div>
+                        ) : guestMode ? (
+                            <div className={styles.ctaCard}>
+                                <h3 className={styles.ctaTitle}>결과를 저장하고 싶으신가요?</h3>
+                                <p style={{fontSize: '14px', color: 'var(--color-text-muted)', margin: '0 0 16px'}}>
+                                    회원가입하면 진단 결과가 저장되고 맞춤 포트폴리오를 생성할 수 있어요.
+                                </p>
+                                <div className={styles.featureList}>
+                                    {[
+                                        {icon: '💾', title: '결과 저장', desc: '진단 결과를 언제든 다시 확인'},
+                                        {icon: '🤖', title: 'AI 맞춤 추천', desc: '성향에 딱 맞는 종목 조합'},
+                                        {icon: '🔄', title: '정기 리밸런싱', desc: '시장 변화에 따라 자동 조정'},
+                                    ].map(f => (
+                                        <div key={f.title} className={styles.featureItem}>
+                                            <span className={styles.featureIcon}>{f.icon}</span>
+                                            <div>
+                                                <p className={styles.featureTitle} style={{color}}>{f.title}</p>
+                                                <p className={styles.featureDesc}>{f.desc}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button className={styles.ctaBtn} style={{background: color}}
+                                        onClick={() => navigate('/signup')}>
+                                    회원가입하고 포트폴리오 만들기 →
+                                </button>
+                                <button
+                                    onClick={() => openLoginModal()}
+                                    style={{marginTop: '10px', width: '100%', padding: '10px', background: 'none', border: `1px solid ${color}`, borderRadius: '8px', color, fontSize: '14px', fontWeight: 600, cursor: 'pointer'}}
+                                >
+                                    이미 회원이신가요? 로그인
+                                </button>
+                            </div>
+                        ) : (
+                            <div className={styles.ctaCard}>
+                                <h3 className={styles.ctaTitle}>자동 포트폴리오 구성</h3>
+                                <div className={styles.featureList}>
+                                    {[
+                                        {icon: '🤖', title: 'AI 맞춤 추천', desc: '성향에 딱 맞는 종목 조합'},
+                                        {icon: '🔄', title: '정기 리밸런싱', desc: '시장 변화에 따라 자동 조정'},
+                                    ].map(f => (
+                                        <div key={f.title} className={styles.featureItem}>
+                                            <span className={styles.featureIcon}>{f.icon}</span>
+                                            <div>
+                                                <p className={styles.featureTitle} style={{color}}>{f.title}</p>
+                                                <p className={styles.featureDesc}>{f.desc}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button className={styles.ctaBtn} style={{background: color}}
+                                        onClick={() => navigate('/portfolio/auto', {state: {resultType, totalScore, selectedThemes, recommendations}})}>
+                                    ✦ 포트폴리오 생성하러 가기 →
+                                </button>
+                            </div>
+                        )}
 
                         <div className={styles.retakeCard}>
                             <p className={styles.retakeText}>결과가 만족스럽지 않으신가요?</p>

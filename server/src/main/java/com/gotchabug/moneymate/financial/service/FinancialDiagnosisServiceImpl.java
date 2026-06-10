@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -27,7 +30,12 @@ public class FinancialDiagnosisServiceImpl
         FinancialProfile profile =
                 financialProfileRepository.findByMember_MemberId(memberId)
                         .orElseThrow(() ->
-                                new IllegalArgumentException("재무정보가 없습니다."));
+                                new ResponseStatusException(HttpStatus.NOT_FOUND, "재무정보가 없습니다."));
+
+        // 수입이 0이면 재무진단 미완료 상태로 간주
+        if (profile.getMonthlyIncome().compareTo(BigDecimal.ZERO) == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "재무진단을 완료해주세요.");
+        }
 
         BigDecimal totalExpense =
                 profile.getMonthlyFixedExpense()
@@ -49,11 +57,11 @@ public class FinancialDiagnosisServiceImpl
                 );
 
         /*
-        현금 유동성
+        현금 유동성 (totalExpense가 0이면 0개월 처리)
          */
-        BigDecimal liquidityMonths =
-                profile.getCashAsset()
-                        .divide(totalExpense, 1, RoundingMode.HALF_UP);
+        BigDecimal liquidityMonths = totalExpense.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
+                : profile.getCashAsset().divide(totalExpense, 1, RoundingMode.HALF_UP);
 
         /*
         점수 계산

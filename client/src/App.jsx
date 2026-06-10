@@ -117,8 +117,8 @@ function AppContent() {
                     <Route path="/asset-detail" element={<PrivateRoute><AssetDetail/></PrivateRoute>}/>
                     <Route path="/financial/input" element={<PrivateRoute><FinancialInput/></PrivateRoute>}/>
                     <Route path="/financial/result" element={<PrivateRoute><FinancialResult/></PrivateRoute>}/>
-                    <Route path="/investment/questions" element={<PrivateRoute><InvestmentQuestions/></PrivateRoute>}/>
-                    <Route path="/investment/result" element={<PrivateRoute><InvestmentResult/></PrivateRoute>}/>
+                    <Route path="/investment/questions" element={<InvestmentQuestions/>}/>
+                    <Route path="/investment/result" element={<InvestmentResult/>}/>
                     <Route path="/portfolio" element={<PrivateRoute><PortfolioMain/></PrivateRoute>}/>
                     <Route path="/portfolio/auto" element={<PrivateRoute><PortfolioAuto/></PrivateRoute>}/>
                     <Route path="/portfolio/result" element={<PrivateRoute><PortfolioResult/></PrivateRoute>}/>
