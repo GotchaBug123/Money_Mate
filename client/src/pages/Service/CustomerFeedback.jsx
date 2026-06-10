@@ -3,19 +3,14 @@ import {useNavigate} from 'react-router-dom';
 import styles from './CustomerFeedback.module.css';
 import {getInquiryCategories, createInquiry} from '../../api/customerServiceApi.js';
 
-const FALLBACK_TYPES = [
-    {categoryId: null, categoryName: '💡 서비스 제안'},
-    {categoryId: null, categoryName: '👏 칭찬해요'},
-    {categoryId: null, categoryName: '😞 불편해요'},
-    {categoryId: null, categoryName: '기타 의견'},
-];
+const FALLBACK_TYPES = ['💡 서비스 제안', '👏 칭찬해요', '😞 불편해요', '기타 의견'];
 
 function CustomerFeedback() {
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState(FALLBACK_TYPES);
     const [formData, setFormData] = useState({
-        categoryId: null,
+        category: FALLBACK_TYPES[0],
         title: '',
         content: '',
     });
@@ -28,7 +23,7 @@ function CustomerFeedback() {
                 const list = Array.isArray(data) ? data : (data.categories ?? []);
                 if (list.length > 0) {
                     setCategories(list);
-                    setFormData(prev => ({...prev, categoryId: list[0].categoryId}));
+                    setFormData(prev => ({...prev, category: list[0]}));
                 }
             } catch (error) {
                 console.error('카테고리 조회 실패:', error);
@@ -37,8 +32,8 @@ function CustomerFeedback() {
         loadCategories();
     }, []);
 
-    const handleTypeSelect = (categoryId) => {
-        setFormData(prev => ({...prev, categoryId}));
+    const handleTypeSelect = (category) => {
+        setFormData(prev => ({...prev, category}));
     };
 
     const handleChange = (event) => {
@@ -57,7 +52,7 @@ function CustomerFeedback() {
         setSubmitting(true);
         try {
             await createInquiry({
-                categoryId: formData.categoryId,
+                category: formData.category,
                 title: formData.title,
                 content: formData.content,
             });
@@ -98,12 +93,12 @@ function CustomerFeedback() {
                             <div className={styles.typeChips}>
                                 {categories.map((cat) => (
                                     <button
-                                        key={cat.categoryId ?? cat.categoryName}
+                                        key={cat}
                                         type="button"
-                                        className={`${styles.chip} ${formData.categoryId === cat.categoryId ? styles.chipActive : ''}`}
-                                        onClick={() => handleTypeSelect(cat.categoryId)}
+                                        className={`${styles.chip} ${formData.category === cat ? styles.chipActive : ''}`}
+                                        onClick={() => handleTypeSelect(cat)}
                                     >
-                                        {cat.categoryName}
+                                        {cat}
                                     </button>
                                 ))}
                             </div>
