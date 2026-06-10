@@ -1,5 +1,6 @@
 package com.gotchabug.moneymate.risk.controller;
 
+import com.gotchabug.moneymate.risk.dto.RiskAnswerSheetResponse;
 import com.gotchabug.moneymate.risk.dto.RiskSurveyRequest;
 import com.gotchabug.moneymate.risk.dto.RiskSurveyResponse;
 import com.gotchabug.moneymate.member.entity.Member;
@@ -81,5 +82,20 @@ public class RiskSurveyApiController {
                 loginUser,
                 request
         );
+    }
+
+    @GetMapping("/latest")
+    @Operation(
+            summary = "최신 투자성향 진단 결과 조회",
+            description = "로그인한 사용자의 가장 최근 투자성향 진단 결과를 반환합니다."
+    )
+    public RiskAnswerSheetResponse getLatestSurvey(
+            @Parameter(hidden = true) HttpSession session
+    ) {
+        Member loginUser = (Member) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+        return riskSurveyService.getLatestResult(loginUser.getMemberId());
     }
 }

@@ -1,8 +1,9 @@
 import axiosInstance from "./axiosInstance.js";
 
-export const searchAssetsApi = async (keyword) => {
+export const searchAssetsApi = async (keyword, signal) => {
     const response = await axiosInstance.get('/market/assets/search', {
-        params: {keyword}
+        params: {keyword},
+        signal,
     });
     return response.data;
 }

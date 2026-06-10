@@ -2,16 +2,24 @@ import React, {useState, useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import styles from './MyAsset.module.css';
 import {getFinancialProfileApi, getFinanceDiagnosisApi} from '../../api/myPageApi.js';
+import {getPortfolioHistoryApi} from '../../api/assetApi.js';
 import {useAuthStore} from '../../store/useAuthStore.js';
 
-const chartPoints = [
-    {month: '1월', x: 70, y: 150},
-    {month: '2월', x: 185, y: 132},
-    {month: '3월', x: 300, y: 140},
-    {month: '4월', x: 415, y: 105},
-    {month: '5월', x: 530, y: 88},
-    {month: '6월', x: 650, y: 65},
-];
+// SVG viewBox "0 0 720 250" 기준으로 월별 평가액을 좌표로 변환
+const buildChartPoints = (monthlyHistory) => {
+    if (!monthlyHistory || monthlyHistory.length === 0) return [];
+    const values = monthlyHistory.map(m => Number(m.portfolioValue));
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+    const range = maxVal - minVal || 1;
+    const X_START = 70, X_END = 650, Y_MIN = 50, Y_MAX = 200;
+    const n = monthlyHistory.length;
+    return monthlyHistory.map((m, i) => ({
+        month: m.label,
+        x: n === 1 ? (X_START + X_END) / 2 : X_START + (i / (n - 1)) * (X_END - X_START),
+        y: Y_MAX - ((Number(m.portfolioValue) - minVal) / range) * (Y_MAX - Y_MIN),
+    }));
+};
 
 const filterDescription = {
     전체: '전체 재무 정보를 확인합니다.',
@@ -27,17 +35,20 @@ function MyAsset() {
     const [profile, setProfile] = useState(null);
     const [diagnosis, setDiagnosis] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [chartPoints, setChartPoints] = useState([]);
 
     useEffect(() => {
         if (!user) return; // 비로그인 시 API 호출 안 함 (PrivateRoute가 블러 처리)
         const fetchData = async () => {
             try {
-                const [profileRes, diagnosisRes] = await Promise.all([
+                const [profileRes, diagnosisRes, historyRes] = await Promise.all([
                     getFinancialProfileApi(),
                     getFinanceDiagnosisApi(),
+                    getPortfolioHistoryApi().catch(() => null),
                 ]);
                 setProfile(profileRes);
                 setDiagnosis(diagnosisRes);
+                setChartPoints(buildChartPoints(historyRes?.monthlyHistory));
                 setLoading(false);
             } catch (error) {
                 if (error.response?.status === 404) {
@@ -114,23 +125,28 @@ function MyAsset() {
                     </div>
 
                     <div className={styles.lineChartMock}>
-                        <svg viewBox="0 0 720 250" className={styles.assetLineChart}>
-                            <polyline
-                                points={chartPoints.map((point) => `${point.x},${point.y}`).join(' ')}
-                                fill="none"
-                                className={styles.assetLine}
-                            />
-
-                            {chartPoints.map((point) => (
-                                <g key={point.month}>
-                                    <circle cx={point.x} cy={point.y} r="18" className={styles.assetDotBg}/>
-                                    <circle cx={point.x} cy={point.y} r="7" className={styles.assetDot}/>
-                                    <text x={point.x} y="222" textAnchor="middle" className={styles.assetMonthText}>
-                                        {point.month}
-                                    </text>
-                                </g>
-                            ))}
-                        </svg>
+                        {chartPoints.length === 0 ? (
+                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '160px', color: 'var(--color-text-muted)', fontSize: '14px'}}>
+                                보유 종목을 추가하면 자산 흐름이 표시됩니다.
+                            </div>
+                        ) : (
+                            <svg viewBox="0 0 720 250" className={styles.assetLineChart}>
+                                <polyline
+                                    points={chartPoints.map((point) => `${point.x},${point.y}`).join(' ')}
+                                    fill="none"
+                                    className={styles.assetLine}
+                                />
+                                {chartPoints.map((point) => (
+                                    <g key={point.month}>
+                                        <circle cx={point.x} cy={point.y} r="18" className={styles.assetDotBg}/>
+                                        <circle cx={point.x} cy={point.y} r="7" className={styles.assetDot}/>
+                                        <text x={point.x} y="222" textAnchor="middle" className={styles.assetMonthText}>
+                                            {point.month}
+                                        </text>
+                                    </g>
+                                ))}
+                            </svg>
+                        )}
                     </div>
                 </section>
 

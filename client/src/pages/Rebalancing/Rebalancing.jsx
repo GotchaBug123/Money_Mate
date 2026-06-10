@@ -1,61 +1,8 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import styles from './Rebalancing.module.css';
 import {searchAssetsApi, analyzeRebalanceApi} from "../../api/rebalanceApi.js";
 import {ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from "recharts";
-
-const LOGO_MAP = {
-    '005930': 'samsung.com', '000660': 'skhynix.com', 'NVDA': 'nvidia.com',
-    'AAPL': 'apple.com', '360750': 'tigeretf.com', '005380': 'hyundai.com',
-    '373220': 'lgensol.com', '035720': 'kakao.com', 'TSM': 'tsmc.com',
-    'MU': 'micron.com', 'MSFT': 'microsoft.com', 'TSLA': 'tesla.com',
-};
-
-/*const STOCK_LIST = [
-    {id: 1, name: '삼성전자', ticker: '005930', market: '국내', price: '78,400원', chg: '+2.61%', pos: true},
-    {id: 2, name: 'SK하이닉스', ticker: '000660', market: '국내', price: '198,500원', chg: '-0.88%', pos: false},
-    {id: 3, name: 'NVIDIA', ticker: 'NVDA', market: '해외', price: '$1,208.88', chg: '+3.14%', pos: true},
-    {id: 4, name: 'TIGER 미국S&P500', ticker: '360750', market: 'ETF', price: '18,245원', chg: '-0.42%', pos: false},
-    {id: 5, name: 'Apple', ticker: 'AAPL', market: '해외', price: '$196.89', chg: '+0.54%', pos: true},
-    {id: 6, name: '현대차', ticker: '005380', market: '국내', price: '245,000원', chg: '-1.20%', pos: false},
-    {id: 7, name: 'LG에너지솔루션', ticker: '373220', market: '국내', price: '412,000원', chg: '+2.55%', pos: true},
-    {id: 8, name: '카카오', ticker: '035720', market: '국내', price: '52,300원', chg: '-0.19%', pos: false},
-    {id: 9, name: 'TSMC', ticker: 'TSM', market: '해외', price: '$185.40', chg: '+1.22%', pos: true},
-    {id: 10, name: '마이크론', ticker: 'MU', market: '해외', price: '$132.50', chg: '+0.74%', pos: true},
-    {id: 11, name: 'Microsoft', ticker: 'MSFT', market: '해외', price: '$420.21', chg: '+0.32%', pos: true},
-    {id: 12, name: 'Tesla', ticker: 'TSLA', market: '해외', price: '$178.82', chg: '-2.14%', pos: false},
-];*/
-
-/*const searchStocks = (query) => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return STOCK_LIST.filter(s =>
-        s.name.toLowerCase().includes(q) || s.ticker.toLowerCase().includes(q)
-    );
-};*/
-
-// 💡 종목 구분을 위한 다양한 배지 컬러 테마는 유지
-const BADGE_COLORS = ['#E8F0FE', '#EDFAF4', '#FFF0EE', '#FAEEDA', '#F0F4FF', '#FEF0F8', '#EEF8FF', '#F5F0FF'];
-const BADGE_TEXT = ['#1B5ED9', '#1A7A45', '#C0392B', '#B47D0C', '#2E5CD9', '#C03980', '#0C7CD9', '#7B3FA0'];
-
-const getBadge = (ticker) => {
-    if (!ticker) return {bg: BADGE_COLORS[0], color: BADGE_TEXT[0]};
-    const idx = ticker.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % BADGE_COLORS.length;
-    return {bg: BADGE_COLORS[idx], color: BADGE_TEXT[idx]};
-};
-
-const StockLogo = ({ticker, name}) => {
-    const [failed, setFailed] = useState(false);
-    const domain = LOGO_MAP[ticker];
-    const badge = getBadge(ticker);
-
-    if (!domain || failed) return (
-        <div className={styles.logoBadge} style={{background: badge.bg, color: badge.color}}>
-            {name ? name.charAt(0) : '?'}
-        </div>
-    );
-    return <img className={styles.logoImg} src={`https://logo.clearbit.com/${domain}`}
-                alt={name} onError={() => setFailed(true)}/>;
-};
+import StockLogo from '../../components/common/StockLogo.jsx';
 
 /*const MOCK_RESULT = (investAmount) => ({
     achievementRate: 74,
@@ -81,12 +28,12 @@ const CustomTooltip = ({active, payload, label, currency}) => {
                 </p>
                 {/* 예상 자산 (Area) */}
                 <p style={{margin: 0, fontSize: '14px', color: 'var(--color-primary)', fontWeight: '600'}}>
-                    예상 자산: {payload[0]?.value?.toLocaleString()} {currency}
+                    예상 자산: {Math.round((payload[0]?.value ?? 0) / 10000).toLocaleString()}만원
                 </p>
                 {/* 목표 자산 (Line) - 있는 경우에만 표시 */}
                 {payload[1] && (
                     <p style={{margin: '4px 0 0 0', fontSize: '13px', color: 'var(--color-text-muted)'}}>
-                        목표 자산: {payload[1]?.value?.toLocaleString()} {currency}
+                        목표 자산: {Math.round((payload[1]?.value ?? 0) / 10000).toLocaleString()}만원
                     </p>
                 )}
             </div>
@@ -109,10 +56,21 @@ const Rebalancing = () => {
 
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [tooltipPos, setTooltipPos] = useState(null);
+    const chartContainerRef = useRef(null);
 
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+
+    useEffect(() => {
+        if (!searchQuery.trim()) { setSearchResults([]); return; }
+        const controller = new AbortController();
+        searchAssetsApi(searchQuery, controller.signal)
+            .then(data => setSearchResults(data))
+            .catch(() => {});
+        return () => controller.abort();
+    }, [searchQuery]);
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) return;
@@ -175,8 +133,8 @@ const Rebalancing = () => {
         if (totalWeight !== 100) return alert(`비중 합계가 ${totalWeight}%입니다. 100%가 되어야 합니다.`);
 
         // 백엔드 제약조건(최소 100만원) 프론트엔드에서 사전 차단
-        if (Number(goalAmount) < 1000000) {
-            return alert('목표 금액은 최소 1,000,000원 이상이어야 합니다.');
+        if (Number(goalAmount) < 100) {
+            return alert('목표 금액은 최소 100만원 이상이어야 합니다.');
         }
 
         setLoading(true);
@@ -205,14 +163,19 @@ const Rebalancing = () => {
         if (years === 0) years = 1;
 
         const cycleMap = {'없음': 'NONE', '매달': 'MONTHLY', '매분기': 'QUARTERLY', '매년': 'YEARLY'};
+        // 납입 주기별 월 환산: 백엔드는 monthlyInvestment를 항상 월 단위로 처리함
+        const periodDivisor = {'매달': 1, '매분기': 3, '매년': 12};
+        const monthlyInvestment = addPeriod === '없음'
+            ? 0
+            : Math.round(Number(addAmount || 0) * 10000 / (periodDivisor[addPeriod] ?? 1));
 
         const requestData = {
             goalName: "나의 커스텀 포트폴리오",
-            currentAmount: Number(investAmount),
-            monthlyInvestment: addPeriod === '없음' ? 0 : Number(addAmount || 0),
-            targetAmount: Number(goalAmount),
-            investmentYears: years,    // 💡 1 이상 보장
-            investmentMonths: months,  // 💡 1 이상 보장
+            currentAmount: Number(investAmount) * 10000,
+            monthlyInvestment,
+            targetAmount: Number(goalAmount) * 10000,
+            investmentYears: years,
+            investmentMonths: months,
             rebalanceCycle: cycleMap[addPeriod],
             selectedAssets: stocks.map(st => ({
                 symbol: st.ticker,
@@ -255,20 +218,20 @@ const Rebalancing = () => {
                     {/* ── 왼쪽: 입력 폼 ── */}
                     <div className={styles.formSection}>
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>투자 금액</label>
+                            <label className={styles.inputLabel}>투자 금액 (만원)</label>
                             <div className={styles.fieldRow}>
                                 <select className={styles.sel} value={currency}
                                         onChange={e => setCurrency(e.target.value)}>
                                     <option>원화</option>
                                     <option>달러</option>
                                 </select>
-                                <input className={styles.textInput} type="number" placeholder="금액 입력"
+                                <input className={styles.textInput} type="number" placeholder="예: 500"
                                        value={investAmount} onChange={e => setInvestAmount(e.target.value)}/>
                             </div>
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>추가 납입금액</label>
+                            <label className={styles.inputLabel}>추가 납입금액 (만원)</label>
                             <div className={styles.fieldRow}>
                                 <select className={styles.sel} value={addPeriod} onChange={e => {
                                     setAddPeriod(e.target.value);
@@ -281,7 +244,7 @@ const Rebalancing = () => {
                                 </select>
                                 <input
                                     className={addPeriod === '없음' ? styles.disabledInput : styles.textInput}
-                                    type="number" placeholder="금액 입력"
+                                    type="number" placeholder="예: 10"
                                     value={addAmount} onChange={e => setAddAmount(e.target.value)}
                                     disabled={addPeriod === '없음'}
                                 />
@@ -300,8 +263,8 @@ const Rebalancing = () => {
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>목표 금액</label>
-                            <input className={styles.textInput} type="number" placeholder="목표 금액 입력"
+                            <label className={styles.inputLabel}>목표 금액 (만원)</label>
+                            <input className={styles.textInput} type="number" placeholder="예: 1000"
                                    value={goalAmount} onChange={e => setGoalAmount(e.target.value)}/>
                         </div>
 
@@ -391,12 +354,21 @@ const Rebalancing = () => {
                                         </div>
                                     </div>
 
-                                    <div style={{width: '100%', height: 260, marginTop: '20px'}}>
+                                    <div ref={chartContainerRef} style={{width: '100%', height: 260, marginTop: '20px'}}>
                                         <ResponsiveContainer width="100%" height="100%">
                                             <ComposedChart
                                                 data={result.chartData}
-                                                // 💡 1. right 여백을 늘리고, left를 음수로 당겨서 중앙 밸런스를 맞춥니다.
                                                 margin={{top: 10, right: 30, left: -15, bottom: 0}}
+                                                onMouseMove={(e) => {
+                                                    if (e?.activeCoordinate) {
+                                                        const { x, y } = e.activeCoordinate;
+                                                        const chartW = chartContainerRef.current?.offsetWidth ?? 400;
+                                                        const offsetX = x > chartW * 0.6 ? -180 : 20;
+                                                        const offsetY = y < 80 ? 20 : -80;
+                                                        setTooltipPos({ x: x + offsetX, y: y + offsetY });
+                                                    }
+                                                }}
+                                                onMouseLeave={() => setTooltipPos(null)}
                                             >
                                                 <defs>
                                                     <linearGradient id="colorMedian" x1="0" y1="0" x2="0" y2="1">
@@ -418,9 +390,12 @@ const Rebalancing = () => {
                                                 />
 
                                                 <YAxis
-                                                    tickFormatter={(tick) => currency === '원화' ? `${(tick / 10000).toLocaleString()}만` : tick.toLocaleString()}
-                                                    // 💡 3. Y축 여백을 80에서 55로 줄이고, 선을 숨깁니다.
-                                                    width={55}
+                                                    tickFormatter={(tick) => {
+                                                        const man = Math.round(tick / 10000);
+                                                        if (man >= 10000) return `${(man / 10000).toFixed(1)}억`;
+                                                        return `${man}만`;
+                                                    }}
+                                                    width={65}
                                                     axisLine={false}
                                                     tickLine={false}
                                                     tick={{fill: 'var(--color-text-muted)', fontSize: 12}}
@@ -429,8 +404,11 @@ const Rebalancing = () => {
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false}
                                                                stroke="var(--color-border-light)"/>
 
-                                                <Tooltip content={<CustomTooltip currency={currency}/>}
-                                                         cursor={{stroke: '#e4eaf5', strokeWidth: 1}}/>
+                                                <Tooltip
+                                                    content={<CustomTooltip currency={currency}/>}
+                                                    cursor={{stroke: '#e4eaf5', strokeWidth: 1}}
+                                                    position={tooltipPos ?? undefined}
+                                                />
 
                                                 <Area
                                                     type="monotone"
@@ -473,8 +451,8 @@ const Rebalancing = () => {
                                 <div className={styles.statsGrid}>
                                     <div className={styles.statItem}>
                                         <p className={styles.statLabel}>최종 시뮬레이션 금액</p>
-                                        <p className={styles.statVal}>{Number(result.finalAmount).toLocaleString()}<span
-                                            className={styles.statUnit}>{currency}</span></p>
+                                        <p className={styles.statVal}>{Math.round(Number(result.finalAmount) / 10000).toLocaleString()}<span
+                                            className={styles.statUnit}>만원</span></p>
                                     </div>
                                     <div className={styles.statItem}>
                                         <p className={styles.statLabel}>연평균 수익률</p>

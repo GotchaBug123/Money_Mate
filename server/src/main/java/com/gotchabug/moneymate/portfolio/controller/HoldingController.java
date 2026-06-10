@@ -1,6 +1,8 @@
 package com.gotchabug.moneymate.portfolio.controller;
 
 import com.gotchabug.moneymate.auth.dto.HoldingDto;
+import com.gotchabug.moneymate.investment.dto.PortfolioHistoryDto;
+import com.gotchabug.moneymate.investment.dto.PortfolioReturnDto;
 import com.gotchabug.moneymate.member.entity.Member;
 import com.gotchabug.moneymate.investment.service.HoldingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -201,6 +203,28 @@ public class HoldingController {
                 "message",
                 "투자 종목에서 삭제되었습니다."
         );
+    }
+
+    @Operation(
+            summary = "포트폴리오 수익률 조회",
+            description = "보유 종목 기준으로 종합 수익률과 월 수익률을 계산하여 반환합니다."
+    )
+    @GetMapping("/return")
+    public PortfolioReturnDto getPortfolioReturn(
+            @Parameter(hidden = true) HttpSession session
+    ) {
+        return holdingService.getPortfolioReturn(getLoginUser(session).getMemberId());
+    }
+
+    @Operation(
+            summary = "월별 포트폴리오 히스토리 조회",
+            description = "최근 6개월 포트폴리오 평가액과 월 수익률을 반환합니다."
+    )
+    @GetMapping("/monthly-history")
+    public PortfolioHistoryDto getMonthlyHistory(
+            @Parameter(hidden = true) HttpSession session
+    ) {
+        return holdingService.getPortfolioHistory(getLoginUser(session).getMemberId());
     }
 
     @Operation(

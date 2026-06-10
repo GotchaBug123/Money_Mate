@@ -265,18 +265,26 @@ const InvestmentInformation = () => {
                 // (스케줄러가 매일 새벽 수집하므로, 평소엔 이 분기를 타지 않음)
                 if (isDataStale(res)) {
                     setSyncStatus('syncing');
-                    await syncStockDataApi();
-
-                    setSyncStatus('dividend');
-                    await syncDividendDataApi();
-
-                    setSyncStatus(null);
+                    try {
+                        await syncStockDataApi();
+                        setSyncStatus('dividend');
+                        await syncDividendDataApi();
+                    } catch (syncErr) {
+                        console.error('데이터 동기화 실패 (외부 API 키 미설정 또는 네트워크 오류):', syncErr);
+                    } finally {
+                        setSyncStatus(null);
+                    }
                     res = await getInvestmentInfoApi('ALL');
                 } else if (!hasDividendData(res)) {
                     // 주가는 최신이지만 배당 수익률이 한 번도 수집되지 않은 경우
                     setSyncStatus('dividend');
-                    await syncDividendDataApi();
-                    setSyncStatus(null);
+                    try {
+                        await syncDividendDataApi();
+                    } catch (syncErr) {
+                        console.error('배당 동기화 실패:', syncErr);
+                    } finally {
+                        setSyncStatus(null);
+                    }
                     res = await getInvestmentInfoApi('ALL');
                 }
 
@@ -640,6 +648,14 @@ const InvestmentInformation = () => {
                         <span>거래대금</span>
                         <span>담기</span>
                     </div>
+
+                    {visible.length === 0 && (
+                        <div style={{textAlign: 'center', padding: '40px 20px', color: 'var(--color-text-muted)'}}>
+                            {stockList.length === 0
+                                ? '투자 데이터를 불러올 수 없습니다. 백엔드 연결 및 API 키 설정을 확인해주세요.'
+                                : '검색 결과가 없습니다.'}
+                        </div>
+                    )}
 
                     {visible.map((stock, index) => {
                         const rank = startIndex + index + 1;

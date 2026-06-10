@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
 import styles from './PortfolioAuto.module.css';
+import {getLatestRiskSurveyApi} from '../../../api/riskSurveyApi.js';
 
 const MOCK_RESPONSE = () => ({
     stocks: [
@@ -79,7 +80,18 @@ const PortfolioAuto = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const {typeName = '위험중립형', totalScore, selectedThemes, productScores} = location.state || {};
+    // resultType (from InvestmentResult) or typeName (from PortfolioResult) are both accepted
+    const {resultType, typeName: passedTypeName, totalScore, selectedThemes, recommendations} = location.state || {};
+    const [typeName, setTypeName] = useState(resultType || passedTypeName || null);
+
+    useEffect(() => {
+        if (typeName) return;
+        getLatestRiskSurveyApi()
+            .then(data => { if (data?.resultType) setTypeName(data.resultType); })
+            .catch(() => setTypeName('위험중립형'));
+    }, []);
+
+    const displayTypeName = typeName || '위험중립형';
 
     const [currency, setCurrency] = useState('원화');
     const [amount, setAmount] = useState('');
@@ -119,10 +131,9 @@ const PortfolioAuto = () => {
                 endDate,
                 goalAmount: Number(goalAmount),
                 rebalanceCycle: 'QUARTERLY',
-                typeName,
+                typeName: displayTypeName,
                 totalScore,
                 selectedThemes,
-                productScores,
             },
         });
     };
@@ -136,7 +147,7 @@ const PortfolioAuto = () => {
                     <div>
                         <p className={styles.pageHeaderTitle}>포트폴리오 자동 생성</p>
                         <div className={styles.pageHeaderDesc}>
-                            <span className={styles.typeBadge}>{typeName}</span>
+                            <span className={styles.typeBadge}>{displayTypeName}</span>
                             진단된 성향을 기반으로 최적의 투자 포트폴리오를 AI가 구성합니다.
                         </div>
                     </div>

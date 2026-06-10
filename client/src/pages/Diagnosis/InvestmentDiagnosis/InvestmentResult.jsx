@@ -3,6 +3,7 @@ import {useNavigate, useLocation} from 'react-router-dom';
 import styles from './InvestmentDiagnosis.module.css';
 import {useAuthStore} from '../../../store/useAuthStore.js';
 import {submitPendingSurvey} from '../../../utils/pendingInvestmentSurvey.js';
+import {getLatestRiskSurveyApi} from '../../../api/riskSurveyApi.js';
 
 const typeInfo = {
     '안정형': {
@@ -37,15 +38,23 @@ const InvestmentResult = () => {
     const [guestMode, setGuestMode] = useState(isGuest || !user);
     const [saving, setSaving] = useState(false);
 
-    // 결과 페이지에 있는 동안 로그인하면 즉시 백엔드에 제출하고 UI를 풀버전으로 전환
+    // 결과 페이지에 있는 동안 로그인하면 백엔드에 제출하고 UI를 풀버전으로 전환.
+    // LoginModal이 먼저 submitPendingSurvey를 가져간 경우(null 반환) 최신 결과를 백엔드에서 조회한다.
     useEffect(() => {
         if (!user || !guestMode) return;
         setSaving(true);
         submitPendingSurvey()
-            .then((result) => {
+            .then(async (result) => {
                 if (result) {
                     setSurveyData(result);
                     setGuestMode(false);
+                } else {
+                    // LoginModal이 이미 제출함 → 백엔드에서 최신 결과 가져오기
+                    const latest = await getLatestRiskSurveyApi().catch(() => null);
+                    if (latest) {
+                        setSurveyData(latest);
+                        setGuestMode(false);
+                    }
                 }
             })
             .catch(console.error)

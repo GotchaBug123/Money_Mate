@@ -2,36 +2,21 @@ import React, {useState, useEffect} from 'react';
 import {Link} from "react-router-dom";
 import {useModal} from '../../hooks/useModal';
 import styles from './AssetDetail.module.css';
-import {getHoldingListApi, addHoldingApi, removeHoldingApi, getWatchlistApi} from '../../api/assetApi.js';
+import {getHoldingListApi, addHoldingApi, removeHoldingApi, getWatchlistApi, getPortfolioReturnApi, getPortfolioHistoryApi, toggleWatchlistApi} from '../../api/assetApi.js';
 import {searchAssetsApi} from '../../api/rebalanceApi.js';
 
-const monthlyData = {
-    '2026-01': {monthlyReturn: '+1.8%', totalReturn: '+4.2%'},
-    '2026-02': {monthlyReturn: '+2.7%', totalReturn: '+6.9%'},
-    '2026-03': {monthlyReturn: '-1.1%', totalReturn: '+5.8%'},
-    '2026-04': {monthlyReturn: '+5.2%', totalReturn: '+12.8%'},
-    '2026-05': {monthlyReturn: '+3.4%', totalReturn: '+16.2%'},
-    '2026-06': {monthlyReturn: '-0.8%', totalReturn: '+15.4%'},
-    '2026-07': {monthlyReturn: '+2.9%', totalReturn: '+18.3%'},
-};
-
-const barChartData = [
-    {label: '1월', height: '34%', value: '+1.8%', minus: false},
-    {label: '2월', height: '48%', value: '+2.7%', minus: false},
-    {label: '3월', height: '24%', value: '-1.1%', minus: true},
-    {label: '4월', height: '76%', value: '+5.2%', minus: false},
-    {label: '5월', height: '58%', value: '+3.4%', minus: false},
-    {label: '6월', height: '20%', value: '-0.8%', minus: true},
-    {label: '7월', height: '52%', value: '+2.9%', minus: false},
-];
 
 function AssetDetail() {
     const {isOpen, open, close} = useModal();
     const {isOpen: isSellOpen, open: openSell, close: closeSell} = useModal();
-    const [selectedDate, setSelectedDate] = useState('2026-04-01');
+    const {isOpen: isWatchOpen, open: openWatch, close: closeWatch} = useModal();
+    const today = new Date().toISOString().slice(0, 10);
+    const [selectedDate, setSelectedDate] = useState(today);
     const [holdings, setHoldings] = useState([]);
     const [watchlist, setWatchlist] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [portfolioReturn, setPortfolioReturn] = useState(null);
+    const [monthlyHistory, setMonthlyHistory] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -43,15 +28,23 @@ function AssetDetail() {
     const [sellTarget, setSellTarget] = useState(null);
     const [sellLoading, setSellLoading] = useState(false);
 
+    const [watchQuery, setWatchQuery] = useState('');
+    const [watchResults, setWatchResults] = useState([]);
+    const [watchLoading, setWatchLoading] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [holdingData, watchlistData] = await Promise.all([
+                const [holdingData, watchlistData, returnData, historyData] = await Promise.all([
                     getHoldingListApi(),
                     getWatchlistApi(),
+                    getPortfolioReturnApi().catch(() => null),
+                    getPortfolioHistoryApi().catch(() => null),
                 ]);
                 setHoldings(holdingData);
                 setWatchlist(watchlistData);
+                setPortfolioReturn(returnData);
+                setMonthlyHistory(historyData?.monthlyHistory || []);
             } catch (error) {
                 console.error('자산 상세 조회 실패:', error);
                 alert('자산 정보를 불러오는 데 실패했습니다.');
@@ -129,9 +122,63 @@ function AssetDetail() {
         }
     };
 
+    const handleWatchModalClose = () => {
+        closeWatch();
+        setWatchQuery('');
+        setWatchResults([]);
+    };
+
+    const handleWatchSearch = async () => {
+        if (!watchQuery.trim()) return;
+        try {
+            const data = await searchAssetsApi(watchQuery);
+            setWatchResults(data);
+        } catch (error) {
+            console.error('종목 검색 실패:', error);
+            alert('종목 검색에 실패했습니다.');
+        }
+    };
+
+    const handleWatchAdd = async (stock) => {
+        setWatchLoading(true);
+        try {
+            const result = await toggleWatchlistApi({
+                ticker: stock.symbol,
+                assetName: stock.assetName,
+                market: stock.market,
+            });
+            if (result.isRegistered) {
+                const updated = await getWatchlistApi();
+                setWatchlist(updated);
+                alert(`${stock.assetName}이(가) 관심 종목에 추가되었습니다.`);
+            } else {
+                alert(`${stock.assetName}이(가) 관심 종목에서 해제되었습니다.`);
+                const updated = await getWatchlistApi();
+                setWatchlist(updated);
+            }
+            handleWatchModalClose();
+        } catch (error) {
+            console.error('관심 종목 추가 실패:', error);
+            alert('관심 종목 추가에 실패했습니다.');
+        } finally {
+            setWatchLoading(false);
+        }
+    };
+
     const selectedMonthKey = selectedDate.slice(0, 7);
-    const monthlyReturn = monthlyData[selectedMonthKey]?.monthlyReturn || '+0.0%';
-    const totalReturn = monthlyData[selectedMonthKey]?.totalReturn || '+0.0%';
+
+    const formatReturn = (pct) => {
+        if (pct === null || pct === undefined) return '-';
+        const num = Number(pct);
+        return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
+    };
+
+    // 선택된 달에 해당하는 월 수익률을 monthlyHistory에서 검색
+    const selectedMonthData = monthlyHistory.find(m => m.month === selectedMonthKey);
+    const monthlyReturn = selectedMonthData
+        ? formatReturn(selectedMonthData.monthlyReturnPct)
+        : formatReturn(portfolioReturn?.monthlyReturnPct);
+    const totalReturn = formatReturn(portfolioReturn?.totalReturnPct);
 
     return (
         <div className={styles.pageWrapper}>
@@ -183,15 +230,29 @@ function AssetDetail() {
                     </div>
 
                     <div className={styles.barChart}>
-                        {barChartData.map((bar) => (
-                            <div key={bar.label} className={styles.barItem}>
-                                <span>{bar.label}</span>
-                                <div>
-                                    <b className={bar.minus ? styles.minusBar : undefined} style={{height: bar.height}}></b>
-                                </div>
-                                <em>{bar.value}</em>
+                        {monthlyHistory.length === 0 ? (
+                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80px', color: 'var(--color-text-muted)', fontSize: '14px'}}>
+                                보유 종목을 추가하면 월별 수익률이 표시됩니다.
                             </div>
-                        ))}
+                        ) : (() => {
+                            const returns = monthlyHistory.map(m => Number(m.monthlyReturnPct ?? 0));
+                            const maxAbs = Math.max(...returns.map(Math.abs), 0.01);
+                            return monthlyHistory.map((m) => {
+                                const pct = Number(m.monthlyReturnPct ?? 0);
+                                const isMinus = pct < 0;
+                                const heightPct = `${Math.round((Math.abs(pct) / maxAbs) * 80) + 5}%`;
+                                const label = pct === 0 ? '0%' : `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
+                                return (
+                                    <div key={m.month} className={styles.barItem}>
+                                        <span>{m.label}</span>
+                                        <div>
+                                            <b className={isMinus ? styles.minusBar : undefined} style={{height: heightPct}}></b>
+                                        </div>
+                                        <em>{label}</em>
+                                    </div>
+                                );
+                            });
+                        })()}
                     </div>
                 </section>
 
@@ -258,7 +319,7 @@ function AssetDetail() {
                         </div>
 
                         <div className={styles.btnGroup}>
-                            <button className={styles.secondaryBtn}>관심 종목 담기</button>
+                            <button className={styles.secondaryBtn} onClick={openWatch}>관심 종목 담기</button>
                         </div>
                     </div>
                 </div>
@@ -406,6 +467,64 @@ function AssetDetail() {
                             >
                                 {sellLoading ? '처리 중...' : '매도하기'}
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isWatchOpen && (
+                <div className={styles.modalOverlay} onClick={handleWatchModalClose}>
+                    <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>관심 종목 담기</h3>
+                            <button onClick={handleWatchModalClose} className={styles.modalCloseBtn}>✕</button>
+                        </div>
+
+                        <div style={{display: 'flex', gap: '8px', marginBottom: '8px'}}>
+                            <input
+                                type="text"
+                                placeholder="종목명 또는 티커 입력"
+                                value={watchQuery}
+                                onChange={e => setWatchQuery(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleWatchSearch()}
+                                className={styles.qtyInput}
+                                style={{flex: 1}}
+                                autoFocus
+                            />
+                            <button className={styles.buyBtn} onClick={handleWatchSearch}>검색</button>
+                        </div>
+
+                        {watchResults.length > 0 && (
+                            <div style={{maxHeight: '240px', overflowY: 'auto', border: '1px solid var(--color-border)', borderRadius: '8px'}}>
+                                {watchResults.map((stock) => (
+                                    <div
+                                        key={stock.symbol}
+                                        onClick={() => !watchLoading && handleWatchAdd(stock)}
+                                        style={{
+                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                            padding: '10px 14px', cursor: 'pointer',
+                                            borderBottom: '1px solid var(--color-border-light)',
+                                            opacity: watchLoading ? 0.5 : 1,
+                                        }}
+                                    >
+                                        <div>
+                                            <p style={{margin: 0, fontSize: '14px', fontWeight: 600}}>{stock.assetName}</p>
+                                            <p style={{margin: 0, fontSize: '12px', color: 'var(--color-text-muted)'}}>{stock.symbol} · {stock.market}</p>
+                                        </div>
+                                        <span style={{fontSize: '12px', color: 'var(--color-primary)'}}>
+                                            {watchlist.some(w => w.ticker === stock.symbol) ? '✓ 담김' : '+ 담기'}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {watchResults.length === 0 && watchQuery && (
+                            <p style={{fontSize: '13px', color: 'var(--color-text-muted)'}}>검색 결과가 없습니다.</p>
+                        )}
+
+                        <div className={styles.modalBottomRow}>
+                            <button className={styles.secondaryBtn} onClick={handleWatchModalClose}>닫기</button>
                         </div>
                     </div>
                 </div>

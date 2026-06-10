@@ -9,3 +9,8 @@ export const saveRiskProfileApi = async (totalScore) => {
     const response = await axiosInstance.post('/risk-profile', {totalScore});
     return response.data;
 };
+
+export const getLatestRiskSurveyApi = async () => {
+    const response = await axiosInstance.get('/risk-survey/latest');
+    return response.data;
+};

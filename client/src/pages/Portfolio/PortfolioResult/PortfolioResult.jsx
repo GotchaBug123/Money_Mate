@@ -77,6 +77,7 @@ const PortfolioResult = () => {
                 })();
 
                 const requestData = {
+                    currentAmount: (Number(investAmount) || 0) * 10000,
                     monthlyInvestment: 0,
                     targetAmount: Number(goalAmount) * 10000,
                     investmentMonths,
@@ -87,8 +88,8 @@ const PortfolioResult = () => {
                         assetType: st.category || st.assetType || '국내',
                         market: st.market || st.category || '국내',
                         targetWeight: st.weight,
-                        expectedAnnualReturn: st.expectedReturn ?? st.expectedAnnualReturn ?? 0,
-                        annualVolatility: 0,
+                        expectedAnnualReturn: (st.expectedReturn ?? st.expectedAnnualReturn ?? 8) / 100,
+                        annualVolatility: st.annualVolatility || null,
                     })),
                 };
 
@@ -128,19 +129,24 @@ const PortfolioResult = () => {
         );
     }
 
-    const achievementRate = Math.round((result.successProbability ?? 0) * 100);
+    // 백엔드가 이미 퍼센트 값으로 반환하므로 추가 ×100 불필요
+    const achievementRate = Math.min(100, Math.round(result.successProbability ?? 0));
     const finalAmount = result.medianAmount ?? 0;
-    const avgReturnRate = Number(((result.annualizedReturn ?? 0) * 100).toFixed(1));
-    const maxDrawdown = Number(((result.maxDrawdown ?? 0) * 100).toFixed(1));
-    const minAnnualReturn = Number(((result.worstAnnualReturn ?? 0) * 100).toFixed(1));
-    const maxAnnualReturn = Number(((result.bestAnnualReturn ?? 0) * 100).toFixed(1));
+    const avgReturnRate = Number((result.annualizedReturn ?? 0).toFixed(1));
+    const maxDrawdown = Number((result.maxDrawdown ?? 0).toFixed(1));
+    const minAnnualReturn = Number((result.worstAnnualReturn ?? 0).toFixed(1));
+    const maxAnnualReturn = Number((result.bestAnnualReturn ?? 0).toFixed(1));
 
     const totalDays = (() => {
         if (!startDate || !endDate) return null;
         const diff = new Date(endDate) - new Date(startDate);
         return Math.round(diff / (1000 * 60 * 60 * 24));
     })();
-    const remainingDays = totalDays ?? 0;
+    const remainingDays = (() => {
+        if (!endDate) return 0;
+        const diff = new Date(endDate) - new Date();
+        return Math.max(0, Math.round(diff / (1000 * 60 * 60 * 24)));
+    })();
     const progressRate = totalDays ? Math.min(100, Math.round(((totalDays - remainingDays) / totalDays) * 100)) : 0;
 
     const barData = [
@@ -208,8 +214,8 @@ const PortfolioResult = () => {
                                 <span className={styles.gaugeValueGreen}>{achievementRate}%</span>
                             </div>
                             <p className={styles.cardMeta}>
-                                투자금 {Number(investAmount).toLocaleString()}{currency} →
-                                목표 {Number(goalAmount).toLocaleString()}{currency}
+                                투자금 {Number(investAmount).toLocaleString()}만원 →
+                                목표 {Number(goalAmount).toLocaleString()}만원
                             </p>
                         </div>
                     </div>
@@ -223,7 +229,7 @@ const PortfolioResult = () => {
                     <div className={styles.statCard}>
                         <p className={styles.statLabel}>최종금액</p>
                         <p className={styles.statValue}>
-                            {finalAmount.toLocaleString()}<span className={styles.statUnit}>{currency}</span>
+                            {Math.round(finalAmount / 10000).toLocaleString()}<span className={styles.statUnit}>만원</span>
                         </p>
                         <div className={`${styles.statIcon} ${styles.iconWallet}`}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -309,7 +315,7 @@ const PortfolioResult = () => {
                     <button
                         className={styles.secondaryBtn}
                         onClick={() => navigate('/portfolio/auto', {
-                            state: {typeName, totalScore, selectedThemes, productScores},
+                            state: {typeName, resultType: typeName, totalScore, selectedThemes},
                         })}
                     >
                         직접 만들어 다시하기

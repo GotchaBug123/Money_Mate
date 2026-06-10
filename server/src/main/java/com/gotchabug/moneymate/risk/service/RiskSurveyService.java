@@ -1,6 +1,7 @@
 package com.gotchabug.moneymate.risk.service;
 
 import com.gotchabug.moneymate.risk.dto.InvestmentRecommendationCard;
+import com.gotchabug.moneymate.risk.dto.RiskAnswerSheetResponse;
 import com.gotchabug.moneymate.risk.dto.RiskSurveyRequest;
 import com.gotchabug.moneymate.risk.dto.RiskSurveyResponse;
 import com.gotchabug.moneymate.member.entity.Member;
@@ -81,6 +82,13 @@ public class RiskSurveyService {
                 .financialInterestLabel(levelLabel(financialInterestPercent))
                 .recommendations(recommendations)
                 .build();
+    }
+
+    public RiskAnswerSheetResponse getLatestResult(Long memberId) {
+        return riskAnswerSheetRepository
+                .findTopByMember_MemberIdOrderBySubmittedAtDesc(memberId)
+                .map(RiskAnswerSheetResponse::from)
+                .orElse(null);
     }
 
     private String calculateResultType(int score) {

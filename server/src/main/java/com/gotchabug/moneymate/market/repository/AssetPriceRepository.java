@@ -200,4 +200,8 @@ ORDER BY ap.priceDate ASC
             @Param("ticker") String ticker,
             @Param("startDate") LocalDate startDate
     );
+
+    // ticker 기준 최신 가격 1건 (포트폴리오 수익률 계산용)
+    @Query("SELECT ap FROM AssetPrice ap JOIN ap.asset a WHERE a.ticker = :ticker ORDER BY ap.priceDate DESC")
+    List<AssetPrice> findLatestByTicker(@Param("ticker") String ticker);
 }

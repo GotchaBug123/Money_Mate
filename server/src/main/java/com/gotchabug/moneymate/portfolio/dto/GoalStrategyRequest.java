@@ -61,24 +61,11 @@ public class GoalStrategyRequest {
     }
 
     public long effectiveCurrentAmount() {
-        if (shouldTreatCurrentAmountAsMonthlyInvestment()) {
-            return 0L;
-        }
-
         return safeCurrentAmount();
     }
 
     public long effectiveMonthlyInvestment() {
-        if (shouldTreatCurrentAmountAsMonthlyInvestment()) {
-            return safeCurrentAmount();
-        }
-
         return safeMonthlyInvestment();
-    }
-
-    public boolean shouldTreatCurrentAmountAsMonthlyInvestment() {
-        return safeCurrentAmount() > 0
-                && safeMonthlyInvestment() == 0;
     }
 
     public int safeInvestmentYears() {
