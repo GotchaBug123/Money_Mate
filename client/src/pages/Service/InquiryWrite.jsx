@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {createInquiry} from '../../api/customerServiceApi';
 import {useAuthStore} from '../../store/useAuthStore';
-import {useInquiryStore} from '../../store/useInquiryStore';
 import styles from './InquiryWrite.module.css';
 
 function InquiryWrite() {
@@ -11,8 +10,6 @@ function InquiryWrite() {
     const storeLoggedIn = useAuthStore((state) => state.isLoggedIn);
     const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const isLoggedIn = storeLoggedIn || localLoggedIn;
-
-    const addInquiry = useInquiryStore((state) => state.addInquiry);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,8 +68,6 @@ function InquiryWrite() {
             };
 
             await createInquiry(inquiryData);
-
-            addInquiry(inquiryData);
 
             alert('문의가 성공적으로 등록되었습니다.');
             navigate('/inquiry-list');

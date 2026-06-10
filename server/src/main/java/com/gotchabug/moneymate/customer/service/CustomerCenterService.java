@@ -1,5 +1,6 @@
 package com.gotchabug.moneymate.customer.service;
 
+import com.gotchabug.moneymate.customer.dto.CustomerInquiryResponse;
 import com.gotchabug.moneymate.customer.entity.CustomerInquiry;
 import com.gotchabug.moneymate.customer.entity.Faq;
 import com.gotchabug.moneymate.member.entity.Member;
@@ -38,8 +39,11 @@ public class CustomerCenterService {
         );
     }
 
-    public List<CustomerInquiry> getMyInquiries(Long memberId) {
-        return customerInquiryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+    public List<CustomerInquiryResponse> getMyInquiries(Long memberId) {
+        return customerInquiryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId)
+                .stream()
+                .map(CustomerInquiryResponse::from)
+                .toList();
     }
 
     @Transactional

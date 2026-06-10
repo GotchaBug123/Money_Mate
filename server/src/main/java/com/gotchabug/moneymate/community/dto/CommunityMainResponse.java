@@ -23,6 +23,7 @@ public class CommunityMainResponse {
         private String themeName;
         private String description;
         private Integer displayOrder;
+        private String activeYn;
 
         public static ThemeResponse from(CommunityTheme theme) {
             return ThemeResponse.builder()
@@ -30,6 +31,7 @@ public class CommunityMainResponse {
                     .themeName(theme.getThemeName())
                     .description(theme.getDescription())
                     .displayOrder(theme.getDisplayOrder())
+                    .activeYn(theme.getActiveYn())
                     .build();
         }
     }
