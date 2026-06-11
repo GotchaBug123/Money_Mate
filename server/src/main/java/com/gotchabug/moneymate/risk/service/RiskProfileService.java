@@ -59,13 +59,13 @@ public class RiskProfileService {
         if (totalScore >= 42) {     //42~51
             return "ACTIVE";
         }
-        if (totalScore >= 30) {     //30~41
+        if (totalScore >= 32) {     //32~41
             return "NEUTRAL";
         }
-        if (totalScore >= 20) {     //20~29
+        if (totalScore >= 22) {     //22~31
             return "STABLE_SEEKING";
         }
-        return "STABLE";            //12~19
+        return "STABLE";            //12~21
     }
 
     private String calculateRiskTypeName(String riskTypeCode) {
