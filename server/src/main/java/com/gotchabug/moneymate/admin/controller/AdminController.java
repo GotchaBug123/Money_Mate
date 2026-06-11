@@ -117,6 +117,22 @@ public class AdminController {
         return ResponseEntity.ok(adminInquiryService.getInquiry(id));
     }
 
+    @Operation(summary = "문의 삭제")
+    @DeleteMapping("/inquiries/{id}")
+    public ResponseEntity<?> deleteInquiry(
+            @PathVariable Long id,
+            HttpSession session
+    ) {
+        checkAdmin(session);
+
+        adminInquiryService.deleteInquiry(id);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "문의가 삭제되었습니다.",
+                "inquiryId", id
+        ));
+    }
+
     @Operation(summary = "문의 답변 등록")
     @PostMapping("/inquiries/{id}/answer")
     public ResponseEntity<?> answerInquiry(

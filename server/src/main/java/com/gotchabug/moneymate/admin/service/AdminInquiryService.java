@@ -37,4 +37,12 @@ public class AdminInquiryService {
 
         inquiry.answer(answer);
     }
+
+    @Transactional
+    public void deleteInquiry(Long inquiryId) {
+        CustomerInquiry inquiry = customerInquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new IllegalArgumentException("문의가 존재하지 않습니다."));
+
+        customerInquiryRepository.delete(inquiry);
+    }
 }

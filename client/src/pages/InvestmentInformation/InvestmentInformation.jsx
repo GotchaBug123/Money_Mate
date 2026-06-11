@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import styles from './InvestmentInformation.module.css';
 import {getInvestmentInfoApi, syncStockDataApi, syncDividendDataApi, getMarketIndexApi, getHoldingListApi, addHoldingApi, updateHoldingQuantityApi, removeHoldingApi} from '../../api/investmentApi';
+import {getWatchlistApi, toggleWatchlistApi} from '../../api/assetApi';
 import {useAuthStore} from '../../store/useAuthStore';
 
 const LOGO_MAP = {
@@ -390,6 +391,13 @@ const InvestmentInformation = () => {
             .catch(err => console.error('장바구니 불러오기 실패', err));
     }, [user]);
 
+    useEffect(() => {
+        if (!user) { setLikes([]); return; }
+        getWatchlistApi()
+            .then(data => setLikes((data || []).map(w => w.ticker)))
+            .catch(err => console.error('관심종목 불러오기 실패', err));
+    }, [user]);
+
     // 💡 필터 및 정렬 로직에 이제 MOCK_STOCKS 대신 백엔드에서 받은 stockList를 사용합니다.
     const filtered = sortStocks(
         stockList.filter((stock) =>
@@ -458,10 +466,23 @@ const InvestmentInformation = () => {
         addRecent(stock.id);
     };
 
-    const toggleLike = (event, id) => {
+    const toggleLike = async (event, id) => {
         event.stopPropagation();
-        setLikes((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
+        if (!user) { openLoginModal(); return; }
+        const stock = stockList.find(s => s.id === id);
+        if (!stock) return;
+        setLikes(prev => prev.includes(stock.ticker)
+            ? prev.filter(t => t !== stock.ticker)
+            : [...prev, stock.ticker]);
         addRecent(id);
+        try {
+            await toggleWatchlistApi({ticker: stock.ticker, assetName: stock.name, market: stock.rawMarket || stock.market});
+        } catch (e) {
+            console.error('관심종목 변경 실패', e);
+            setLikes(prev => prev.includes(stock.ticker)
+                ? prev.filter(t => t !== stock.ticker)
+                : [...prev, stock.ticker]);
+        }
     };
 
     const cartSidebarData = holdings.map(h => {
@@ -472,7 +493,7 @@ const InvestmentInformation = () => {
     const sidebarData = sidebarTab === 'cart'
         ? cartSidebarData
         : sidebarTab === 'like'
-            ? stockList.filter((stock) => likes.includes(stock.id))
+            ? stockList.filter((stock) => likes.includes(stock.ticker))
             : stockList.filter((stock) => recent.includes(stock.id));
 
     const openThemePanel = (selectedTheme) => {
@@ -685,7 +706,7 @@ const InvestmentInformation = () => {
                                         🛒
                                     </button>
                                     <button
-                                        className={`${styles.sbt} ${likes.includes(stock.id) ? styles.sbtLikeOn : ''}`}
+                                        className={`${styles.sbt} ${likes.includes(stock.ticker) ? styles.sbtLikeOn : ''}`}
                                         onClick={(event) => toggleLike(event, stock.id)}
                                         title="좋아요"
                                     >

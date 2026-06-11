@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styles from './CustomerInquiryManagePage.module.css';
-import {answerAdminInquiryApi, getAdminInquiriesApi} from '../../api/adminApi.js';
+import {answerAdminInquiryApi, deleteAdminInquiryApi, getAdminInquiriesApi} from '../../api/adminApi.js';
 
 const extractInquiries = (payload) => {
     if (Array.isArray(payload)) {
@@ -163,8 +163,16 @@ function CustomerInquiryManagePage() {
         }
     };
 
-    const handleDeleteClick = () => {
-        alert('문의 삭제 기능은 현재 지원되지 않습니다.');
+    const handleDeleteClick = async (inquiryId) => {
+        if (!window.confirm('해당 문의를 삭제하시겠습니까?')) return;
+        try {
+            await deleteAdminInquiryApi(inquiryId);
+            setInquiries(prev => prev.filter(inq => inq.inquiryId !== inquiryId));
+            if (answerForm?.inquiryId === inquiryId) setAnswerForm({});
+        } catch (error) {
+            console.error('문의 삭제 실패:', error);
+            alert('문의 삭제에 실패했습니다.');
+        }
     };
 
     const getStatusBadge = (inquiry) => {

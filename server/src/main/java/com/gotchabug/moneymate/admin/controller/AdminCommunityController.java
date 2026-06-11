@@ -1,8 +1,6 @@
 package com.gotchabug.moneymate.admin.controller;
 
-import com.gotchabug.moneymate.community.dto.CommunityPostCreateRequest;
 import com.gotchabug.moneymate.community.dto.CommunityPostPageResponse;
-import com.gotchabug.moneymate.community.dto.CommunityPostUpdateRequest;
 import com.gotchabug.moneymate.community.service.CommunityService;
 import com.gotchabug.moneymate.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,12 +9,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Tag(name = "관리자 커뮤니티", description = "관리자 커뮤니티 게시글 관리 API")
@@ -60,48 +55,6 @@ public class AdminCommunityController {
         );
     }
 
-    @Operation(summary = "게시글 수정")
-    @PutMapping(value = "/posts/{postId}", consumes = "multipart/form-data")
-    public ResponseEntity<?> updatePost(
-            @PathVariable Long postId,
-
-            @RequestParam(required = false) Long themeId,
-            @RequestParam String category,
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestParam(required = false) String stockSymbol,
-            @RequestParam(required = false) String stockName,
-
-            @RequestParam(required = false) List<String> attachmentUrl,
-            @RequestParam(required = false) List<String> attachmentName,
-            @RequestPart(required = false) List<MultipartFile> files,
-
-            HttpSession session
-    ) {
-        checkAdmin(session);
-
-        CommunityPostUpdateRequest request = new CommunityPostUpdateRequest(
-                themeId,
-                category,
-                title,
-                content,
-                stockSymbol,
-                stockName,
-                createAttachmentRequests(attachmentUrl, attachmentName)
-        );
-
-        communityService.updatePostByAdmin(
-                postId,
-                request,
-                files == null ? List.of() : files
-        );
-
-        return ResponseEntity.ok(Map.of(
-                "message", "게시글이 수정되었습니다.",
-                "postId", postId
-        ));
-    }
-
     @Operation(summary = "게시글 삭제")
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<?> deletePost(
@@ -136,36 +89,4 @@ public class AdminCommunityController {
         }
     }
 
-    private List<CommunityPostCreateRequest.AttachmentRequest> createAttachmentRequests(
-            List<String> attachmentUrls,
-            List<String> attachmentNames
-    ) {
-        if (attachmentUrls == null || attachmentNames == null) {
-            return List.of();
-        }
-
-        int size = Math.min(attachmentUrls.size(), attachmentNames.size());
-        List<CommunityPostCreateRequest.AttachmentRequest> attachments = new ArrayList<>();
-
-        for (int index = 0; index < size; index++) {
-            String url = normalize(attachmentUrls.get(index));
-            String name = normalize(attachmentNames.get(index));
-
-            if (url == null || name == null) {
-                continue;
-            }
-
-            attachments.add(new CommunityPostCreateRequest.AttachmentRequest(url, name));
-        }
-
-        return attachments;
-    }
-
-    private String normalize(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return null;
-        }
-
-        return value.trim();
-    }
 }

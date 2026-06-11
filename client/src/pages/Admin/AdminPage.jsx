@@ -45,10 +45,10 @@ function AdminPage() {
 
     const adminMenuItems = [
         {label: '대시보드', onClick: () => setActiveMenu('dashboard')},
-        {label: '회원관리', onClick: () => setActiveMenu('memberManage')},
-        {label: '투자관리', onClick: () => setActiveMenu('investmentManage')},
-        {label: '커뮤니티관리', onClick: () => setActiveMenu('communityManage')},
-        {label: '고객문의관리', onClick: () => setActiveMenu('customerInquiryManage')},
+        {label: '회원 관리', onClick: () => setActiveMenu('memberManage')},
+        {label: '투자 관리', onClick: () => setActiveMenu('investmentManage')},
+        {label: '커뮤니티 관리', onClick: () => setActiveMenu('communityManage')},
+        {label: '고객 문의 관리', onClick: () => setActiveMenu('customerInquiryManage')},
         {label: '일반 페이지', to: '/'},
     ];
 
@@ -79,28 +79,28 @@ function AdminPage() {
                     <section className={styles.cardGrid}>
                         <button className={styles.dashboardCard} onClick={() => setActiveMenu('memberManage')}>
                             <span className={styles.cardIcon}>👥</span>
-                            <h2 className={styles.cardTitle}>회원관리</h2>
+                            <h2 className={styles.cardTitle}>회원 관리</h2>
                             <p className={styles.cardDesc}>전체 회원 목록 조회, 상세 정보 수정 및 탈퇴 처리를 관리합니다.</p>
                             <strong className={styles.cardHighlight}>총 {dashboard.memberCount}명</strong>
                         </button>
 
                         <button className={styles.dashboardCard} onClick={() => setActiveMenu('investmentManage')}>
                             <span className={styles.cardIcon}>📈</span>
-                            <h2 className={styles.cardTitle}>투자관리</h2>
+                            <h2 className={styles.cardTitle}>투자 관리</h2>
                             <p className={styles.cardDesc}>투자 상품, 포트폴리오 성과 및 수익률 통계를 모니터링합니다.</p>
                             <strong className={styles.cardHighlight}>활성 상품 현황</strong>
                         </button>
 
                         <button className={styles.dashboardCard} onClick={() => setActiveMenu('communityManage')}>
                             <span className={styles.cardIcon}>💬</span>
-                            <h2 className={styles.cardTitle}>커뮤니티관리</h2>
+                            <h2 className={styles.cardTitle}>커뮤니티 관리</h2>
                             <p className={styles.cardDesc}>게시글 모니터링, 부적절한 콘텐츠 블라인드 및 삭제를 진행합니다.</p>
                             <strong className={styles.cardHighlight}>게시글 {dashboard.postCount}개</strong>
                         </button>
 
                         <button className={styles.dashboardCard} onClick={() => setActiveMenu('customerInquiryManage')}>
                             <span className={styles.cardIcon}>🎧</span>
-                            <h2 className={styles.cardTitle}>고객문의관리</h2>
+                            <h2 className={styles.cardTitle}>고객 문의 관리</h2>
                             <p className={styles.cardDesc}>문의 답변, 삭제 조치, 처리 상태를 관리합니다.</p>
                             <strong className={styles.cardHighlight}>대기 {dashboard.waitingInquiryCount}건</strong>
                         </button>

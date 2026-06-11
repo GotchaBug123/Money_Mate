@@ -28,15 +28,6 @@ export const getAdminAgeGroupStatsApi = async () =>
 export const getAdminPostsApi = async (params) =>
     axiosInstance.get('/admin/community/posts', {params}).then(r => r.data);
 
-export const updateAdminPostApi = async (postId, {category, title, content, stockName, stockSymbol}) => {
-    const formData = new FormData();
-    formData.append('category', category ?? 'STOCK');
-    formData.append('title', title);
-    formData.append('content', content);
-    if (stockName) formData.append('stockName', stockName);
-    if (stockSymbol) formData.append('stockSymbol', stockSymbol);
-    return axiosInstance.put(`/admin/community/posts/${postId}`, formData).then(r => r.data);
-};
 
 export const deleteAdminPostApi = async (postId) =>
     axiosInstance.delete(`/admin/community/posts/${postId}`).then(r => r.data);
@@ -47,3 +38,6 @@ export const getAdminInquiriesApi = async () =>
 
 export const answerAdminInquiryApi = async (inquiryId, answer) =>
     axiosInstance.post(`/admin/inquiries/${inquiryId}/answer`, {answer}).then(r => r.data);
+
+export const deleteAdminInquiryApi = async (inquiryId) =>
+    axiosInstance.delete(`/admin/inquiries/${inquiryId}`).then(r => r.data);

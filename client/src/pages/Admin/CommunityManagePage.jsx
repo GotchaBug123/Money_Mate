@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import styles from './CommunityManagePage.module.css';
-import {getAdminPostsApi, updateAdminPostApi, deleteAdminPostApi} from '../../api/adminApi.js';
+import {getAdminPostsApi, deleteAdminPostApi} from '../../api/adminApi.js';
 
 function CommunityManagePage() {
     const [posts, setPosts] = useState([]);
@@ -10,7 +10,6 @@ function CommunityManagePage() {
     const [searchType, setSearchType] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
-    const [editForm, setEditForm] = useState({});
 
     useEffect(() => {
         const load = async () => {
@@ -62,45 +61,15 @@ function CommunityManagePage() {
     const handleOpenDetail = (post) => { setSelectedPost(post); setMode('detail'); };
     const handleCloseDetail = () => { setSelectedPost(null); setMode('list'); };
 
-    const handleOpenEdit = (post) => {
-        setEditForm({
-            postId: post.postId ?? post.postNo,
-            title: post.title ?? '',
-            content: post.content ?? post.contentPreview ?? '',
-            authorName: post.authorName ?? post.writerName ?? '',
-            authorId: post.authorId ?? post.writerId ?? '',
-            createdAt: post.createdAt ?? '',
-        });
-        setMode('edit');
-    };
-    const handleCloseEdit = () => { setEditForm({}); setMode('list'); };
-
-    const handleEditChange = (e) => {
-        const {name, value} = e.target;
-        setEditForm(prev => ({...prev, [name]: value}));
-    };
-
-    const handleEditSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await updateAdminPostApi(editForm.postId, {title: editForm.title, content: editForm.content});
-            setPosts(prev => prev.map(p =>
-                (p.postId ?? p.postNo) === editForm.postId ? {...p, title: editForm.title} : p
-            ));
-            alert('게시글 정보가 수정되었습니다.');
-            setMode('list');
-        } catch (error) {
-            console.error('게시글 수정 실패:', error);
-            alert('게시글 수정에 실패했습니다.');
-        }
-    };
-
     const handleDeleteClick = async (postId) => {
         if (!window.confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
         try {
             await deleteAdminPostApi(postId);
             setPosts(prev => prev.filter(p => (p.postId ?? p.postNo) !== postId));
-            alert('게시글이 삭제되었습니다.');
+            if (selectedPost && (selectedPost.postId ?? selectedPost.postNo) === postId) {
+                setSelectedPost(null);
+                setMode('list');
+            }
         } catch (error) {
             console.error('게시글 삭제 실패:', error);
             alert('게시글 삭제에 실패했습니다.');
@@ -112,7 +81,7 @@ function CommunityManagePage() {
             <div className={styles.header}>
                 <div>
                     <h2 className={styles.title}>커뮤니티 관리</h2>
-                    <p className={styles.desc}>게시글 목록을 조회하고, 부적절한 게시글을 수정 및 삭제할 수 있습니다.</p>
+                    <p className={styles.desc}>게시글 목록을 조회하고, 부적절한 게시글을 삭제할 수 있습니다.</p>
                 </div>
             </div>
 
@@ -176,7 +145,7 @@ function CommunityManagePage() {
                                         <span>{(post.createdAt ?? '').slice(0, 10)}</span>
                                         <span>{post.themeName ?? '-'}</span>
                                         <div className={styles.actionGroup}>
-                                            <button className={styles.actionBtn} onClick={() => handleOpenEdit(post)}>수정</button>
+                                            <button className={styles.actionBtn} onClick={() => handleOpenDetail(post)}>상세</button>
                                             <button className={styles.dangerBtn} onClick={() => handleDeleteClick(postId)}>삭제</button>
                                         </div>
                                     </div>
@@ -189,48 +158,6 @@ function CommunityManagePage() {
                         )}
                     </div>
                 </>
-            )}
-
-            {mode === 'edit' && (
-                <div className={styles.tableWrapper} style={{padding: '32px'}}>
-                    <div className={styles.header} style={{marginBottom: '24px'}}>
-                        <h2 className={styles.title}>게시글 수정</h2>
-                    </div>
-                    <form onSubmit={handleEditSubmit}>
-                        <div className={styles.detailGrid}>
-                            <div className={styles.detailField}>
-                                <span className={styles.detailLabel}>게시글 번호</span>
-                                <span className={styles.detailValue}>{editForm.postId}</span>
-                            </div>
-                            <div className={styles.detailField}>
-                                <span className={styles.detailLabel}>작성일</span>
-                                <span className={styles.detailValue}>{(editForm.createdAt ?? '').slice(0, 10)}</span>
-                            </div>
-                            <div className={styles.detailField}>
-                                <span className={styles.detailLabel}>작성자 이름</span>
-                                <span className={styles.detailValue}>{editForm.authorName}</span>
-                            </div>
-                            <div className={styles.detailField}>
-                                <span className={styles.detailLabel}>작성자 ID</span>
-                                <span className={styles.detailValue}>{editForm.authorId}</span>
-                            </div>
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>제목</label>
-                            <input type="text" name="title" value={editForm.title} onChange={handleEditChange}
-                                   className={styles.input} required/>
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>내용</label>
-                            <textarea name="content" value={editForm.content} onChange={handleEditChange}
-                                      className={styles.textarea} required/>
-                        </div>
-                        <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px'}}>
-                            <button type="button" className={styles.secondaryBtn} onClick={handleCloseEdit}>취소</button>
-                            <button type="submit" className={styles.primaryBtn}>저장</button>
-                        </div>
-                    </form>
-                </div>
             )}
 
             {mode === 'detail' && selectedPost && (
@@ -269,10 +196,15 @@ function CommunityManagePage() {
                             </div>
                         </div>
                     </div>
-                    <div style={{display: 'flex', justifyContent: 'center', marginTop: '24px'}}>
-                        <button type="button" className={styles.primaryBtn} onClick={handleCloseDetail}
-                                style={{minWidth: '200px'}}>
+                    <div style={{display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '24px'}}>
+                        <button type="button" className={styles.secondaryBtn} onClick={handleCloseDetail}
+                                style={{minWidth: '160px'}}>
                             목록으로 돌아가기
+                        </button>
+                        <button type="button" className={styles.dangerBtn}
+                                onClick={() => handleDeleteClick(selectedPost.postId ?? selectedPost.postNo)}
+                                style={{minWidth: '160px'}}>
+                            게시글 삭제
                         </button>
                     </div>
                 </div>
