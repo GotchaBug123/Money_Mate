@@ -1,29 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {useNavigate} from 'react-router-dom';
+import {usePortfolioStore} from '../../../store/usePortfolioStore';
 import styles from './PortfolioMain.module.css';
 
-// 💡 백엔드 연결 전 임시 목업 데이터
-const MOCK_AUTO_LIST = [
-    {
-        id: 1,
-        name: '공격투자형 포트폴리오',
-        investAmount: 500, currency: '만원',
-        startDate: '2026-05-24', endDate: '2030-05-24',
-        goalAmount: 800, finalAmount: 715,
-        avgReturnRate: 12.4, achievementRate: 78,
-        stocks: [
-            {name: 'TIGER 미국S&P500', weight: 30},
-            {name: 'NVIDIA', weight: 25},
-            {name: '삼성전자', weight: 25},
-            {name: 'KODEX 2차전지', weight: 20},
-        ],
-        createdAt: '2026-05-24',
-    },
-];
-
-const MOCK_DIRECT_LIST = [];
-
-// 💡 헥스 코드 대신 글로벌 변수로 테마와 연동
 const CHIP_COLORS = [
     {bg: 'var(--color-primary-light)', color: 'var(--color-primary)'},
     {bg: 'var(--color-success-bg)', color: 'var(--color-success)'},
@@ -32,7 +11,6 @@ const CHIP_COLORS = [
     {bg: 'var(--color-bg-input)', color: 'var(--color-text-sub)'},
 ];
 
-// AI 자동생성 포트폴리오 카드 컴포넌트
 const AutoCard = ({portfolio, onView, onDelete}) => (
     <div className={styles.card}>
         <button className={styles.delBtn} onClick={(e) => {
@@ -75,7 +53,6 @@ const AutoCard = ({portfolio, onView, onDelete}) => (
     </div>
 );
 
-// 직접생성 포트폴리오 카드 컴포넌트
 const DirectCard = ({portfolio, onView, onDelete}) => (
     <div className={styles.card}>
         <button className={styles.delBtn} onClick={(e) => {
@@ -108,8 +85,7 @@ const DirectCard = ({portfolio, onView, onDelete}) => (
                 );
             })}
             {portfolio.stocks.length > 3 && (
-                <span className={styles.chip}
-                      style={{background: 'var(--color-bg-input)', color: 'var(--color-text-sub)'}}>
+                <span className={styles.chip} style={{background: 'var(--color-bg-input)', color: 'var(--color-text-sub)'}}>
                     +{portfolio.stocks.length - 3}
                 </span>
             )}
@@ -120,25 +96,17 @@ const DirectCard = ({portfolio, onView, onDelete}) => (
     </div>
 );
 
-// 메인 화면 컴포넌트
 const PortfolioMain = () => {
     const navigate = useNavigate();
-    const [autoList, setAutoList] = useState([]);
-    const [directList, setDirectList] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setAutoList(MOCK_AUTO_LIST);
-            setDirectList(MOCK_DIRECT_LIST);
-            setLoading(false);
-        }, 500);
-    }, []);
+    const autoList = usePortfolioStore((state) => state.autoList);
+    const directList = usePortfolioStore((state) => state.directList);
+    const deleteAutoPortfolio = usePortfolioStore((state) => state.deleteAutoPortfolio);
+    const deleteDirectPortfolio = usePortfolioStore((state) => state.deleteDirectPortfolio);
 
     const handleDelete = (id, type) => {
         if (window.confirm('포트폴리오를 삭제하시겠습니까?')) {
-            if (type === 'auto') setAutoList(p => p.filter(x => x.id !== id));
-            else setDirectList(p => p.filter(x => x.id !== id));
+            if (type === 'auto') deleteAutoPortfolio(id);
+            else deleteDirectPortfolio(id);
         }
     };
 
@@ -146,7 +114,6 @@ const PortfolioMain = () => {
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
 
-                {/* ── AI 자동생성 섹션 ── */}
                 <section className={styles.section}>
                     <div className={styles.secHead}>
                         <div className={styles.secIconWrap}><span className={styles.secIcon}>🤖</span></div>
@@ -156,51 +123,41 @@ const PortfolioMain = () => {
                         </div>
                     </div>
 
-                    {loading ? (
-                        <p className={styles.loadingText}>데이터를 불러오는 중입니다...</p>
-                    ) : (
-                        <div className={styles.cardRow}>
-                            {autoList.map(p => (
-                                <AutoCard key={p.id} portfolio={p}
-                                          onView={() => navigate('/portfolio/result', {state: {...p}})}
-                                          onDelete={() => handleDelete(p.id, 'auto')}/>
-                            ))}
-                            <div className={styles.addCard} onClick={() => navigate('/portfolio/auto')}>
-                                <div className={styles.addIconWrap}><span className={styles.addPlus}>+</span></div>
-                                <span className={styles.addLabel}>새로운 AI 포트폴리오 진단받기</span>
-                            </div>
+                    <div className={styles.cardRow}>
+                        {autoList.map(p => (
+                            <AutoCard key={p.id} portfolio={p}
+                                      onView={() => navigate('/portfolio/result', {state: {...p}})}
+                                      onDelete={() => handleDelete(p.id, 'auto')}/>
+                        ))}
+                        <div className={styles.addCard} onClick={() => navigate('/portfolio/auto')}>
+                            <div className={styles.addIconWrap}><span className={styles.addPlus}>+</span></div>
+                            <span className={styles.addLabel}>새로운 AI 포트폴리오 진단받기</span>
                         </div>
-                    )}
+                    </div>
                 </section>
 
                 <div className={styles.divider}/>
 
-                {/* ── 직접생성 섹션 ── */}
                 <section className={styles.section}>
                     <div className={styles.secHead}>
                         <div className={styles.secIconWrap}><span className={styles.secIcon}>📋</span></div>
                         <div>
                             <p className={styles.secTitle}>내 포트폴리오</p>
-                            <p className={styles.secDesc}>직접 목표와 종목을 설정해 나만의 포트폴리오를 구성할 수 있어요. 원하는 주식을 담고 목표 수익을 직접
-                                설정해보세요.</p>
+                            <p className={styles.secDesc}>직접 목표와 종목을 설정해 나만의 포트폴리오를 구성할 수 있어요. 원하는 주식을 담고 목표 수익을 직접 설정해보세요.</p>
                         </div>
                     </div>
 
-                    {loading ? (
-                        <p className={styles.loadingText}>불러오는 중...</p>
-                    ) : (
-                        <div className={styles.cardRow}>
-                            {directList.map(p => (
-                                <DirectCard key={p.id} portfolio={p}
-                                            onView={() => navigate('/portfolio/result', {state: {...p}})}
-                                            onDelete={() => handleDelete(p.id, 'direct')}/>
-                            ))}
-                            <div className={styles.addCard} onClick={() => navigate('/portfolio/direct')}>
-                                <div className={styles.addIconWrap}><span className={styles.addPlus}>+</span></div>
-                                <span className={styles.addLabel}>직접 포트폴리오 구성하기</span>
-                            </div>
+                    <div className={styles.cardRow}>
+                        {directList.map(p => (
+                            <DirectCard key={p.id} portfolio={p}
+                                        onView={() => navigate('/portfolio/result', {state: {...p}})}
+                                        onDelete={() => handleDelete(p.id, 'direct')}/>
+                        ))}
+                        <div className={styles.addCard} onClick={() => navigate('/portfolio/direct')}>
+                            <div className={styles.addIconWrap}><span className={styles.addPlus}>+</span></div>
+                            <span className={styles.addLabel}>직접 포트폴리오 구성하기</span>
                         </div>
-                    )}
+                    </div>
                 </section>
 
             </div>

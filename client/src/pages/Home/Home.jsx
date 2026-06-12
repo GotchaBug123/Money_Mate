@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
     LineChart,
@@ -14,13 +14,7 @@ import {
     ReferenceLine
 } from 'recharts';
 import styles from './Home.module.css';
-
-const marketData = [
-    {name: '코스피', value: '2,738.42', change: '+18.65', percent: '+0.69%', up: true},
-    {name: '나스닥', value: '19,215.46', change: '+124.80', percent: '+0.65%', up: true},
-    {name: 'S&P 500', value: '5,304.72', change: '-6.20', percent: '-0.12%', up: false},
-    {name: 'USD/KRW', value: '1,356.50', change: '-4.30', percent: '-0.32%', up: false},
-];
+import {getMarketIndexApi} from "../../api/homeApi.js";
 
 const AGE_DATA = [
     {label: '20대', value: 187, sub: '평균 187만원'},
@@ -252,6 +246,27 @@ const Home = () => {
     const [guideOpen, setGuideOpen] = useState(false);
     const [chartTab, setChartTab] = useState('age');
 
+    const [marketData, setMarketData] = useState([]);
+
+    useEffect(() => {
+        const fetchMarketData = async () => {
+            try {
+                const data = await getMarketIndexApi();
+                const formattedData = data.map(item => ({
+                    name: item.name,
+                    value: item.priceLabel,
+                    change: item.changeLabel,
+                    percent: `${item.changePercent > 0 ? '+' : ''}${item.changePercent}%`,
+                    up: item.rise
+                }));
+                setMarketData(formattedData);
+            } catch (error) {
+                console.error("시장 지수 로드 실패: ", error);
+            }
+        };
+        fetchMarketData();
+    }, []);
+
     return (
         <div className={styles.homeContainer}>
 
@@ -270,7 +285,7 @@ const Home = () => {
                         현실적인 포트폴리오를 제안합니다.
                     </p>
                     <div className={styles.heroBtns}>
-                        <button className={styles.primaryButton} onClick={() => navigate('/financial/input')}>
+                        <button className={styles.primaryButton} onClick={() => navigate('/investment/questions')}>
                             무료 진단 시작하기 →
                         </button>
                         <button className={styles.guideButton} onClick={() => setGuideOpen(true)}>

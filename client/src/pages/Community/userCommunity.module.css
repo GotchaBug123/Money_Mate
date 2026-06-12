@@ -601,7 +601,7 @@
 
 .myPostsHead, .myPostsRow {
     display: grid;
-    grid-template-columns: 80px 2fr 3fr 100px;
+    grid-template-columns: 80px 2fr 3fr 160px;
     padding: 16px;
     border-bottom: 1.5px solid var(--color-border);
     align-items: center;

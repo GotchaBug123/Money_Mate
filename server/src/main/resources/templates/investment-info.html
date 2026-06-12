@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<header th:replace="~{fragments/header :: globalHeader('')}"></header>
+<header th:replace="~{fragments/header :: globalHeader('investment')}"></header>
 
 <main class="invest-wrap">
 
@@ -534,7 +534,7 @@
             }
 
             ul.innerHTML = items.map((item, idx) => {
-                const returnLabel = item.monthlyReturnLabel || '-';
+                const returnLabel = item.dividendYieldLabel || '-';
                 const isUp        = returnLabel.startsWith('+');
                 const isDown      = returnLabel.startsWith('-');
                 const yieldClass  = isUp ? 'div-yield up' : isDown ? 'div-yield down' : 'div-yield';

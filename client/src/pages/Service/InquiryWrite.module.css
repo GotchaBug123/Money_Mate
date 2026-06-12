@@ -1,6 +1,3 @@
-/* src/pages/InquiryWrite.module.css */
-
-/* 전체 배경 및 중앙 정렬 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
@@ -9,98 +6,177 @@
     padding: 40px 24px 90px;
 }
 
-/* 💡 글쓰기 폼에 가장 최적화된 800px 레이아웃 유지 */
 .container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-/* 메인 폼 카드 */
-.card {
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
+.heroSection {
+    padding: 38px 42px;
     border-radius: var(--radius-xl);
-    padding: 48px 40px;
-    box-shadow: var(--shadow-card);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
 }
 
 .title {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--color-text-main);
-    text-align: center;
-    margin: 0 0 32px 0;
+    margin: 0;
+    color: #ffffff;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
-/* 폼 영역 (세로 배치) */
+.subtitle {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 800;
+}
+
+.heroButtons {
+    margin-top: 28px;
+    display: flex;
+    gap: 12px;
+}
+
+.heroButtons button {
+    min-width: 130px;
+    height: 48px;
+    padding: 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+    color: var(--color-primary);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.heroButtons button:last-child {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.heroButtons button:hover {
+    transform: translateY(-1px);
+}
+
+.formCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.formHeader {
+    padding: 30px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sectionBadge {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.formHeader h2 {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.formHeader p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
 .form {
+    padding: 34px 32px 38px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 26px;
 }
 
 .inputGroup {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .label {
-    font-size: 13px;
-    font-weight: 700;
     color: var(--color-text-main);
+    font-size: 15px;
+    font-weight: 900;
 }
 
-/* 공통 입력창 스타일 */
 .input {
     width: 100%;
-    padding: 14px 16px;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
     color: var(--color-text-main);
-    background: var(--color-bg-page);
+    font-size: 15px;
+    font-weight: 700;
     outline: none;
-    transition: border-color 0.2s ease, background 0.2s ease;
     box-sizing: border-box;
 }
 
 .input:focus {
     border-color: var(--color-primary);
     background: var(--color-bg-card);
+    box-shadow: 0 0 0 4px rgba(27, 94, 217, 0.12);
 }
 
 .input::placeholder {
-    color: var(--color-text-light);
+    color: var(--color-text-muted);
 }
 
-/* Select 특화 스타일 */
 .select {
     cursor: pointer;
-    appearance: auto;
 }
 
-/* Textarea 특화 스타일 */
 .textarea {
-    min-height: 240px;
+    min-height: 260px;
     resize: vertical;
-    line-height: 1.6;
-    font-family: inherit; /* 폰트 통일 */
+    line-height: 1.65;
+    font-family: inherit;
 }
 
-/* 파일 첨부 영역 스타일 (모던한 점선 박스) */
 .fileWrapper {
-    border: 1.5px dashed var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 24px;
-    background: var(--color-bg-input);
+    width: 100%;
+    min-height: 76px;
+    padding: 18px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    gap: 16px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
+    box-sizing: border-box;
 }
 
 .fileWrapper:hover {
@@ -109,46 +185,114 @@
 }
 
 .fileInput {
-    font-size: 14px;
-    color: var(--color-text-sub);
-    cursor: pointer;
+    display: none;
 }
 
-/* 파일 업로드 버튼(기본 UI) 커스텀 */
-.fileInput::file-selector-button {
-    padding: 8px 16px;
-    margin-right: 16px;
-    background: var(--color-bg-card);
-    color: var(--color-text-main);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.fileInput::file-selector-button:hover {
-    background: var(--color-bg-input);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-}
-
-/* 문의 등록 버튼 */
-.submitBtn {
-    margin-top: 16px;
-    padding: 16px;
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
+.fileButton {
+    min-width: 100px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: var(--radius-md);
-    font-size: 16px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.fileWrapper:hover .fileButton {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.fileWrapper strong {
+    min-width: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
     font-weight: 800;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.noticeBox {
+    padding: 20px 22px;
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 700;
+}
+
+.noticeBox p {
+    margin: 0;
+}
+
+.noticeBox p + p {
+    margin-top: 6px;
+}
+
+.submitBtn {
+    height: 58px;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 900;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.2);
 }
 
 .submitBtn:hover {
     background: var(--color-primary-hover);
     transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection {
+        padding: 30px 22px;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .heroButtons {
+        flex-direction: column;
+    }
+
+    .heroButtons button {
+        width: 100%;
+    }
+
+    .formHeader {
+        padding: 26px 22px;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .form {
+        padding: 28px 22px 32px;
+    }
+
+    .fileWrapper {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .fileButton {
+        width: 100%;
+    }
+
+    .submitBtn {
+        width: 100%;
+    }
 }

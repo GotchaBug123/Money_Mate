@@ -573,15 +573,18 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 400px;
+    height: 400px;
     overflow-y: auto;
 }
 
 .searchMsg {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 13px;
     color: var(--color-text-muted);
     text-align: center;
-    padding: 32px 0;
     margin: 0;
     font-weight: 600;
 }

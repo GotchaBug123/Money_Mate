@@ -1,3 +1,5 @@
+USE moneymate_db;
+
 INSERT INTO member (login_id, email, name, birth_date, signup_status, role)
 VALUES ('masteradmin', 'masteradmin@moneymate.com', '최고관리자', NULL, 'ACTIVE', 'ADMIN'),
        ('test1', 'test1@test.com', '홍길동', '1995-01-01', 'ACTIVE', 'USER');

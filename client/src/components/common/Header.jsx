@@ -1,7 +1,9 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import styles from './Header.module.css';
 import moneymateLogo from '../../assets/moneymate_logo.png';
+import {useAuthStore} from '../../store/useAuthStore'; // 💡 Zustand 스토어 가져오기
+import {logoutApi} from '../../api/authApi';           // 💡 로그아웃 API 가져오기
 
 function Header({
                     menuItems,
@@ -9,13 +11,22 @@ function Header({
                     logoTo = '/',
                     logoOnClick,
                 }) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('role');
-        alert('로그아웃 되었습니다.');
-        window.location.href = '/'; // 상태 갱신을 위해 메인으로 이동하며 새로고침
+    const {isLoggedIn, user, logout, openLoginModal} = useAuthStore();
+
+    const userName = user?.name || '회원';
+
+    const handleLogout = async () => {
+        try {
+            await logoutApi();
+        } catch (error) {
+            console.error('백엔드 로그아웃 실패:', error);
+        } finally {
+            logout();
+            alert('로그아웃 되었습니다.');
+            navigate('/');
+        }
     };
 
     const defaultMenuItems = [
@@ -24,13 +35,13 @@ function Header({
         {label: '리밸런싱', to: '/rebalancing'},
         {label: '투자정보', to: '/investment-information'},
         {label: '커뮤니티', to: '/community'},
+        {label: '고객센터', to: '/customer-service'},
+        ...(user?.role === 'ADMIN' ? [{label: '관리자 페이지', to: '/admin', admin: true}] : []),
     ];
 
     const finalMenuItems = menuItems || defaultMenuItems;
 
-    // 우측 버튼 렌더링 로직
     const renderRightButtons = () => {
-        // 1. 외부에서 커스텀 버튼을 주입한 경우
         if (rightButtons) {
             return rightButtons.map((button) => {
                 const btnClass = button.primary
@@ -53,13 +64,25 @@ function Header({
             });
         }
 
-        // 2. 로그인 상태인 경우
         if (isLoggedIn) {
             return (
                 <>
+                    <div style={userNameStyle}>
+                        <span style={{fontSize: '20px', lineHeight: 1}}>🙂</span>
+                        <span style={{
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: 'var(--color-text-main)',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            {userName}님
+                        </span>
+                    </div>
+
                     <Link to="/mypage" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         내 정보
                     </Link>
+
                     <button onClick={handleLogout} className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
                         로그아웃
                     </button>
@@ -67,12 +90,15 @@ function Header({
             );
         }
 
-        // 3. 로그아웃 상태인 경우 (기본)
         return (
             <>
-                <Link to="/login" className={`${styles.actionBtn} ${styles.secondaryBtn}`}>
+                <button
+                    type="button"
+                    onClick={() => openLoginModal()}
+                    className={`${styles.actionBtn} ${styles.secondaryBtn}`}
+                >
                     로그인
-                </Link>
+                </button>
                 <Link to="/signup" className={`${styles.actionBtn} ${styles.primaryBtn}`}>
                     회원가입
                 </Link>
@@ -83,8 +109,6 @@ function Header({
     return (
         <header className={styles.headerWrapper}>
             <div className={styles.container}>
-
-                {/* 왼쪽: 로고 및 내비게이션 메뉴 */}
                 <div className={styles.leftSection}>
                     <Link to={logoTo} onClick={logoOnClick} className={styles.logoLink}>
                         <img
@@ -92,18 +116,22 @@ function Header({
                             alt="MoneyMate 로고"
                             className={styles.logoImg}
                         />
+                        <span style={logoTextStyle}>MoneyMate</span>
                     </Link>
 
                     <nav className={styles.nav}>
                         {finalMenuItems.map((item) => {
                             if (item.to) {
                                 return (
-                                    <Link key={item.label} to={item.to} className={styles.navItem}>
+                                    <Link
+                                        key={item.label}
+                                        to={item.to}
+                                        className={styles.navItem}
+                                    >
                                         {item.label}
                                     </Link>
                                 );
                             }
-
                             return (
                                 <button
                                     key={item.label}
@@ -118,14 +146,26 @@ function Header({
                     </nav>
                 </div>
 
-                {/* 오른쪽: 로그인/회원가입 등 액션 버튼 */}
                 <div className={styles.rightSection}>
                     {renderRightButtons()}
                 </div>
-
             </div>
         </header>
     );
 }
+
+const logoTextStyle = {
+    fontSize: '16px',
+    fontWeight: 700,
+    color: 'var(--color-primary, #2563EB)',
+    letterSpacing: '-0.3px',
+    marginLeft: '6px',
+};
+
+const userNameStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 7,
+};
 
 export default Header;

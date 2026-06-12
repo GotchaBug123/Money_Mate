@@ -23,7 +23,10 @@
     --color-border: #e8eaf0; /* 기본 테두리 색상 */
 
     /* 5. 상태 색상 */
-    --color-error: #C0392B; /* 에러 (빨강) */
+    --color-success: #1A7A45; /* 성공/상승 (초록) */
+    --color-success-bg: #EDFAF4; /* 상승 배경 (연초록) */
+    --color-error: #C0392B; /* 에러/하락 (빨강) */
+    --color-error-bg: #FDEEEC; /* 하락 배경 (연빨강) */
 
     /* 6. 모서리 둥글기 (Border Radius) */
     --radius-sm: 8px;

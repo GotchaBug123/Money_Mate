@@ -1,5 +1,6 @@
 package com.gotchabug.moneymate.admin.service;
 
+import com.gotchabug.moneymate.admin.dto.AdminInquiryResponse;
 import com.gotchabug.moneymate.customer.entity.CustomerInquiry;
 import com.gotchabug.moneymate.customer.repository.CustomerInquiryRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,18 @@ public class AdminInquiryService {
 
     private final CustomerInquiryRepository customerInquiryRepository;
 
-    public List<CustomerInquiry> getAllInquiries() {
-        return customerInquiryRepository.findAllByOrderByCreatedAtDesc();
+    public List<AdminInquiryResponse> getAllInquiries() {
+        return customerInquiryRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(AdminInquiryResponse::from)
+                .toList();
     }
 
-    public CustomerInquiry getInquiry(Long inquiryId) {
-        return customerInquiryRepository.findById(inquiryId)
+    public AdminInquiryResponse getInquiry(Long inquiryId) {
+        CustomerInquiry inquiry = customerInquiryRepository.findById(inquiryId)
                 .orElseThrow(() -> new IllegalArgumentException("문의가 존재하지 않습니다."));
+
+        return AdminInquiryResponse.from(inquiry);
     }
 
     @Transactional
@@ -30,5 +36,13 @@ public class AdminInquiryService {
                 .orElseThrow(() -> new IllegalArgumentException("문의가 존재하지 않습니다."));
 
         inquiry.answer(answer);
+    }
+
+    @Transactional
+    public void deleteInquiry(Long inquiryId) {
+        CustomerInquiry inquiry = customerInquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new IllegalArgumentException("문의가 존재하지 않습니다."));
+
+        customerInquiryRepository.delete(inquiry);
     }
 }

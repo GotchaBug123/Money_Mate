@@ -1,28 +1,34 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import styles from './FindId.module.css';
+import {findIdApi} from "../../api/authApi.js";
 
 function FindId() {
     const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
-    const [code, setCode] = useState('');
-
-    // 찾은 아이디를 저장할 상태 (초기값은 null)
+    const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [foundId, setFoundId] = useState(null);
 
-    // 인증 확인 및 아이디 찾기 로직
-    const handleVerify = () => {
-        if (!name || !phone || !code) {
-            alert('이름, 전화번호, 인증번호를 모두 입력해 주세요.');
+    const handleVerify = async () => {
+        if (!name || !email) {
+            alert('이름과 이메일을 모두 입력해 주세요.');
             return;
         }
 
-        // 백엔드 연동 전 임시 테스트 로직 (인증번호가 123456일 때 성공)
-        if (code === '123456') {
-            setFoundId('bestevan01');
-        } else {
-            alert('인증번호가 일치하지 않습니다.\n(테스트용 인증번호: 123456)');
-            setFoundId(null);
+        setIsLoading(true);
+        setFoundId(null);
+
+        try {
+            const response = await findIdApi(name, email);
+
+            if (response.success && response.data) setFoundId(response.data);
+            else alert(response.message || '가입된 아이디 정보를 찾을 수 없습니다.');
+        } catch (error) {
+            console.error('아이디 찾기 실패: ', error);
+            const errorMsg = error.response?.data?.message || '일치하는 회원 정보가 없습니다. 이름과 이메일을 확인해 주세요.';
+            alert(errorMsg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -39,57 +45,44 @@ function FindId() {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="이름 입력"
+                            placeholder="가입 시 등록한 이름"
                             className={styles.input}
                         />
                     </div>
 
-                    {/* 전화번호 입력 */}
+                    {/* 이메일 입력 (기존 전화번호/인증번호 영역 대체) */}
                     <div className={styles.inputGroup}>
-                        <label className={styles.label}>전화번호</label>
-                        <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="010-0000-0000"
-                            className={styles.input}
-                        />
-                    </div>
-
-                    {/* 인증번호 입력 */}
-                    <div className={styles.inputGroup}>
-                        <label className={styles.label}>인증번호</label>
+                        <label className={styles.label}>이메일</label>
                         <div className={styles.verifyRow}>
                             <input
-                                type="text"
-                                value={code}
-                                onChange={(e) => setCode(e.target.value)}
-                                placeholder="6자리"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="example@email.com"
                                 className={styles.verifyInput}
-                                maxLength={6}
                             />
                             <button
                                 onClick={handleVerify}
                                 className={styles.verifyBtn}
+                                disabled={isLoading}
                             >
-                                인증확인
+                                {isLoading ? '조회중...' : '아이디 찾기'}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* 💡 아이디 결과 출력 박스 (조건부 스타일 적용) */}
+                {/* 결과 출력 박스 */}
                 <div className={`${styles.resultBox} ${foundId ? styles.resultSuccess : styles.resultEmpty}`}>
-                    {foundId ? `당신의 아이디는 ${foundId} 입니다.` : '인증을 완료하면 아이디가 표시됩니다.'}
+                    {foundId ? `회원님의 아이디는 [ ${foundId} ] 입니다.` : '이름과 이메일을 입력하여 조회해 주세요.'}
                 </div>
 
-                {/* 하단 이동 버튼 (비밀번호 찾기, 회원가입) */}
+                {/* 하단 이동 버튼 */}
                 <div className={styles.bottomLinks}>
                     <Link to="/find-pw" className={styles.linkBtn}>
                         비밀번호 찾기
                     </Link>
                     <div className={styles.divider}/>
-                    {/* 💡 버튼 사이 구분선 추가 */}
                     <Link to="/signup" className={styles.linkBtn}>
                         회원가입
                     </Link>

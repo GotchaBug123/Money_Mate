@@ -1,26 +1,46 @@
 import React, {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate, useLocation} from 'react-router-dom';
 import styles from './Login.module.css';
+import {loginApi} from "../../api/authApi.js";
+import {useAuthStore} from "../../store/useAuthStore.js";
 
 function Login() {
-    const [id, setId] = useState('');
-    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from ?? '/';
 
-    const handleLogin = (e) => {
+    const [loginId, setLoginId] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const login = useAuthStore((state) => state.login);
+
+    const handleLogin = async (e) => {
         e.preventDefault(); // 폼 제출 시 새로고침 방지
 
-        // 💡 백엔드 연동 전 하드코딩 테스트 (아이디: test, 비밀번호: 1234)
-        if (id === 'test' && password === '1234') {
-            localStorage.setItem('isLoggedIn', 'true');
-            alert('로그인 성공! 메인페이지로 이동합니다.');
-            window.location.href = '/'; // 상태를 헤더에 반영하기 위해 이동
-        } else if (id === 'admin' && password === '1234') {
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('role', 'admin');
-            alert('관리자 로그인 성공!');
-            window.location.href = '/admin';
-        } else {
-            alert('아이디 또는 비밀번호가 일치하지 않습니다.\n(테스트 계정: test / 1234)');
+        if (!loginId || !password) {
+            alert('아이디와 비밀번호를 입력해주세요.');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const response = await loginApi(loginId, password);
+
+            if (response.success) {
+                login(response.data);
+
+                alert(response.message || `${response.data.name}님 환영합니다!`);
+
+                navigate(from, {replace: true});
+            } else alert(response.message || '로그인에 실패했습니다.');
+        } catch (error) {
+            console.error('로그인 에러: ', error);
+            const errorMsg = error.response?.data?.message || '아이디 또는 비밀번호가 일치하지 않습니다.';
+            alert(errorMsg);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -35,8 +55,8 @@ function Login() {
                         <label className={styles.label}>아이디</label>
                         <input
                             type="text"
-                            value={id}
-                            onChange={(e) => setId(e.target.value)}
+                            value={loginId}
+                            onChange={(e) => setLoginId(e.target.value)}
                             className={styles.input}
                             placeholder="아이디를 입력해주세요"
                         />
@@ -55,8 +75,8 @@ function Login() {
                     </div>
 
                     {/* 로그인 버튼 */}
-                    <button type="submit" className={styles.submitBtn}>
-                        로그인
+                    <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+                        {isLoading ? '로그인 중...' : '로그인'}
                     </button>
                 </form>
 

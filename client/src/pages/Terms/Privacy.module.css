@@ -1,0 +1,135 @@
+/* src/pages/Privacy.module.css */
+
+/* 전체 배경 및 중앙 정렬 */
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    display: flex;
+    justify-content: center;
+    padding: 60px 24px;
+}
+
+/* 문서 가독성을 위한 800px 폭 유지 */
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 메인 문서 카드 */
+.card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 56px 48px;
+    box-shadow: var(--shadow-card);
+}
+
+/* 상단 타이틀 영역 */
+.header {
+    border-bottom: 2px solid var(--color-border-light);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--color-text-main);
+    margin: 0 0 12px 0;
+    letter-spacing: -0.02em;
+}
+
+.lastUpdated {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* 본문 내용 영역 */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.text {
+    font-size: 15px;
+    color: var(--color-text-sub);
+    line-height: 1.8;
+    margin: 0;
+    word-break: keep-all;
+}
+
+.list {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.listItem {
+    font-size: 15px;
+    color: var(--color-text-sub);
+    line-height: 1.7;
+}
+
+.highlight {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* 하단 버튼 영역 */
+.footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--color-border-light);
+}
+
+.backBtn {
+    padding: 16px 40px;
+    background: var(--color-bg-input);
+    color: var(--color-text-main);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* 모바일 반응형 처리 */
+@media (max-width: 600px) {
+    .card {
+        padding: 32px 24px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+}

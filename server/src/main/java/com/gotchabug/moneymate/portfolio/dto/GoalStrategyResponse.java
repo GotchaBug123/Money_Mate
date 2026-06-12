@@ -33,6 +33,8 @@ public class GoalStrategyResponse {
 
     private Double annualizedReturn;
 
+    private Double totalReturn;
+
     private Double maxDrawdown;
 
     private Double bestAnnualReturn;

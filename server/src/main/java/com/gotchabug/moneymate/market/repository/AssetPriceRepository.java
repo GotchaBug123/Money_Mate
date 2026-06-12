@@ -15,6 +15,10 @@ public interface AssetPriceRepository extends JpaRepository<AssetPrice, Long> {
     @Query("SELECT ap FROM AssetPrice ap WHERE ap.asset.assetId = :assetId ORDER BY ap.priceDate DESC")
     List<AssetPrice> findLatestByAssetId(@Param("assetId") Long assetId);
 
+    /** 전체 가격 데이터 중 가장 최근 거래일 (데이터 최신 여부 판단용) */
+    @Query("SELECT MAX(ap.priceDate) FROM AssetPrice ap")
+    LocalDate findMaxPriceDate();
+
     @Query(value = """
     SELECT ap.*
     FROM asset_price ap
@@ -183,4 +187,21 @@ public interface AssetPriceRepository extends JpaRepository<AssetPrice, Long> {
     LIMIT 10
     """, nativeQuery = true)
     List<AssetPrice> findEtfThemeTop10();
+    // 특정 종목의 최근 N년 가격 데이터 조회
+    @Query("""
+SELECT ap
+FROM AssetPrice ap
+JOIN ap.asset a
+WHERE a.ticker = :ticker
+  AND ap.priceDate >= :startDate
+ORDER BY ap.priceDate ASC
+""")
+    List<AssetPrice> findPriceHistoryByTicker(
+            @Param("ticker") String ticker,
+            @Param("startDate") LocalDate startDate
+    );
+
+    // ticker 기준 최신 가격 1건 (포트폴리오 수익률 계산용)
+    @Query("SELECT ap FROM AssetPrice ap JOIN ap.asset a WHERE a.ticker = :ticker ORDER BY ap.priceDate DESC")
+    List<AssetPrice> findLatestByTicker(@Param("ticker") String ticker);
 }

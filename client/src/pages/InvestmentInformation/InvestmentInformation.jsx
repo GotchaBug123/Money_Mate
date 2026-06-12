@@ -1,19 +1,48 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styles from './InvestmentInformation.module.css';
+import {getInvestmentInfoApi, syncStockDataApi, syncDividendDataApi, getMarketIndexApi, getHoldingListApi, addHoldingApi, updateHoldingQuantityApi, removeHoldingApi} from '../../api/investmentApi';
+import {getWatchlistApi, toggleWatchlistApi} from '../../api/assetApi';
+import {useAuthStore} from '../../store/useAuthStore';
 
 const LOGO_MAP = {
-    '005930': 'samsung.com', '000660': 'skhynix.com', 'NVDA': 'nvidia.com',
-    'AAPL': 'apple.com', '360750': 'tigeretf.com', '005380': 'hyundai.com',
-    '373220': 'lgensol.com', '035720': 'kakao.com', 'TSM': 'tsmc.com',
-    'MU': 'micron.com', 'MSFT': 'microsoft.com', 'GOOGL': 'google.com',
-    'AMZN': 'amazon.com', 'META': 'meta.com', 'TSLA': 'tesla.com',
+    // 국내 (Google이 파비콘을 캐싱한 주요 기업만)
+    '005930': 'samsung.com',    // 삼성전자
+    '000660': 'skhynix.com',    // SK하이닉스
+    '005380': 'hyundai.com',    // 현대차
+    '000270': 'kia.com',        // 기아
+    '005490': 'posco.com',      // 포스코홀딩스
+    '066570': 'lg.com',         // LG전자
+    '035720': 'kakao.com',      // 카카오
+    '035420': 'naver.com',      // NAVER
+    '068270': 'celltrion.com',  // 셀트리온
+    '017670': 'sktelecom.com',  // SK텔레콤
+    '030200': 'kt.com',         // KT
+    '034020': 'doosan.com',     // 두산에너빌리티
+    '259960': 'krafton.com',    // 크래프톤
+    '323410': 'kakaobank.com',  // 카카오뱅크
+    '036570': 'ncsoft.com',     // 엔씨소프트
+    // 해외 대형주
+    'NVDA': 'nvidia.com', 'AAPL': 'apple.com', 'MSFT': 'microsoft.com',
+    'GOOGL': 'google.com', 'GOOG': 'google.com', 'AMZN': 'amazon.com',
+    'META': 'meta.com', 'TSLA': 'tesla.com', 'TSM': 'tsmc.com',
+    'MU': 'micron.com', 'AMD': 'amd.com', 'INTC': 'intel.com',
+    'AVGO': 'broadcom.com', 'QCOM': 'qualcomm.com', 'ASML': 'asml.com',
+    'JPM': 'jpmorganchase.com', 'BAC': 'bankofamerica.com',
+    'V': 'visa.com', 'MA': 'mastercard.com', 'WMT': 'walmart.com',
+    'JNJ': 'jnj.com', 'PFE': 'pfizer.com',
+    'XOM': 'exxonmobil.com', 'CVX': 'chevron.com', 'NKE': 'nike.com',
+    'DIS': 'disney.com', 'NFLX': 'netflix.com', 'SBUX': 'starbucks.com',
+    'COST': 'costco.com', 'HD': 'homedepot.com',
+    // ETF
+    'SPY': 'ssga.com', 'QQQ': 'invesco.com', 'VOO': 'vanguard.com',
+    'VTI': 'vanguard.com', 'SCHD': 'schwab.com',
 };
 
-// 💡 뱃지 색상은 다양성을 위해 유지
 const BADGE_COLORS = ['#E8F0FE', '#EDFAF4', '#FFF0EE', '#FAEEDA', '#F0F4FF', '#FEF0F8', '#EEF8FF', '#F5F0FF'];
 const BADGE_TEXT = ['#1B5ED9', '#1A7A45', '#C0392B', '#B47D0C', '#2E5CD9', '#C03980', '#0C7CD9', '#7B3FA0'];
 
 const getBadge = (ticker) => {
+    if (!ticker) return {bg: BADGE_COLORS[0], color: BADGE_TEXT[0]};
     const idx = ticker.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % BADGE_COLORS.length;
     return {bg: BADGE_COLORS[idx], color: BADGE_TEXT[idx]};
 };
@@ -22,196 +51,35 @@ const StockLogo = ({ticker, name, size = 36}) => {
     const [failed, setFailed] = useState(false);
     const domain = LOGO_MAP[ticker];
     const badge = getBadge(ticker);
-    if (!domain || failed) return (
-        <div className={styles.logoBadge} style={{
-            width: size,
-            height: size,
-            background: badge.bg,
-            color: badge.color,
-            fontSize: size * 0.35,
-            borderRadius: '50%'
-        }}>
-            {name.charAt(0)}
-        </div>
+
+    if (!domain || failed) {
+        return (
+            <div
+                className={styles.logoBadge}
+                style={{
+                    width: size,
+                    height: size,
+                    background: badge.bg,
+                    color: badge.color,
+                    fontSize: size * 0.35,
+                    borderRadius: '50%'
+                }}
+            >
+                {name ? name.charAt(0) : '?'}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            className={styles.logoImg}
+            style={{width: size, height: size, borderRadius: '50%'}}
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+            alt={name}
+            onError={() => setFailed(true)}
+        />
     );
-    return <img className={styles.logoImg} style={{width: size, height: size, borderRadius: '50%'}}
-                src={`https://logo.clearbit.com/${domain}`} alt={name} onError={() => setFailed(true)}/>;
 };
-
-const MOCK_INDEX = [
-    {
-        label: '코스피',
-        value: '2,634.82',
-        change: '+32.14',
-        changeRate: '+1.24%',
-        pos: true,
-        chart: [0, 4, 6, 10, 12, 16, 18, 22, 24, 20, 22, 26]
-    },
-    {
-        label: '코스닥',
-        value: '728.15',
-        change: '-2.82',
-        changeRate: '-0.38%',
-        pos: false,
-        chart: [24, 22, 20, 18, 16, 14, 12, 10, 12, 8, 6, 4]
-    },
-    {
-        label: 'S&P 500',
-        value: '5,304.72',
-        change: '+45.88',
-        changeRate: '+0.87%',
-        pos: true,
-        chart: [4, 6, 4, 10, 8, 14, 12, 18, 16, 20, 22, 26]
-    },
-    {
-        label: '달러 환율',
-        value: '1,342.50',
-        change: '-1.60',
-        changeRate: '-0.12%',
-        pos: false,
-        chart: [6, 8, 7, 12, 14, 16, 14, 18, 20, 22, 24, 26]
-    },
-];
-
-const MOCK_STOCKS = [
-    {id: 1, name: '삼성전자', ticker: '005930', market: '국내', price: '78,400원', chg: '+2.61%', pos: true, vol: '2.1조'},
-    {
-        id: 2,
-        name: 'SK하이닉스',
-        ticker: '000660',
-        market: '국내',
-        price: '198,500원',
-        chg: '-0.88%',
-        pos: false,
-        vol: '8,420억'
-    },
-    {id: 3, name: 'NVIDIA', ticker: 'NVDA', market: '해외', price: '$1,208.88', chg: '+3.14%', pos: true, vol: '$18.4B'},
-    {
-        id: 4,
-        name: 'TIGER 미국S&P500',
-        ticker: '360750',
-        market: 'ETF',
-        price: '18,245원',
-        chg: '-0.42%',
-        pos: false,
-        vol: '3,820억'
-    },
-    {id: 5, name: 'Apple', ticker: 'AAPL', market: '해외', price: '$196.89', chg: '+0.54%', pos: true, vol: '$9.2B'},
-    {id: 6, name: '현대차', ticker: '005380', market: '국내', price: '245,000원', chg: '-1.20%', pos: false, vol: '1.4조'},
-    {id: 7, name: 'LG에너지솔루션', ticker: '373220', market: '국내', price: '412,000원', chg: '+2.55%', pos: true, vol: '1.1조'},
-    {id: 8, name: '카카오', ticker: '035720', market: '국내', price: '52,300원', chg: '-0.19%', pos: false, vol: '2.3조'},
-    {id: 9, name: 'TSMC', ticker: 'TSM', market: '해외', price: '$185.40', chg: '+1.22%', pos: true, vol: '$4.1B'},
-    {id: 10, name: '마이크론', ticker: 'MU', market: '해외', price: '$132.50', chg: '+0.74%', pos: true, vol: '$2.8B'},
-    {id: 11, name: 'Microsoft', ticker: 'MSFT', market: '해외', price: '$420.21', chg: '+0.32%', pos: true, vol: '$8.1B'},
-    {id: 12, name: 'Tesla', ticker: 'TSLA', market: '해외', price: '$178.82', chg: '-2.14%', pos: false, vol: '$6.3B'},
-    {id: 13, name: 'Amazon', ticker: 'AMZN', market: '해외', price: '$185.07', chg: '+1.08%', pos: true, vol: '$5.9B'},
-    {id: 14, name: 'Meta', ticker: 'META', market: '해외', price: '$492.30', chg: '+0.77%', pos: true, vol: '$4.2B'},
-    {id: 15, name: 'Google', ticker: 'GOOGL', market: '해외', price: '$175.84', chg: '+0.45%', pos: true, vol: '$3.8B'},
-    {
-        id: 16,
-        name: 'POSCO홀딩스',
-        ticker: '005490',
-        market: '국내',
-        price: '392,000원',
-        chg: '+0.33%',
-        pos: true,
-        vol: '4,200억'
-    },
-    {
-        id: 17,
-        name: '에코프로비엠',
-        ticker: '247540',
-        market: '국내',
-        price: '118,500원',
-        chg: '-2.11%',
-        pos: false,
-        vol: '6,800억'
-    },
-    {
-        id: 18,
-        name: 'KODEX 2차전지',
-        ticker: '305720',
-        market: 'ETF',
-        price: '12,340원',
-        chg: '-1.45%',
-        pos: false,
-        vol: '2,100억'
-    },
-    {
-        id: 19,
-        name: 'KODEX 반도체',
-        ticker: '091160',
-        market: 'ETF',
-        price: '45,600원',
-        chg: '+1.88%',
-        pos: true,
-        vol: '1,540억'
-    },
-    {id: 20, name: '기아', ticker: '000270', market: '국내', price: '98,400원', chg: '-0.61%', pos: false, vol: '3,200억'},
-];
-
-const MOCK_THEMES = [
-    {
-        name: 'AI 테마',
-        avg: '+2.1%',
-        pos: true,
-        stocks: [{n: 'NVIDIA', c: '+3.14%', p: true}, {n: '삼성전자', c: '+2.61%', p: true}, {
-            n: 'SK하이닉스',
-            c: '-0.88%',
-            p: false
-        }]
-    },
-    {
-        name: '반도체 테마',
-        avg: '+0.9%',
-        pos: true,
-        stocks: [{n: 'SK하이닉스', c: '-0.88%', p: false}, {n: 'TSMC', c: '+1.22%', p: true}, {
-            n: '마이크론',
-            c: '+0.74%',
-            p: true
-        }]
-    },
-    {
-        name: '2차전지 테마',
-        avg: '-1.2%',
-        pos: false,
-        stocks: [{n: 'LG에너지솔루션', c: '-1.45%', p: false}, {n: 'POSCO홀딩스', c: '+0.33%', p: true}, {
-            n: '에코프로비엠',
-            c: '-2.11%',
-            p: false
-        }]
-    },
-];
-
-const MOCK_DIVIDEND = [
-    {
-        title: '국내 고배당주', market: 'domestic',
-        list: [
-            {id: 'd1', name: 'KT&G', price: '88,500원', yield: '6.8%', freq: '연 배당 2회'},
-            {id: 'd2', name: '하나금융지주', price: '62,400원', yield: '6.2%', freq: '연 배당 4회'},
-            {id: 'd3', name: '우리금융지주', price: '14,250원', yield: '5.9%', freq: '연 배당 4회'},
-            {id: 'd4', name: '기업은행', price: '13,800원', yield: '5.5%', freq: '연 배당 2회'},
-        ]
-    },
-    {
-        title: '해외 고배당주', market: 'foreign',
-        list: [
-            {id: 'd5', name: 'Altria Group', price: '$44.20', yield: '9.1%', freq: '분기 배당'},
-            {id: 'd6', name: 'AT&T', price: '$16.80', yield: '6.7%', freq: '분기 배당'},
-            {id: 'd7', name: 'Verizon', price: '$39.40', yield: '6.4%', freq: '분기 배당'},
-            {id: 'd8', name: 'Realty Income', price: '$52.30', yield: '5.9%', freq: '월 배당'},
-        ]
-    },
-    {
-        title: 'ETF 고배당', market: 'etf',
-        list: [
-            {id: 'd9', name: 'TIGER 리츠부동산', price: '4,850원', yield: '5.4%', freq: '월 배당'},
-            {id: 'd10', name: 'KODEX 배당가치', price: '11,240원', yield: '4.8%', freq: '분기 배당'},
-            {id: 'd11', name: 'SCHD', price: '$27.80', yield: '3.6%', freq: '분기 배당'},
-            {id: 'd12', name: 'VYM', price: '$118.40', yield: '3.1%', freq: '분기 배당'},
-        ]
-    },
-];
 
 const FILTERS = ['전체', '국내', '해외', 'ETF'];
 const SORTS = ['거래대금', '거래량', '급상승', '급하락'];
@@ -227,29 +95,154 @@ const SIDEBAR_TABS = [
     {key: 'recent', label: '최근 본', icon: '🕐'},
 ];
 
-// 💡 하드코딩된 색상 제거 및 글로벌 변수 적용
+// 데이터 최신 여부 판단
+// - 가격 데이터가 아예 없으면 stale
+// - 최근 거래일이 STALE_DAYS일보다 오래되면 stale
+//   (주말·공휴일·장중 미반영을 고려해 당일 비교 대신 일수 임계값 사용)
+const STALE_DAYS = 4;
+
+const isDataStale = (res) => {
+    if (!res.assetList || res.assetList.length === 0) return true;
+    if (!res.latestPriceDate) return true;
+
+    const latest = new Date(res.latestPriceDate);
+    if (Number.isNaN(latest.getTime())) return true;
+
+    const diffDays = (Date.now() - latest.getTime()) / (1000 * 60 * 60 * 24);
+    return diffDays > STALE_DAYS;
+};
+
+// 배당 수익률 데이터가 한 번도 수집되지 않은 경우 감지
+const hasDividendData = (res) =>
+    (res.dividendKoreanList?.length > 0) ||
+    (res.dividendOverseasList?.length > 0) ||
+    (res.dividendEtfList?.length > 0);
+
+// 시장 상태 코드 → 한글 라벨
+const MARKET_STATE_LABEL = {
+    REGULAR: '장중',
+    CLOSED: '장마감',
+    PRE: '장전',
+    POST: '장후',
+    PREPRE: '장전',
+    POSTPOST: '장후',
+};
+
+// MarketIndexDto → 지수 카드 데이터 변환
+const mapIndexCard = (idx, label) => {
+    const price = idx?.price;
+    const cp = idx?.changePercent;
+    const currency = idx?.currency;
+
+    let value = '-';
+    if (price !== null && price !== undefined) {
+        value = currency === 'USD'
+            ? `$${Number(price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+            : Number(price).toLocaleString('ko-KR', {maximumFractionDigits: 2});
+    }
+
+    const hasRate = cp !== null && cp !== undefined;
+    const pos = hasRate ? Number(cp) >= 0 : true;
+    const changeRate = hasRate ? `${pos ? '+' : ''}${Number(cp).toFixed(2)}%` : '-';
+
+    return {
+        label,
+        value,
+        change: MARKET_STATE_LABEL[idx?.marketState] ?? '',
+        changeRate,
+        pos,
+        chart: idx?.sparkline || [],
+    };
+};
+
+const parseChange = (chg) => {
+    if (!chg) return 0;
+    return Number(chg.replace('%', '').replace('+', ''));
+};
+
+const getTradeValue = (vol) => {
+    if (!vol) return 0;
+    if (vol.includes('조')) return Number(vol.replace('조', '')) * 10000;
+    if (vol.includes('억')) return Number(vol.replace('억', '').replace(',', ''));
+    if (vol.includes('B')) return Number(vol.replace('$', '').replace('B', '')) * 13000;
+    if (vol.includes('M')) return Number(vol.replace('$', '').replace('M', '')) * 13;
+    return 0;
+};
+
+const sortStocks = (stocks, sort) => {
+    const sorted = [...stocks];
+    if (sort === '거래대금') return sorted.sort((a, b) => getTradeValue(b.vol) - getTradeValue(a.vol));
+    if (sort === '거래량') return sorted.sort((a, b) => (b.volume || 0) - (a.volume || 0));
+    if (sort === '급상승') return sorted.sort((a, b) => parseChange(b.chg) - parseChange(a.chg));
+    if (sort === '급하락') return sorted.sort((a, b) => parseChange(a.chg) - parseChange(b.chg));
+    return sorted;
+};
+
 const Spark = ({data, pos}) => {
-    const W = 80, H = 28, min = Math.min(...data), max = Math.max(...data), range = max - min || 1;
-    const pts = data.map((v, i) => `${(i / (data.length - 1)) * W},${H - ((v - min) / range) * (H - 4) + 2}`).join(' ');
+    if (!data || data.length === 0) return null;
+    const W = 80;
+    const H = 44;
+    const PAD = 4;
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+
+    const coords = data.map((v, i) => {
+        const x = (i / (data.length - 1)) * W;
+        const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+        return [x, y];
+    });
+
+    const linePts = coords.map(([x, y]) => `${x},${y}`).join(' ');
+    // 라인 아래 영역 채우기용 폴리곤 좌표
+    const areaPts = `0,${H} ${linePts} ${W},${H}`;
+    const color = pos ? 'var(--color-success)' : 'var(--color-error)';
+    const fillId = `sparkFill-${pos ? 'up' : 'down'}`;
+
     return (
-        <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
-            <polyline points={pts} fill="none" stroke={pos ? 'var(--color-success)' : 'var(--color-error)'}
-                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"
+             style={{display: 'block', width: '100%', height: `${H}px`, marginTop: '4px'}}>
+            <defs>
+                <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
+                    <stop offset="100%" stopColor={color} stopOpacity="0"/>
+                </linearGradient>
+            </defs>
+            <polygon points={areaPts} fill={`url(#${fillId})`} stroke="none"/>
+            <polyline
+                points={linePts}
+                fill="none"
+                stroke={color}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
         </svg>
     );
 };
 
 const InvestmentInformation = () => {
+    // 백엔드 연결용 상태 변수들
+    const [isLoading, setIsLoading] = useState(true);
+    const [syncStatus, setSyncStatus] = useState(null); // null | 'syncing' | 'dividend'
+    const [indices, setIndices] = useState([]);
+    const [stockList, setStockList] = useState([]);
+    const [themeList, setThemeList] = useState([]);
+    const [divList, setDivList] = useState([]);
+
+    // 기존 UI 및 필터 상태 변수들
     const [filter, setFilter] = useState('전체');
     const [sort, setSort] = useState('거래대금');
     const [theme, setTheme] = useState('전체');
     const [query, setQuery] = useState('');
-    const [showCount, setShowCount] = useState(PAGE);
+    const [currentPage, setCurrentPage] = useState(1);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarTab, setSidebarTab] = useState('cart');
-    const [cart, setCart] = useState([1, 3]);
-    const [likes, setLikes] = useState([2]);
-    const [recent, setRecent] = useState([1, 2, 3]);
+    const [holdings, setHoldings] = useState([]); // [{holdingId, ticker, assetName, market, quantity}]
+    const [likes, setLikes] = useState([]);
+    const [recent, setRecent] = useState([]);
+
+    const {user, openLoginModal} = useAuthStore();
 
     const [themePanel, setThemePanel] = useState(null);
     const [detailPeriod, setDetailPeriod] = useState('1일');
@@ -261,33 +254,250 @@ const InvestmentInformation = () => {
     const [divSort, setDivSort] = useState('배당 수익률순');
     const [divSelected, setDivSelected] = useState([]);
 
-    const filtered = MOCK_STOCKS.filter(s =>
-        (filter === '전체' || s.market === filter) &&
-        (!query || s.name.includes(query) || s.ticker.toLowerCase().includes(query.toLowerCase()))
+    // 백엔드 API 호출
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                // 1차 조회
+                let res = await getInvestmentInfoApi('ALL');
+
+                // 데이터가 최신이 아니면 동기화 후 재조회
+                // (스케줄러가 매일 새벽 수집하므로, 평소엔 이 분기를 타지 않음)
+                if (isDataStale(res)) {
+                    setSyncStatus('syncing');
+                    try {
+                        await syncStockDataApi();
+                        setSyncStatus('dividend');
+                        await syncDividendDataApi();
+                    } catch (syncErr) {
+                        console.error('데이터 동기화 실패 (외부 API 키 미설정 또는 네트워크 오류):', syncErr);
+                    } finally {
+                        setSyncStatus(null);
+                    }
+                    res = await getInvestmentInfoApi('ALL');
+                } else if (!hasDividendData(res)) {
+                    // 주가는 최신이지만 배당 수익률이 한 번도 수집되지 않은 경우
+                    setSyncStatus('dividend');
+                    try {
+                        await syncDividendDataApi();
+                    } catch (syncErr) {
+                        console.error('배당 동기화 실패:', syncErr);
+                    } finally {
+                        setSyncStatus(null);
+                    }
+                    res = await getInvestmentInfoApi('ALL');
+                }
+
+                // 1. 시장 지수 데이터 맵핑 (전용 실시간 엔드포인트 사용 - sparkline 포함)
+                // 반환 순서: 코스피(KODEX200) → 코스닥 → S&P500 → USD/KRW
+                try {
+                    const indexData = await getMarketIndexApi();
+                    const LABELS = ['코스피', '코스닥', 'S&P 500', '달러 환율'];
+                    const mappedIndices = (indexData || []).map((idx, i) => mapIndexCard(idx, LABELS[i]));
+                    setIndices(mappedIndices);
+                } catch (indexError) {
+                    console.error('시장 지수 불러오기 실패', indexError);
+                    setIndices([]);
+                }
+
+                // 2. 메인 주식 리스트 (TOP 100) 맵핑
+                // market 필드를 필터 버튼 값(국내/해외/ETF)으로 정규화
+                const normalizeMarket = (s) => {
+                    if (s.assetType === 'ETF') return 'ETF';
+                    if (s.market === 'KOSPI' || s.market === 'KOSDAQ') return '국내';
+                    return '해외';
+                };
+                const mappedStocks = (res.assetList || []).map(s => ({
+                    id: s.assetId || s.symbol,
+                    name: s.assetName,
+                    ticker: s.ticker || s.symbol,
+                    market: normalizeMarket(s),
+                    rawMarket: s.market,
+                    price: s.closePriceLabel || `${s.closePrice}`,
+                    chg: s.dailyReturnLabel || `${s.dailyReturnPct > 0 ? '+' : ''}${s.dailyReturnPct}%`,
+                    vol: s.tradingValueLabel || s.volumeLabel || '0',
+                    pos: s.rise,
+                    volume: s.volume || 0
+                }));
+                setStockList(mappedStocks);
+
+                // 3. 테마별 섹션 맵핑
+                const makeTheme = (name, list) => {
+                    if (!list || list.length === 0) return null;
+                    const avgPct = list.reduce((acc, curr) => acc + (curr.dailyReturnPct || 0), 0) / list.length;
+                    return {
+                        name,
+                        avg: `${avgPct > 0 ? '+' : ''}${avgPct.toFixed(1)}%`,
+                        pos: avgPct >= 0,
+                        stocks: list.map(s => ({
+                            id: s.assetId || s.symbol,
+                            name: s.assetName,
+                            ticker: s.ticker || s.symbol,
+                            chg: s.dailyReturnLabel || `${s.dailyReturnPct > 0 ? '+' : ''}${s.dailyReturnPct}%`,
+                            pos: s.rise,
+                            price: s.closePriceLabel,
+                            vol: s.tradingValueLabel,
+                            volume: s.volume
+                        }))
+                    };
+                };
+                const themes = [
+                    makeTheme('반도체 테마', res.semiList),
+                    makeTheme('AI 테마', res.aiList),
+                    makeTheme('2차전지 테마', res.batteryList),
+                    makeTheme('바이오 테마', res.bioList),
+                    makeTheme('금융 테마', res.finList),
+                ].filter(Boolean);
+                setThemeList(themes);
+
+                // 4. 배당 데이터 맵핑
+                const makeDiv = (title, market, list) => {
+                    if (!list || list.length === 0) return null;
+                    return {
+                        title,
+                        market,
+                        list: list.map(s => ({
+                            id: s.assetId || s.symbol,
+                            name: s.assetName,
+                            ticker: s.ticker || s.symbol,
+                            price: s.closePriceLabel,
+                            yield: s.dividendYieldLabel || `${s.dividendYieldPct}%`,
+                            freq: s.country === 'US' ? '분기 배당' : '연 배당',
+                            pos: s.rise
+                        }))
+                    };
+                };
+                const divs = [
+                    makeDiv('국내 고배당주', 'domestic', res.dividendKoreanList),
+                    makeDiv('해외 고배당주', 'foreign', res.dividendOverseasList),
+                    makeDiv('ETF 고배당', 'etf', res.dividendEtfList),
+                ].filter(Boolean);
+                setDivList(divs);
+
+            } catch (e) {
+                console.error("투자정보 불러오기 실패", e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadData();
+    }, []);
+
+    useEffect(() => {
+        if (!user) { setHoldings([]); return; }
+        getHoldingListApi()
+            .then(data => setHoldings(data || []))
+            .catch(err => console.error('장바구니 불러오기 실패', err));
+    }, [user]);
+
+    useEffect(() => {
+        if (!user) { setLikes([]); return; }
+        getWatchlistApi()
+            .then(data => setLikes((data || []).map(w => w.ticker)))
+            .catch(err => console.error('관심종목 불러오기 실패', err));
+    }, [user]);
+
+    // 💡 필터 및 정렬 로직에 이제 MOCK_STOCKS 대신 백엔드에서 받은 stockList를 사용합니다.
+    const filtered = sortStocks(
+        stockList.filter((stock) =>
+            (filter === '전체' || stock.market === filter) &&
+            (
+                !query ||
+                stock.name.toLowerCase().includes(query.toLowerCase()) ||
+                stock.ticker.toLowerCase().includes(query.toLowerCase())
+            )
+        ),
+        sort
     );
-    const visible = filtered.slice(0, showCount);
 
-    const addRecent = (id) => setRecent(p => [id, ...p.filter(x => x !== id)].slice(0, 20));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE));
+    const startIndex = (currentPage - 1) * PAGE;
+    const visible = filtered.slice(startIndex, startIndex + PAGE);
 
-    const toggleCart = (e, id) => {
-        e.stopPropagation();
-        setCart(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-        addRecent(id);
+    const addRecent = (id) => setRecent((prev) => [id, ...prev.filter((item) => item !== id)].slice(0, 20));
+
+    const handleRemoveHolding = async (holdingId) => {
+        try {
+            await removeHoldingApi(holdingId);
+            setHoldings(prev => prev.filter(h => h.holdingId !== holdingId));
+        } catch (e) {
+            console.error('장바구니 삭제 실패', e);
+        }
     };
-    const toggleLike = (e, id) => {
-        e.stopPropagation();
-        setLikes(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-        addRecent(id);
+
+    const handleQuantityChange = async (holdingId, newQty) => {
+        if (newQty < 1) { await handleRemoveHolding(holdingId); return; }
+        try {
+            const updated = await updateHoldingQuantityApi(holdingId, newQty);
+            setHoldings(prev => prev.map(h => h.holdingId === holdingId ? {...h, quantity: updated.quantity} : h));
+        } catch (e) {
+            console.error('수량 변경 실패', e);
+        }
     };
+
+    const toggleCart = async (event, stock) => {
+        event.stopPropagation();
+        if (!user) { openLoginModal(); return; }
+        const existing = holdings.find(h => h.ticker === stock.ticker);
+        if (existing) {
+            // 낙관적 삭제: UI 먼저 제거 후 API 호출
+            setHoldings(prev => prev.filter(h => h.holdingId !== existing.holdingId));
+            try {
+                await removeHoldingApi(existing.holdingId);
+            } catch (e) {
+                // API 실패 시 되돌리기
+                setHoldings(prev => [...prev, existing]);
+                alert('장바구니에서 제거하는데 실패했습니다.');
+            }
+        } else {
+            // 낙관적 추가: 임시 항목으로 UI 먼저 표시 후 API 호출
+            const tempId = Date.now();
+            const tempItem = {holdingId: tempId, ticker: stock.ticker, assetName: stock.name, market: stock.market || '', quantity: 1};
+            setHoldings(prev => [...prev, tempItem]);
+            try {
+                const result = await addHoldingApi({ticker: stock.ticker, assetName: stock.name, market: stock.market || '', buyPrice: 0});
+                setHoldings(prev => prev.map(h => h.holdingId === tempId ? result : h));
+            } catch (e) {
+                setHoldings(prev => prev.filter(h => h.holdingId !== tempId));
+                alert('장바구니 담기에 실패했습니다. 로그인 상태를 확인해주세요.');
+            }
+        }
+        addRecent(stock.id);
+    };
+
+    const toggleLike = async (event, id) => {
+        event.stopPropagation();
+        if (!user) { openLoginModal(); return; }
+        const stock = stockList.find(s => s.id === id);
+        if (!stock) return;
+        setLikes(prev => prev.includes(stock.ticker)
+            ? prev.filter(t => t !== stock.ticker)
+            : [...prev, stock.ticker]);
+        addRecent(id);
+        try {
+            await toggleWatchlistApi({ticker: stock.ticker, assetName: stock.name, market: stock.rawMarket || stock.market});
+        } catch (e) {
+            console.error('관심종목 변경 실패', e);
+            setLikes(prev => prev.includes(stock.ticker)
+                ? prev.filter(t => t !== stock.ticker)
+                : [...prev, stock.ticker]);
+        }
+    };
+
+    const cartSidebarData = holdings.map(h => {
+        const stock = stockList.find(s => s.ticker === h.ticker);
+        return {holdingId: h.holdingId, id: h.holdingId, name: h.assetName, ticker: h.ticker, market: h.market || '', price: stock?.price || '-', chg: stock?.chg || '-', pos: stock?.pos ?? true, quantity: h.quantity};
+    });
 
     const sidebarData = sidebarTab === 'cart'
-        ? MOCK_STOCKS.filter(s => cart.includes(s.id))
+        ? cartSidebarData
         : sidebarTab === 'like'
-            ? MOCK_STOCKS.filter(s => likes.includes(s.id))
-            : MOCK_STOCKS.filter(s => recent.includes(s.id));
+            ? stockList.filter((stock) => likes.includes(stock.ticker))
+            : stockList.filter((stock) => recent.includes(stock.id));
 
-    const openThemePanel = (th) => {
-        setThemePanel(th);
+    const openThemePanel = (selectedTheme) => {
+        setThemePanel(selectedTheme);
         setDetailPeriod('1일');
         setDetailSort('수익률 상승');
         setDetailShowAll(false);
@@ -296,158 +506,293 @@ const InvestmentInformation = () => {
     };
 
     const toggleDetailSelect = (id) =>
-        setDetailSelected(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+        setDetailSelected((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
 
-    const handleDetailCart = () => {
-        if (!detailSelected.length) {
-            alert('담을 종목을 선택해주세요.');
-            return;
+    const handleDetailCart = async () => {
+        if (!detailSelected.length) { alert('담을 종목을 선택해주세요.'); return; }
+        if (!user) { openLoginModal(); return; }
+        const selectedStocks = themePanel.stocks.filter(s => detailSelected.includes(s.id));
+        for (const stock of selectedStocks) {
+            if (holdings.some(h => h.ticker === stock.ticker)) continue;
+            try {
+                const result = await addHoldingApi({ticker: stock.ticker, assetName: stock.name, market: stock.market || '', buyPrice: 0});
+                setHoldings(prev => [...prev, result]);
+            } catch (e) {
+                console.error('장바구니 담기 실패', e);
+            }
         }
-        setCart(p => [...new Set([...p, ...detailSelected])]);
-        detailSelected.forEach(id => addRecent(id));
+        selectedStocks.forEach(s => addRecent(s.id));
         alert(`${detailSelected.length}개 종목이 장바구니에 담겼습니다!`);
         setDetailSelected([]);
     };
 
-    const detailStocks = [...MOCK_STOCKS].sort((a, b) => {
-        if (detailSort === '수익률 상승') return (b.pos ? 1 : 0) - (a.pos ? 1 : 0) || parseFloat(b.chg) - parseFloat(a.chg);
-        if (detailSort === '수익률 하락') return (a.pos ? 1 : 0) - (b.pos ? 1 : 0) || parseFloat(a.chg) - parseFloat(b.chg);
-        return 0;
-    });
+    // 💡 테마 모달의 목록은 전체 종목이 아니라 '해당 테마에 속한 종목'들만 정렬하여 보여줍니다.
+    const detailStocks = sortStocks(
+        themePanel ? themePanel.stocks : [],
+        detailSort === '거래대금' ? '거래대금' : detailSort === '수익률 상승' ? '급상승' : '급하락'
+    );
     const detailVisible = detailShowAll ? detailStocks : detailStocks.slice(0, 6);
 
-    const openDivPanel = (d) => {
-        setDivPanel(d);
+    const openDivPanel = (selectedDividend) => {
+        setDivPanel(selectedDividend);
         setDivSort('배당 수익률순');
         setDivSelected([]);
         setThemePanel(null);
     };
 
     const toggleDivSelect = (id) =>
-        setDivSelected(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+        setDivSelected((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
 
-    const handleDivCart = () => {
-        if (!divSelected.length) {
-            alert('담을 종목을 선택해주세요.');
-            return;
+    const handleDivCart = async () => {
+        if (!divSelected.length) { alert('담을 종목을 선택해주세요.'); return; }
+        if (!user) { openLoginModal(); return; }
+        const selectedItems = divPanel.list.filter(s => divSelected.includes(s.id));
+        for (const item of selectedItems) {
+            if (holdings.some(h => h.ticker === item.ticker)) continue;
+            try {
+                const result = await addHoldingApi({ticker: item.ticker, assetName: item.name, market: '', buyPrice: 0});
+                setHoldings(prev => [...prev, result]);
+            } catch (e) {
+                console.error('장바구니 담기 실패', e);
+            }
         }
+        selectedItems.forEach(s => addRecent(s.id));
         alert(`${divSelected.length}개 종목이 장바구니에 담겼습니다!`);
         setDivSelected([]);
     };
 
-    return (
-        <div className={styles.wrap}>
-            <div className={`${styles.main} ${sidebarOpen ? styles.mainShifted : ''}`}>
+    if (isLoading) {
+        const message = syncStatus === 'syncing'
+            ? '📡 주가 데이터를 수집하는 중입니다... (최초 1회, 약 90초 소요)'
+            : syncStatus === 'dividend'
+                ? '💰 배당 수익률 데이터를 수집하는 중입니다... (약 90초 소요)'
+                : '실시간 투자 정보를 불러오는 중입니다...';
 
+        return (
+            <div className={styles.wrap} style={{justifyContent: 'center', alignItems: 'center'}}>
+                <div style={{textAlign: 'center', padding: '60px 20px'}}>
+                    <div style={{fontSize: '18px', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '12px'}}>
+                        {message}
+                    </div>
+                    {syncStatus && (
+                        <div style={{fontSize: '14px', color: 'var(--color-text-muted)'}}>
+                            데이터가 준비되면 자동으로 화면이 표시됩니다.
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className={`${styles.wrap} ${sidebarOpen ? styles.wrapShifted : ''}`}>
+            <div className={styles.main}>
                 <div className={styles.topBar}>
-                    <button className={styles.sidebarToggle} onClick={() => setSidebarOpen(o => !o)}>
+                    <button className={styles.sidebarToggle} onClick={() => setSidebarOpen((open) => !open)}>
                         <span>🛒</span>
                         관심 주식
-                        {(cart.length + likes.length) > 0 && (
-                            <span className={styles.toggleBadge}>{cart.length + likes.length}</span>
+                        {(holdings.length + likes.length) > 0 && (
+                            <span className={styles.toggleBadge}>{holdings.length + likes.length}</span>
                         )}
                     </button>
                 </div>
 
                 <div className={styles.idxGrid}>
-                    {MOCK_INDEX.map((d, i) => (
-                        <div key={i} className={styles.idxCard}>
-                            <span className={styles.idxLabel}>{d.label}</span>
-                            <span className={styles.idxVal}>{d.value}</span>
+                    {indices.map((item) => (
+                        <div key={item.label} className={styles.idxCard}>
+                            <span className={styles.idxLabel}>{item.label}</span>
+                            <span className={styles.idxVal}>{item.value}</span>
                             <div className={styles.idxBot}>
-                                <span className={d.pos ? styles.idxPos : styles.idxNeg}>{d.change}</span>
-                                <span className={d.pos ? styles.idxBadgePos : styles.idxBadgeNeg}>{d.changeRate}</span>
+                                <span className={item.pos ? styles.idxPos : styles.idxNeg}>{item.change}</span>
+                                <span
+                                    className={item.pos ? styles.idxBadgePos : styles.idxBadgeNeg}>{item.changeRate}</span>
                             </div>
-                            <Spark data={d.chart} pos={d.pos}/>
+                            <Spark data={item.chart} pos={item.pos}/>
                         </div>
                     ))}
                 </div>
 
                 <div className={styles.chartCard}>
                     <div className={styles.ccTop}>
-                        <span className={styles.ccTitle}>실시간 차트</span>
+                        <span className={styles.ccTitle}>실시간 TOP 100 차트</span>
                         <div className={styles.ccRight}>
-                            <input className={styles.srch} placeholder="종목명 또는 티커 검색"
-                                   value={query} onChange={e => {
-                                setQuery(e.target.value);
-                                setShowCount(PAGE);
-                            }}/>
+                            <input
+                                className={styles.srch}
+                                placeholder="종목명 또는 티커 검색"
+                                value={query}
+                                onChange={(event) => {
+                                    setQuery(event.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
                             <button className={styles.srchBtn}>검색</button>
                         </div>
                     </div>
+
                     <div className={styles.filterRow}>
                         <div className={styles.ftabs}>
-                            {FILTERS.map(f => (
-                                <button key={f} className={`${styles.ftab} ${filter === f ? styles.ftabOn : ''}`}
-                                        onClick={() => {
-                                            setFilter(f);
-                                            setShowCount(PAGE);
-                                        }}>{f}</button>
+                            {FILTERS.map((filterName) => (
+                                <button
+                                    key={filterName}
+                                    className={`${styles.ftab} ${filter === filterName ? styles.ftabOn : ''}`}
+                                    onClick={() => {
+                                        setFilter(filterName);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    {filterName}
+                                </button>
                             ))}
                         </div>
+
                         <div className={styles.stabs}>
-                            {SORTS.map(s => (
-                                <button key={s} className={`${styles.stab} ${sort === s ? styles.stabOn : ''}`}
-                                        onClick={() => setSort(s)}>{s}</button>
+                            {SORTS.map((sortName) => (
+                                <button
+                                    key={sortName}
+                                    className={`${styles.stab} ${sort === sortName ? styles.stabOn : ''}`}
+                                    onClick={() => {
+                                        setSort(sortName);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    {sortName}
+                                </button>
                             ))}
                         </div>
                     </div>
+
                     <div className={styles.listHdr}>
-                        <span>순위</span><span>종목</span><span>현재가</span><span>등락률</span><span>거래대금</span><span>담기</span>
+                        <span>순위</span>
+                        <span>종목</span>
+                        <span>현재가</span>
+                        <span>등락률</span>
+                        <span>거래대금</span>
+                        <span>담기</span>
                     </div>
-                    {visible.map((s, i) => (
-                        <div key={s.id} className={styles.srow}>
-                            <span className={styles.sn}>{i + 1}</span>
-                            <div className={styles.sInfo}>
-                                <StockLogo ticker={s.ticker} name={s.name} size={36}/>
-                                <div className={styles.si}>
-                                    <div className={styles.sname}>{s.name}</div>
-                                    <div className={styles.stick}>{s.ticker} · {s.market}</div>
+
+                    {visible.length === 0 && (
+                        <div style={{textAlign: 'center', padding: '40px 20px', color: 'var(--color-text-muted)'}}>
+                            {stockList.length === 0
+                                ? '투자 데이터를 불러올 수 없습니다. 백엔드 연결 및 API 키 설정을 확인해주세요.'
+                                : '검색 결과가 없습니다.'}
+                        </div>
+                    )}
+
+                    {visible.map((stock, index) => {
+                        const rank = startIndex + index + 1;
+
+                        return (
+                            <div key={stock.id} className={styles.srow}>
+                                <span className={styles.sn}>{rank}</span>
+
+                                <div className={styles.sInfo}>
+                                    <StockLogo ticker={stock.ticker} name={stock.name} size={36}/>
+                                    <div className={styles.si}>
+                                        <div className={styles.sname}>{stock.name}</div>
+                                        <div className={styles.stick}>{stock.ticker} · {stock.rawMarket || stock.market}</div>
+                                    </div>
+                                </div>
+
+                                <span className={styles.sp}>{stock.price}</span>
+                                <span className={stock.pos ? styles.spos : styles.sneg}>{stock.chg}</span>
+                                <span className={styles.sv}>{stock.vol}</span>
+
+                                <div className={styles.sbts}>
+                                    <button
+                                        className={`${styles.sbt} ${holdings.some(h => h.ticker === stock.ticker) ? styles.sbtCartOn : ''}`}
+                                        onClick={(event) => toggleCart(event, stock)}
+                                        title="장바구니"
+                                    >
+                                        🛒
+                                    </button>
+                                    <button
+                                        className={`${styles.sbt} ${likes.includes(stock.ticker) ? styles.sbtLikeOn : ''}`}
+                                        onClick={(event) => toggleLike(event, stock.id)}
+                                        title="좋아요"
+                                    >
+                                        ❤️
+                                    </button>
                                 </div>
                             </div>
-                            <span className={styles.sp}>{s.price}</span>
-                            <span className={s.pos ? styles.spos : styles.sneg}>{s.chg}</span>
-                            <span className={styles.sv}>{s.vol}</span>
-                            <div className={styles.sbts}>
-                                <button className={`${styles.sbt} ${cart.includes(s.id) ? styles.sbtCartOn : ''}`}
-                                        onClick={e => toggleCart(e, s.id)} title="장바구니">🛒
-                                </button>
-                                <button className={`${styles.sbt} ${likes.includes(s.id) ? styles.sbtLikeOn : ''}`}
-                                        onClick={e => toggleLike(e, s.id)} title="좋아요">❤️
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {showCount < filtered.length && (
-                        <button className={styles.moreBtn}
-                                onClick={() => setShowCount(c => Math.min(c + PAGE, Math.min(100, filtered.length)))}>
-                            더보기 ({showCount}/{filtered.length}) ▼
+                        );
+                    })}
+
+                    <div style={{
+                        marginTop: '24px',
+                        paddingTop: '20px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '14px',
+                        borderTop: '1px solid var(--color-border)'
+                    }}>
+                        <button
+                            type="button"
+                            className={styles.moreBtn}
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                            style={{maxWidth: '120px', opacity: currentPage === 1 ? 0.45 : 1}}
+                        >
+                            이전
                         </button>
-                    )}
+
+                        <span style={{
+                            minWidth: '90px',
+                            color: 'var(--color-text-main)',
+                            fontSize: '15px',
+                            fontWeight: 900,
+                            textAlign: 'center'
+                        }}>
+                            {currentPage} / {totalPages}
+                        </span>
+
+                        <button
+                            type="button"
+                            className={styles.moreBtn}
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                            style={{maxWidth: '120px', opacity: currentPage === totalPages ? 0.45 : 1}}
+                        >
+                            다음
+                        </button>
+                    </div>
                 </div>
 
                 <div className={styles.section}>
                     <span className={styles.secTitle}>테마별 주식</span>
+
                     <div className={styles.pillRow}>
-                        {THEMES.map(t => (
-                            <button key={t} className={`${styles.pill} ${theme === t ? styles.pillOn : ''}`}
-                                    onClick={() => setTheme(t)}>{t}</button>
+                        {THEMES.map((themeName) => (
+                            <button
+                                key={themeName}
+                                className={`${styles.pill} ${theme === themeName ? styles.pillOn : ''}`}
+                                onClick={() => setTheme(themeName)}
+                            >
+                                {themeName}
+                            </button>
                         ))}
                     </div>
+
                     <div className={styles.themeGrid}>
-                        {MOCK_THEMES.map((th, i) => (
-                            <div key={i} className={`${styles.tc} ${themePanel === th ? styles.tcActive : ''}`}>
+                        {(theme === '전체' ? themeList : themeList.filter(t => t.name.includes(theme))).map((themeItem) => (
+                            <div key={themeItem.name}
+                                 className={`${styles.tc} ${themePanel === themeItem ? styles.tcActive : ''}`}>
                                 <div className={styles.tcTop}>
-                                    <span className={styles.tcName}>{th.name}</span>
-                                    <span className={th.pos ? styles.tcBadgePos : styles.tcBadgeNeg}>{th.avg} 평균</span>
+                                    <span className={styles.tcName}>{themeItem.name}</span>
+                                    <span
+                                        className={themeItem.pos ? styles.tcBadgePos : styles.tcBadgeNeg}>{themeItem.avg} 평균</span>
                                 </div>
-                                {th.stocks.map((st, j) => (
-                                    <div key={j} className={styles.tcRow}>
-                                        <span className={styles.tcSn}>{st.n}</span>
-                                        <span className={st.p ? styles.tcSp : styles.tcSng}>{st.c}</span>
+
+                                {themeItem.stocks.slice(0, 3).map((stock) => (
+                                    <div key={stock.id || stock.name} className={styles.tcRow}>
+                                        <span className={styles.tcSn}>{stock.name}</span>
+                                        <span className={stock.pos ? styles.tcSp : styles.tcSng}>{stock.chg}</span>
                                     </div>
                                 ))}
-                                <button className={styles.tcMore} onClick={() => openThemePanel(th)}>자세히 보기 →</button>
+
+                                <button className={styles.tcMore} onClick={() => openThemePanel(themeItem)}>
+                                    자세히 보기 →
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -455,17 +800,23 @@ const InvestmentInformation = () => {
 
                 <div className={styles.section}>
                     <span className={styles.secTitle}>배당금 TOP 10</span>
+
                     <div className={styles.divGrid}>
-                        {MOCK_DIVIDEND.map((d, i) => (
-                            <div key={i} className={`${styles.dc} ${divPanel === d ? styles.dcActive : ''}`}>
-                                <div className={styles.dcHead}>{d.title}</div>
-                                {d.list.map((item, j) => (
-                                    <div key={j} className={styles.dcRow}>
+                        {divList.map((dividend) => (
+                            <div key={dividend.title}
+                                 className={`${styles.dc} ${divPanel === dividend ? styles.dcActive : ''}`}>
+                                <div className={styles.dcHead}>{dividend.title}</div>
+
+                                {dividend.list.slice(0, 4).map((item) => (
+                                    <div key={item.id} className={styles.dcRow}>
                                         <span className={styles.dcN}>{item.name}</span>
                                         <span className={styles.dcY}>{item.yield}</span>
                                     </div>
                                 ))}
-                                <button className={styles.dcMore} onClick={() => openDivPanel(d)}>자세히 보기 →</button>
+
+                                <button className={styles.dcMore} onClick={() => openDivPanel(dividend)}>
+                                    자세히 보기 →
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -477,33 +828,54 @@ const InvestmentInformation = () => {
                     <span className={styles.sbTitle}>관심 주식</span>
                     <button className={styles.sbClose} onClick={() => setSidebarOpen(false)}>✕</button>
                 </div>
+
                 <div className={styles.sbTabs}>
-                    {SIDEBAR_TABS.map(t => (
-                        <button key={t.key}
-                                className={`${styles.sbTab} ${sidebarTab === t.key ? styles.sbTabOn : ''}`}
-                                onClick={() => setSidebarTab(t.key)}>
-                            {t.icon} {t.label}
-                            <span className={`${styles.sbBadge} ${sidebarTab === t.key ? styles.sbBadgeOn : ''}`}>
-                                {t.key === 'cart' ? cart.length : t.key === 'like' ? likes.length : recent.length}
+                    {SIDEBAR_TABS.map((tab) => (
+                        <button
+                            key={tab.key}
+                            className={`${styles.sbTab} ${sidebarTab === tab.key ? styles.sbTabOn : ''}`}
+                            onClick={() => setSidebarTab(tab.key)}
+                        >
+                            {tab.icon} {tab.label}
+                            <span className={`${styles.sbBadge} ${sidebarTab === tab.key ? styles.sbBadgeOn : ''}`}>
+                                {tab.key === 'cart' ? holdings.length : tab.key === 'like' ? likes.length : recent.length}
                             </span>
                         </button>
                     ))}
                 </div>
+
                 <div className={styles.sbBody}>
                     {sidebarData.length === 0 ? (
-                        <p className={styles.sbEmpty}>아직 없어요</p>
-                    ) : sidebarData.map((s, i) => (
-                        <div key={i} className={styles.sbItem}>
+                        <div className={styles.sbEmpty}>
+                            <span style={{fontSize: '32px'}}>
+                                {sidebarTab === 'cart' ? '🛒' : sidebarTab === 'like' ? '❤️' : '🕐'}
+                            </span>
+                            <span>
+                                {sidebarTab === 'cart' ? '장바구니가 비어있어요' : sidebarTab === 'like' ? '좋아요한 종목이 없어요' : '최근 본 종목이 없어요'}
+                            </span>
+                        </div>
+                    ) : sidebarData.map((stock) => (
+                        <div key={stock.id} className={styles.sbItem}>
                             <div className={styles.sbItemLeft}>
-                                <StockLogo ticker={s.ticker} name={s.name} size={36}/>
+                                <StockLogo ticker={stock.ticker} name={stock.name} size={36}/>
                                 <div>
-                                    <div className={styles.sbItemName}>{s.name}</div>
-                                    <div className={styles.sbItemTicker}>{s.ticker}</div>
+                                    <div className={styles.sbItemName}>{stock.name}</div>
+                                    <div className={styles.sbItemTicker}>{stock.ticker}</div>
                                 </div>
                             </div>
+
                             <div style={{textAlign: 'right'}}>
-                                <div className={styles.sbItemPrice}>{s.price}</div>
-                                <div className={s.pos ? styles.sbItemPos : styles.sbItemNeg}>{s.chg}</div>
+                                <div className={styles.sbItemPrice}>{stock.price}</div>
+                                {sidebarTab === 'cart' ? (
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', justifyContent: 'flex-end'}}>
+                                        <button onClick={() => handleQuantityChange(stock.holdingId, stock.quantity - 1)} style={{width: 22, height: 22, border: '1px solid #ddd', borderRadius: 4, background: '#f5f5f5', cursor: 'pointer', fontSize: 14, lineHeight: 1}}>−</button>
+                                        <span style={{fontSize: '13px', fontWeight: 700, minWidth: '18px', textAlign: 'center'}}>{stock.quantity}</span>
+                                        <button onClick={() => handleQuantityChange(stock.holdingId, stock.quantity + 1)} style={{width: 22, height: 22, border: '1px solid #ddd', borderRadius: 4, background: '#f5f5f5', cursor: 'pointer', fontSize: 14, lineHeight: 1}}>+</button>
+                                        <button onClick={() => handleRemoveHolding(stock.holdingId)} style={{width: 22, height: 22, border: '1px solid #fca5a5', borderRadius: 4, background: '#fff1f1', cursor: 'pointer', fontSize: 13, color: '#E53E3E', lineHeight: 1}}>×</button>
+                                    </div>
+                                ) : (
+                                    <div className={stock.pos ? styles.sbItemPos : styles.sbItemNeg}>{stock.chg}</div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -512,7 +884,7 @@ const InvestmentInformation = () => {
 
             {themePanel && (
                 <div className={styles.themeOverlay} onClick={() => setThemePanel(null)}>
-                    <div className={styles.themeDetailPanel} onClick={e => e.stopPropagation()}>
+                    <div className={styles.themeDetailPanel} onClick={(event) => event.stopPropagation()}>
                         <div className={styles.tpHeader}>
                             <div className={styles.tpTitleRow}>
                                 <span className={styles.tpTitle}>{themePanel.name}</span>
@@ -520,45 +892,64 @@ const InvestmentInformation = () => {
                                     {themePanel.pos ? '↑' : '↓'} {themePanel.avg} 평균
                                 </span>
                             </div>
+
                             <button className={styles.tpClose} onClick={() => setThemePanel(null)}>✕</button>
                         </div>
+
                         <div className={styles.tpPeriods}>
-                            {PERIODS.map(p => (
-                                <button key={p}
-                                        className={`${styles.tpPeriod} ${detailPeriod === p ? styles.tpPeriodOn : ''}`}
-                                        onClick={() => setDetailPeriod(p)}>{p}</button>
+                            {PERIODS.map((period) => (
+                                <button
+                                    key={period}
+                                    className={`${styles.tpPeriod} ${detailPeriod === period ? styles.tpPeriodOn : ''}`}
+                                    onClick={() => setDetailPeriod(period)}
+                                >
+                                    {period}
+                                </button>
                             ))}
                         </div>
+
                         <div className={styles.tpSortTabs}>
-                            {DETAIL_SORTS.map(s => (
-                                <button key={s}
-                                        className={`${styles.tpSortTab} ${detailSort === s ? styles.tpSortTabOn : ''}`}
-                                        onClick={() => setDetailSort(s)}>{s}</button>
+                            {DETAIL_SORTS.map((sortName) => (
+                                <button
+                                    key={sortName}
+                                    className={`${styles.tpSortTab} ${detailSort === sortName ? styles.tpSortTabOn : ''}`}
+                                    onClick={() => setDetailSort(sortName)}
+                                >
+                                    {sortName}
+                                </button>
                             ))}
                         </div>
+
                         <div className={styles.tpStockList}>
-                            {detailVisible.map(st => (
-                                <div key={st.id}
-                                     className={`${styles.tpStockRow} ${detailSelected.includes(st.id) ? styles.tpStockRowOn : ''}`}
-                                     onClick={() => toggleDetailSelect(st.id)}>
+                            {detailVisible.map((stock) => (
+                                <div
+                                    key={stock.id}
+                                    className={`${styles.tpStockRow} ${detailSelected.includes(stock.id) ? styles.tpStockRowOn : ''}`}
+                                    onClick={() => toggleDetailSelect(stock.id)}
+                                >
                                     <div
-                                        className={`${styles.tpCheckbox} ${detailSelected.includes(st.id) ? styles.tpCheckboxOn : ''}`}>
-                                        {detailSelected.includes(st.id) && <span>✓</span>}
+                                        className={`${styles.tpCheckbox} ${detailSelected.includes(stock.id) ? styles.tpCheckboxOn : ''}`}>
+                                        {detailSelected.includes(stock.id) && <span>✓</span>}
                                     </div>
-                                    <StockLogo ticker={st.ticker} name={st.name} size={42}/>
+
+                                    <StockLogo ticker={stock.ticker} name={stock.name} size={42}/>
+
                                     <div className={styles.tpSInfo}>
-                                        <div className={styles.tpSName}>{st.name}</div>
-                                        <div className={styles.tpSPrice}>현재가 {st.price}</div>
+                                        <div className={styles.tpSName}>{stock.name}</div>
+                                        <div className={styles.tpSPrice}>현재가 {stock.price}</div>
                                     </div>
-                                    <span className={st.pos ? styles.tpSPos : styles.tpSNeg}>{st.chg}</span>
+
+                                    <span className={stock.pos ? styles.tpSPos : styles.tpSNeg}>{stock.chg}</span>
                                 </div>
                             ))}
                         </div>
-                        {!detailShowAll && MOCK_STOCKS.length > 6 && (
+
+                        {!detailShowAll && detailStocks.length > 6 && (
                             <button className={styles.tpMoreBtn} onClick={() => setDetailShowAll(true)}>
-                                전체 종목 보기 ({MOCK_STOCKS.length}개) →
+                                전체 종목 보기 ({detailStocks.length}개) →
                             </button>
                         )}
+
                         <div className={styles.tpBottomBtns}>
                             <button className={styles.tpSecBtn} onClick={() => setThemePanel(null)}>닫기</button>
                             <button className={styles.tpPriBtn} onClick={handleDetailCart}>
@@ -571,34 +962,45 @@ const InvestmentInformation = () => {
 
             {divPanel && (
                 <div className={styles.themeOverlay} onClick={() => setDivPanel(null)}>
-                    <div className={styles.themeDetailPanel} onClick={e => e.stopPropagation()}>
+                    <div className={styles.themeDetailPanel} onClick={(event) => event.stopPropagation()}>
                         <div className={styles.tpHeader}>
                             <div className={styles.tpTitleRow}>
                                 <span className={styles.tpTitle}>{divPanel.title}</span>
                                 <span className={styles.tpBadgePos}>배당 TOP {divPanel.list.length}</span>
                             </div>
+
                             <button className={styles.tpClose} onClick={() => setDivPanel(null)}>✕</button>
                         </div>
+
                         <div className={styles.tpSortTabs}>
-                            {DIV_SORTS.map(s => (
-                                <button key={s}
-                                        className={`${styles.tpSortTab} ${divSort === s ? styles.tpSortTabOn : ''}`}
-                                        onClick={() => setDivSort(s)}>{s}</button>
+                            {DIV_SORTS.map((sortName) => (
+                                <button
+                                    key={sortName}
+                                    className={`${styles.tpSortTab} ${divSort === sortName ? styles.tpSortTabOn : ''}`}
+                                    onClick={() => setDivSort(sortName)}
+                                >
+                                    {sortName}
+                                </button>
                             ))}
                         </div>
+
                         <div className={styles.tpStockList}>
                             {divPanel.list.map((item) => (
-                                <div key={item.id}
-                                     className={`${styles.tpDivRow} ${divSelected.includes(item.id) ? styles.tpStockRowOn : ''}`}
-                                     onClick={() => toggleDivSelect(item.id)}>
+                                <div
+                                    key={item.id}
+                                    className={`${styles.tpDivRow} ${divSelected.includes(item.id) ? styles.tpStockRowOn : ''}`}
+                                    onClick={() => toggleDivSelect(item.id)}
+                                >
                                     <div
                                         className={`${styles.tpCheckbox} ${divSelected.includes(item.id) ? styles.tpCheckboxOn : ''}`}>
                                         {divSelected.includes(item.id) && <span>✓</span>}
                                     </div>
+
                                     <div className={styles.tpDivInfo}>
                                         <div className={styles.tpSName}>{item.name}</div>
                                         <div className={styles.tpSPrice}>현재가 {item.price} · {item.freq}</div>
                                     </div>
+
                                     <div className={styles.tpDivRight}>
                                         <div className={styles.tpDivYield}>{item.yield}</div>
                                         <div className={styles.tpDivLabel}>배당수익률</div>
@@ -606,6 +1008,7 @@ const InvestmentInformation = () => {
                                 </div>
                             ))}
                         </div>
+
                         <div className={styles.tpBottomBtns}>
                             <button className={styles.tpSecBtn} onClick={() => setDivPanel(null)}>닫기</button>
                             <button className={styles.tpPriBtn} onClick={handleDivCart}>

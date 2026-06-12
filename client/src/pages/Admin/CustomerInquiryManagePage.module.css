@@ -269,6 +269,7 @@
     color: var(--color-text-sub);
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .actionBtn:hover:not(:disabled) {

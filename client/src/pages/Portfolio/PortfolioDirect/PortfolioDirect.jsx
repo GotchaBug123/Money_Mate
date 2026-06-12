@@ -1,13 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './PortfolioDirect.module.css';
-
-const LOGO_MAP = {
-    '005930': 'samsung.com', '000660': 'skhynix.com', 'NVDA': 'nvidia.com',
-    'AAPL': 'apple.com', '360750': 'tigeretf.com', '005380': 'hyundai.com',
-    '373220': 'lgensol.com', '035720': 'kakao.com', 'TSM': 'tsmc.com',
-    'MU': 'micron.com', 'MSFT': 'microsoft.com', 'TSLA': 'tesla.com',
-};
+import StockLogo from '../../../components/common/StockLogo.jsx';
 
 const STOCK_LIST = [
     {id: 1, name: '삼성전자', ticker: '005930', market: '국내', price: '78,400원', chg: '+2.61%', pos: true},
@@ -32,30 +26,6 @@ const searchStocks = (query) => {
     );
 };
 
-// 💡 뱃지의 다양성을 위한 컬러 팔레트 유지
-const BADGE_COLORS = ['#E8F0FE', '#EDFAF4', '#FFF0EE', '#FAEEDA', '#F0F4FF', '#FEF0F8', '#EEF8FF', '#F5F0FF'];
-const BADGE_TEXT = ['#1B5ED9', '#1A7A45', '#C0392B', '#B47D0C', '#2E5CD9', '#C03980', '#0C7CD9', '#7B3FA0'];
-
-const getBadge = (ticker) => {
-    const idx = ticker.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % BADGE_COLORS.length;
-    return {bg: BADGE_COLORS[idx], color: BADGE_TEXT[idx]};
-};
-
-const StockLogo = ({ticker, name}) => {
-    const [failed, setFailed] = useState(false);
-    const domain = LOGO_MAP[ticker];
-    const badge = getBadge(ticker);
-
-    if (!domain || failed) return (
-        <div className={styles.logoBadge} style={{background: badge.bg, color: badge.color}}>
-            {name.charAt(0)}
-        </div>
-    );
-
-    return <img className={styles.logoImg} src={`https://logo.clearbit.com/${domain}`}
-                alt={name} onError={() => setFailed(true)}/>;
-};
-
 const PortfolioDirect = () => {
     const navigate = useNavigate();
 
@@ -77,6 +47,10 @@ const PortfolioDirect = () => {
     const [pendingAction, setPendingAction] = useState(null);
 
     const handleSearch = () => setSearchResults(searchStocks(searchQuery));
+
+    useEffect(() => {
+        setSearchResults(searchQuery.trim() ? searchStocks(searchQuery) : []);
+    }, [searchQuery]);
 
     const handleAdd = (stock) => {
         if (cart.find(s => s.ticker === stock.ticker)) {
@@ -156,9 +130,23 @@ const PortfolioDirect = () => {
         setShowNameModal(false);
         navigate('/portfolio/result', {
             state: {
-                stocks: cart.map(s => ({name: s.name, ticker: s.ticker, weight: s.weight})),
-                investAmount, currency, addPeriod, addAmount,
-                startDate, endDate, goalAmount, portfolioName, isDirect: true,
+                stocks: cart.map(s => ({
+                    name: s.name,
+                    ticker: s.ticker,
+                    weight: s.weight,
+                    category: s.market,
+                    annualVolatility: 0,
+                })),
+                investAmount,
+                currency,
+                addPeriod,
+                addAmount,
+                startDate,
+                endDate,
+                goalAmount,
+                rebalanceCycle: 'QUARTERLY',
+                portfolioName,
+                isDirect: true,
             },
         });
     };
@@ -192,20 +180,20 @@ const PortfolioDirect = () => {
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>투자 금액</label>
+                            <label className={styles.inputLabel}>투자 금액 (만원)</label>
                             <div className={styles.fieldRow}>
                                 <select className={styles.sel} value={currency}
                                         onChange={e => setCurrency(e.target.value)}>
                                     <option>원화</option>
                                     <option>달러</option>
                                 </select>
-                                <input className={styles.textInput} type="number" placeholder="금액 입력"
+                                <input className={styles.textInput} type="number" placeholder="예: 500"
                                        value={investAmount} onChange={e => setInvestAmount(e.target.value)}/>
                             </div>
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>추가 납입금액</label>
+                            <label className={styles.inputLabel}>추가 납입금액 (만원)</label>
                             <div className={styles.fieldRow}>
                                 <select className={styles.sel} value={addPeriod} onChange={e => {
                                     setAddPeriod(e.target.value);
@@ -218,7 +206,7 @@ const PortfolioDirect = () => {
                                 </select>
                                 <input
                                     className={addPeriod === '없음' ? styles.disabledInput : styles.textInput}
-                                    type="number" placeholder="금액 입력"
+                                    type="number" placeholder="예: 10"
                                     value={addAmount} onChange={e => setAddAmount(e.target.value)}
                                     disabled={addPeriod === '없음'}
                                 />
@@ -237,8 +225,8 @@ const PortfolioDirect = () => {
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label className={styles.inputLabel}>목표 금액</label>
-                            <input className={styles.textInput} type="number" placeholder="목표 금액 입력"
+                            <label className={styles.inputLabel}>목표 금액 (만원)</label>
+                            <input className={styles.textInput} type="number" placeholder="예: 1000"
                                    value={goalAmount} onChange={e => setGoalAmount(e.target.value)}/>
                         </div>
 

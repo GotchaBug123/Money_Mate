@@ -1,192 +1,364 @@
-/* src/pages/AssetDetail.module.css */
-
-/* 전체 레이아웃 */
 .pageWrapper {
     min-height: calc(100vh - 60px);
     background: var(--color-bg-page);
     display: flex;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 40px 24px 80px;
 }
 
 .container {
     width: 100%;
-    max-width: 900px; /* 💡 이 화면은 900px이 가독성에 딱 좋습니다. */
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-/* 상단 뒤로가기 링크 */
+.pageTop {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
 .backLink {
     align-self: flex-start;
-    padding: 10px 20px;
+    padding: 12px 20px;
     background: var(--color-bg-card);
-    color: var(--color-text-sub);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 900;
     text-decoration: none;
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
 }
 
 .backLink:hover {
-    background: var(--color-bg-input);
-    color: var(--color-text-main);
+    background: var(--color-primary);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-/* 상단 수익률 카드 */
+.pageBadge {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+    text-align: right;
+}
+
+.pageTitle {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-align: right;
+}
+
+.pageDesc {
+    margin: 8px 0 0;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    font-weight: 800;
+    text-align: right;
+}
+
 .topCard {
     background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 24px 32px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 30px 34px;
     box-shadow: var(--shadow-card);
-    display: flex;
-    justify-content: flex-start;
-    gap: 60px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    gap: 22px;
+    align-items: stretch;
 }
 
 .returnItem {
+    min-height: 120px;
+    padding: 22px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-}
-
-.returnMonth {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--color-primary);
-    background: var(--color-primary-light);
-    padding: 4px 10px;
+    justify-content: center;
+    gap: 10px;
     border-radius: var(--radius-xl);
-    align-self: flex-start;
-    margin-bottom: 4px;
+    background: var(--color-bg-input);
 }
 
 .returnLabel {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 900;
     color: var(--color-text-muted);
 }
 
 .returnValue {
-    font-size: 24px;
-    font-weight: 800;
+    font-size: 38px;
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
 .pos {
-    color: var(--color-success);
+    color: var(--color-text-main);
 }
 
 .neg {
     color: var(--color-error);
 }
 
-/* 차트 영역 (점선 플레이스홀더 디자인) */
-.chartCard {
-    background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    min-height: 240px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text-light);
-    border: 2px dashed var(--color-border);
+.returnDateInput {
+    width: 172px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 16px;
+    font-weight: 900;
+    outline: none;
+    cursor: pointer;
 }
 
-/* 하단 종목 리스트 2분할 */
+.returnDateInput:focus {
+    box-shadow: 0 0 0 4px rgba(27, 94, 217, 0.14);
+}
+
+.chartCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 34px;
+    min-height: 320px;
+    box-shadow: var(--shadow-card);
+}
+
+.chartHeader {
+    margin-bottom: 26px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.chartHeader h3 {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.chartHeader strong {
+    padding: 9px 16px;
+    border-radius: var(--radius-xl);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.chartBadge {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.barChart {
+    height: 220px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 18px;
+    align-items: end;
+}
+
+.barItem {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 22px 1fr 24px;
+    gap: 8px;
+    text-align: center;
+}
+
+.barItem span {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.barItem div {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
+    overflow: hidden;
+}
+
+.barItem b {
+    width: 100%;
+    display: block;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--color-primary);
+}
+
+.barItem b.minusBar {
+    background: var(--color-error);
+}
+
+.barItem em {
+    color: var(--color-text-main);
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 900;
+}
+
 .listSection {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    gap: 26px;
 }
 
 .listColumn {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
 }
 
 .listBox {
     background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 24px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 30px;
     box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-height: 280px;
+    gap: 14px;
+    min-height: 320px;
+}
+
+.listHeader {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.listHeader span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.listHeader strong {
+    padding: 8px 12px;
+    border-radius: var(--radius-xl);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    font-size: 13px;
+    font-weight: 900;
 }
 
 .listTitle {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 24px;
+    font-weight: 900;
     color: var(--color-text-main);
-    margin: 0 0 8px 0;
+    margin: 0;
 }
 
 .listItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
+    gap: 18px;
+    padding: 18px 20px;
     background: var(--color-bg-input);
-    border-radius: var(--radius-md);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
 }
 
 .listItem:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+.stockInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.stockAvatar {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    font-size: 16px;
+    font-weight: 900;
 }
 
 .itemName {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 900;
     color: var(--color-text-main);
+    white-space: nowrap;
 }
 
 .itemRight {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
 }
 
 .itemQuantity {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--color-text-muted);
-    font-weight: 500;
+    font-weight: 800;
+    white-space: nowrap;
 }
 
 .itemReturn {
-    font-size: 14px;
-    font-weight: 800;
-    min-width: 50px;
+    font-size: 16px;
+    font-weight: 900;
+    min-width: 62px;
     text-align: right;
 }
 
-/* 버튼 그룹 */
 .btnGroup {
     display: flex;
-    gap: 12px;
+    gap: 14px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    flex: 1;
+    height: 58px;
+    border-radius: var(--radius-lg);
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
 }
 
 .primaryBtn {
-    flex: 1;
-    padding: 14px 0;
     background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    color: #ffffff;
+    border: 0;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.2);
 }
 
 .primaryBtn:hover {
@@ -195,33 +367,25 @@
 }
 
 .secondaryBtn {
-    flex: 1;
-    padding: 14px 0;
     background: var(--color-bg-card);
     color: var(--color-primary);
-    border: 1.5px solid var(--color-primary);
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease;
+    border: 2px solid var(--color-primary);
 }
 
 .secondaryBtn:hover {
     background: var(--color-primary-light);
+    transform: translateY(-1px);
 }
 
-/* -------------------------------------
- * 모달 (팝업) 스타일
- * ------------------------------------- */
 .modalOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(17, 17, 17, 0.42);
     z-index: 999;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 24px;
 }
 
 .modalContent {
@@ -229,8 +393,8 @@
     border-radius: var(--radius-xl);
     padding: 32px;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    max-width: 420px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.16);
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -243,41 +407,41 @@
 }
 
 .modalTitle {
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 22px;
+    font-weight: 900;
     color: var(--color-text-main);
     margin: 0;
 }
 
 .modalCloseBtn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: var(--color-text-light);
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--color-primary);
+    font-size: 18px;
+    font-weight: 900;
     cursor: pointer;
-    transition: color 0.2s;
 }
 
 .modalCloseBtn:hover {
-    color: var(--color-text-sub);
+    background: var(--color-primary-hover);
 }
 
 .searchPlaceholderBtn {
-    padding: 24px;
+    padding: 28px;
     background: var(--color-bg-input);
     border: 2px dashed var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
     font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text-muted);
+    font-weight: 900;
+    color: var(--color-primary);
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .searchPlaceholderBtn:hover {
     background: var(--color-primary-light);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
 }
 
 .modalBottomRow {
@@ -286,7 +450,7 @@
     align-items: center;
     background: var(--color-bg-input);
     padding: 16px;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
 }
 
 .qtyControl {
@@ -296,40 +460,96 @@
 }
 
 .qtyInput {
-    width: 60px;
-    padding: 8px 12px;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    width: 70px;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
     text-align: right;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 900;
     color: var(--color-text-main);
     outline: none;
-    transition: border-color 0.2s;
 }
 
 .qtyInput:focus {
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(27, 94, 217, 0.14);
 }
 
 .unitText {
     font-size: 14px;
-    font-weight: 700;
-    color: var(--color-text-sub);
+    font-weight: 900;
+    color: var(--color-text-muted);
 }
 
 .buyBtn {
-    padding: 12px 24px;
+    height: 44px;
+    padding: 0 22px;
     background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
+    color: #ffffff;
+    border: 0;
+    border-radius: var(--radius-md);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 900;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
 .buyBtn:hover {
     background: var(--color-primary-hover);
+}
+
+@media (max-width: 900px) {
+    .pageTop {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .pageBadge,
+    .pageTitle,
+    .pageDesc {
+        text-align: left;
+    }
+
+    .topCard {
+        grid-template-columns: 1fr;
+    }
+
+    .listSection {
+        grid-template-columns: 1fr;
+    }
+
+    .barChart {
+        gap: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .chartCard,
+    .listBox,
+    .topCard {
+        padding: 24px 18px;
+    }
+
+    .returnValue {
+        font-size: 32px;
+    }
+
+    .btnGroup {
+        flex-direction: column;
+    }
+
+    .listItem {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .itemRight {
+        width: 100%;
+        justify-content: space-between;
+    }
 }

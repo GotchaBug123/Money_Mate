@@ -155,10 +155,17 @@
                             82,500원
                         </strong>
 
-                        <span class="holding-count"
-                              th:text="'보유 ' + ${holding.quantity} + '주'">
-                            보유 3주
-                        </span>
+                        <div class="mi-qty-ctrl"
+                             th:id="'qty-ctrl-' + ${holding.holdingId}">
+                            <button class="mi-qty-btn"
+                                    th:onclick="'updateHoldingQty(' + ${holding.holdingId} + ', ' + ${holding.quantity - 1} + ')'">-</button>
+                            <span class="mi-qty-num"
+                                  th:id="'qty-' + ${holding.holdingId}"
+                                  th:text="${holding.quantity}">1</span>
+                            <button class="mi-qty-btn"
+                                    th:onclick="'updateHoldingQty(' + ${holding.holdingId} + ', ' + ${holding.quantity + 1} + ')'">+</button>
+                            <span style="margin-left:4px;font-size:13px;color:#155eef;font-weight:700;">주</span>
+                        </div>
 
                     </div>
 
@@ -239,5 +246,6 @@
     <p>MoneyMate © 2026 All Rights Reserved.</p>
 </footer>
 
+<script th:src="@{/js/my-asset.js}"></script>
 </body>
 </html>

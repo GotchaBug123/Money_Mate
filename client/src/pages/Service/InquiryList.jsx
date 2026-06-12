@@ -1,28 +1,60 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useInquiryStore} from '../../store/useInquiryStore';
+import {getMyInquiryList} from '../../api/customerServiceApi';
 import styles from './InquiryList.module.css';
 
 function InquiryList() {
     const navigate = useNavigate();
+    const inquiries = useInquiryStore((state) => state.inquiries);
+    const setInquiries = useInquiryStore((state) => state.setInquiries);
+    const [selectedInquiry, setSelectedInquiry] = useState(null);
 
-    // 💡 백엔드 연동 전 임시 테스트용 데이터
-    const [inquiries] = useState([
-        {id: 2, type: '서비스 이용 문의', title: '포트폴리오 비중 조정은 어떻게 하나요?', date: '2026-05-25', status: '답변완료'},
-        {id: 1, type: '오류 신고', title: '재무 진단 페이지 접속 시 에러가 납니다.', date: '2026-05-24', status: '답변대기'}
-    ]);
+    useEffect(() => {
+        getMyInquiryList()
+            .then((data) => setInquiries(data))
+            .catch((err) => console.error('문의 내역 불러오기 실패:', err));
+    }, []);
 
-    // 문의 현황 카운트 계산
+    const getInquiryStatus = (inquiry) => {
+        const status = inquiry.status ?? inquiry.answerStatus ?? inquiry.state;
+
+        if (status === 'ANSWERED' || status === 'COMPLETED' || status === '답변완료' || status === '답변 완료') {
+            return '답변완료';
+        }
+
+        if (status === 'WAITING' || status === 'PENDING' || status === '대기' || status === '답변대기' || status === '답변 대기') {
+            return '답변대기';
+        }
+
+        return status || '답변대기';
+    };
+
+    const getInquiryType = (inquiry) => inquiry.type ?? inquiry.category ?? inquiry.categoryName ?? '기타';
+    const getInquiryTitle = (inquiry) => inquiry.title ?? inquiry.subject ?? '-';
+    const getInquiryDate = (inquiry) => {
+        const date = inquiry.date ?? inquiry.createdAt ?? inquiry.createdDate ?? inquiry.regDate;
+        if (!date) return '-';
+        return String(date).slice(0, 10);
+    };
+
     const totalCount = inquiries.length;
-    const pendingCount = inquiries.filter(item => item.status === '답변대기').length;
-    const completedCount = inquiries.filter(item => item.status === '답변완료').length;
+    const pendingCount = inquiries.filter((item) => getInquiryStatus(item) === '답변대기').length;
+    const completedCount = inquiries.filter((item) => getInquiryStatus(item) === '답변완료').length;
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.container}>
 
-                <h2 className={styles.title}>나의 문의 내역</h2>
+                <section className={styles.heroSection}>
+                    <h1 className={styles.title}>나의 문의 내역</h1>
+                    <p className={styles.subtitle}>내가 남긴 문의와 답변 상태를 한눈에 확인할 수 있습니다.</p>
+                    <div className={styles.heroButtons}>
+                        <button type="button" onClick={() => navigate('/customer-service')}>고객센터 홈</button>
+                        <button type="button" onClick={() => navigate('/inquiry-write')}>새 문의 작성</button>
+                    </div>
+                </section>
 
-                {/* 상단: 나의 문의 현황 요약 카드 */}
                 <div className={styles.summaryCard}>
                     <div className={styles.statItem}>
                         <span className={styles.statLabel}>전체 문의</span>
@@ -38,9 +70,11 @@ function InquiryList() {
                     </div>
                 </div>
 
-                {/* 메인: 문의 내역 테이블 영역 */}
                 <div className={styles.listCard}>
-                    <h3 className={styles.listTitle}>문의 목록</h3>
+                    <div className={styles.listHeader}>
+                        <h3 className={styles.listTitle}>문의 목록</h3>
+                        <p>문의 제목을 클릭하면 상세 내용을 확인할 수 있습니다.</p>
+                    </div>
 
                     <div className={styles.tableWrap}>
                         <table className={styles.table}>
@@ -55,24 +89,34 @@ function InquiryList() {
                             </thead>
                             <tbody>
                             {inquiries.length > 0 ? (
-                                inquiries.map((inquiry, index) => (
-                                    <tr key={inquiry.id}>
-                                        <td className={styles.td}
-                                            style={{textAlign: 'center'}}>{inquiries.length - index}</td>
-                                        <td className={styles.td} style={{textAlign: 'center'}}>{inquiry.type}</td>
-                                        <td className={`${styles.td} ${styles.tdTitle}`}>
-                                            {inquiry.title}
-                                        </td>
-                                        <td className={styles.td} style={{textAlign: 'center'}}>{inquiry.date}</td>
-                                        <td className={styles.td} style={{textAlign: 'center'}}>
-                                            {/* 💡 조건부 클래스로 상태별 배지(Badge) 적용 */}
-                                            <span
-                                                className={`${styles.statusBadge} ${inquiry.status === '답변완료' ? styles.statusCompleted : styles.statusPending}`}>
-                                                {inquiry.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
+                                inquiries.map((inquiry, index) => {
+                                    const status = getInquiryStatus(inquiry);
+                                    return (
+                                        <tr key={inquiry.inquiryNo ?? inquiry.id ?? index}>
+                                            <td className={styles.td} style={{textAlign: 'center'}}>
+                                                {inquiries.length - index}
+                                            </td>
+                                            <td className={styles.td} style={{textAlign: 'center'}}>
+                                                <span className={styles.typeBadge}>{getInquiryType(inquiry)}</span>
+                                            </td>
+                                            <td
+                                                className={`${styles.td} ${styles.tdTitle}`}
+                                                style={{cursor: 'pointer'}}
+                                                onClick={() => setSelectedInquiry(inquiry)}
+                                            >
+                                                {getInquiryTitle(inquiry)}
+                                            </td>
+                                            <td className={styles.td} style={{textAlign: 'center'}}>
+                                                {getInquiryDate(inquiry)}
+                                            </td>
+                                            <td className={styles.td} style={{textAlign: 'center'}}>
+                                                <span className={`${styles.statusBadge} ${status === '답변완료' ? styles.statusCompleted : styles.statusPending}`}>
+                                                    {status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan="5" className={`${styles.td} ${styles.emptyRow}`}>
@@ -84,21 +128,95 @@ function InquiryList() {
                         </table>
                     </div>
 
-                    {/* 하단: 페이지네이션 및 새 문의 작성 버튼 */}
                     <div className={styles.footer}>
-                        <button className={styles.pagination}>
-                            &lt; 1 &gt;
-                        </button>
-
-                        <button
-                            onClick={() => navigate('/inquiry-write')}
-                            className={styles.writeBtn}
-                        >
+                        <button className={styles.pagination}>&lt; 1 &gt;</button>
+                        <button onClick={() => navigate('/inquiry-write')} className={styles.writeBtn}>
                             새 문의 작성
                         </button>
                     </div>
                 </div>
             </div>
+
+            {selectedInquiry && (
+                <div
+                    style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    }}
+                    onClick={() => setSelectedInquiry(null)}
+                >
+                    <div
+                        style={{
+                            background: 'var(--color-bg-card)', borderRadius: 'var(--radius-xl)',
+                            padding: '32px', width: '560px', maxWidth: '90vw', maxHeight: '80vh',
+                            overflowY: 'auto', boxShadow: 'var(--shadow-hover)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+                            <h3 style={{fontSize: '18px', fontWeight: 800, color: 'var(--color-text-main)', margin: 0}}>
+                                문의 상세
+                            </h3>
+                            <button
+                                onClick={() => setSelectedInquiry(null)}
+                                style={{background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--color-text-light)'}}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                            <span className={styles.typeBadge}>{getInquiryType(selectedInquiry)}</span>
+                            <span className={`${styles.statusBadge} ${getInquiryStatus(selectedInquiry) === '답변완료' ? styles.statusCompleted : styles.statusPending}`}>
+                                {getInquiryStatus(selectedInquiry)}
+                            </span>
+                        </div>
+
+                        <div style={{marginBottom: '8px', fontSize: '13px', color: 'var(--color-text-muted)'}}>
+                            {getInquiryDate(selectedInquiry)}
+                        </div>
+
+                        <h4 style={{fontSize: '16px', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '12px'}}>
+                            {getInquiryTitle(selectedInquiry)}
+                        </h4>
+
+                        <div style={{
+                            padding: '16px', background: 'var(--color-bg-page)',
+                            borderRadius: 'var(--radius-md)', fontSize: '14px',
+                            color: 'var(--color-text-sub)', lineHeight: 1.6,
+                            whiteSpace: 'pre-wrap', marginBottom: '20px'
+                        }}>
+                            {selectedInquiry.content || '내용 없음'}
+                        </div>
+
+                        {selectedInquiry.answer && (
+                            <div>
+                                <h4 style={{fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '8px'}}>
+                                    관리자 답변
+                                </h4>
+                                <div style={{
+                                    padding: '16px', background: 'var(--color-primary-light)',
+                                    borderRadius: 'var(--radius-md)', fontSize: '14px',
+                                    color: 'var(--color-text-sub)', lineHeight: 1.6,
+                                    whiteSpace: 'pre-wrap', borderLeft: '3px solid var(--color-primary)'
+                                }}>
+                                    {selectedInquiry.answer}
+                                </div>
+                            </div>
+                        )}
+
+                        {!selectedInquiry.answer && (
+                            <div style={{
+                                padding: '16px', background: 'var(--color-bg-page)',
+                                borderRadius: 'var(--radius-md)', fontSize: '14px',
+                                color: 'var(--color-text-muted)', textAlign: 'center'
+                            }}>
+                                아직 답변이 등록되지 않았습니다.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

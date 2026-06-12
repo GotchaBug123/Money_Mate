@@ -1,133 +1,72 @@
 package com.gotchabug.moneymate.customer.controller;
 
 import com.gotchabug.moneymate.customer.dto.CustomerInquiryRequest;
-import com.gotchabug.moneymate.member.entity.Member;
 import com.gotchabug.moneymate.customer.service.CustomerCenterService;
+import org.springframework.web.server.ResponseStatusException;
+import com.gotchabug.moneymate.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "고객센터", description = "고객센터 화면 조회 및 문의 등록 API")
-@Controller
+@RestController
+@RequestMapping("/api/customer-center")
 @RequiredArgsConstructor
+@Tag(name = "고객센터", description = "고객센터 FAQ 및 문의 API")
 public class CustomerCenterController {
 
     private final CustomerCenterService customerCenterService;
 
-    @Operation(
-            summary = "고객센터 화면 조회",
-            description = "로그인한 사용자의 고객센터 화면을 조회합니다. FAQ, 문의 카테고리, 내 문의 목록을 함께 제공합니다."
-    )
-    @GetMapping("/customer-center")
-    public String customerCenter(
-            @Parameter(hidden = true)
-            HttpSession session,
+    @Operation(summary = "고객센터 메인 데이터 조회")
+    @GetMapping
+    public ResponseEntity<?> getCustomerCenter(HttpSession session) {
+        Member loginUser = getLoginUser(session);
 
-            @Parameter(hidden = true)
-            Model model
-    ) {
-
-        Member loginUser =
-                (Member) session.getAttribute("loginUser");
-
-        if (loginUser == null) {
-            return "redirect:/login";
-        }
-
-        model.addAttribute(
-                "member",
-                loginUser
+        return ResponseEntity.ok(
+                CustomerCenterResponse.builder()
+                        .member(loginUser)
+                        .faqs(customerCenterService.getTopFaqs())
+                        .categories(customerCenterService.getCategories())
+                        .inquiries(customerCenterService.getMyInquiries(loginUser.getMemberId()))
+                        .build()
         );
-
-        model.addAttribute(
-                "faqs",
-                customerCenterService.getTopFaqs()
-        );
-
-        model.addAttribute(
-                "categories",
-                customerCenterService.getCategories()
-        );
-
-        model.addAttribute(
-                "inquiries",
-                customerCenterService.getMyInquiries(
-                        loginUser.getMemberId()
-                )
-        );
-
-        model.addAttribute(
-                "inquiryRequest",
-                new CustomerInquiryRequest()
-        );
-
-        return "customer-center";
     }
 
-    @Operation(
-            summary = "고객 문의 등록",
-            description = "로그인한 사용자가 고객센터 문의를 등록합니다. 입력값 검증 실패 시 고객센터 화면으로 다시 이동합니다."
-    )
-    @PostMapping("/customer-center/inquiry")
-    public String createInquiry(
+    @Operation(summary = "FAQ 목록 조회")
+    @GetMapping("/faqs")
+    public ResponseEntity<?> getFaqs() {
+        return ResponseEntity.ok(customerCenterService.getTopFaqs());
+    }
 
-            @Parameter(description = "고객 문의 등록 요청 데이터")
-            @Valid
-            @ModelAttribute("inquiryRequest")
-            CustomerInquiryRequest request,
+    @Operation(summary = "문의 카테고리 조회")
+    @GetMapping("/categories")
+    public ResponseEntity<?> getCategories() {
+        return ResponseEntity.ok(customerCenterService.getCategories());
+    }
 
-            @Parameter(hidden = true)
-            BindingResult bindingResult,
+    @Operation(summary = "내 문의 목록 조회")
+    @GetMapping("/inquiries/me")
+    public ResponseEntity<?> getMyInquiries(HttpSession session) {
+        Member loginUser = getLoginUser(session);
 
-            @Parameter(hidden = true)
-            HttpSession session,
+        return ResponseEntity.ok(
+                customerCenterService.getMyInquiries(loginUser.getMemberId())
+        );
+    }
 
-            @Parameter(hidden = true)
-            Model model
+    @Operation(summary = "고객 문의 등록")
+    @PostMapping("/inquiries")
+    public ResponseEntity<?> createInquiry(
+            @Valid @RequestBody CustomerInquiryRequest request,
+            HttpSession session
     ) {
-
-        Member loginUser =
-                (Member) session.getAttribute("loginUser");
-
-        if (loginUser == null) {
-            return "redirect:/login";
-        }
-
-        if (bindingResult.hasErrors()) {
-
-            model.addAttribute(
-                    "member",
-                    loginUser
-            );
-
-            model.addAttribute(
-                    "faqs",
-                    customerCenterService.getTopFaqs()
-            );
-
-            model.addAttribute(
-                    "categories",
-                    customerCenterService.getCategories()
-            );
-
-            model.addAttribute(
-                    "inquiries",
-                    customerCenterService.getMyInquiries(
-                            loginUser.getMemberId()
-                    )
-            );
-
-            return "customer-center";
-        }
+        Member loginUser = getLoginUser(session);
 
         customerCenterService.createInquiry(
                 loginUser,
@@ -136,6 +75,42 @@ public class CustomerCenterController {
                 request.getContent()
         );
 
-        return "redirect:/customer-center?success";
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiMessage.of("문의가 등록되었습니다."));
+    }
+
+    private Member getLoginUser(HttpSession session) {
+        Object loginUser = session.getAttribute("loginUser");
+
+        if (!(loginUser instanceof Member member)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "로그인이 필요합니다."
+            );
+        }
+
+        return member;
+    }
+
+    @Getter
+    @Builder
+    public static class CustomerCenterResponse {
+        private Member member;
+        private Object faqs;
+        private Object categories;
+        private Object inquiries;
+    }
+
+    @Getter
+    @Builder
+    public static class ApiMessage {
+        private String message;
+
+        public static ApiMessage of(String message) {
+            return ApiMessage.builder()
+                    .message(message)
+                    .build();
+        }
     }
 }

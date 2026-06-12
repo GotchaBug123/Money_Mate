@@ -46,6 +46,18 @@ public class FinancialProfile {
     @Column(name = "investable_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal investableAmount = BigDecimal.ZERO;
 
+    @Column(name = "net_asset", nullable = false, precision = 15, scale = 2)
+    private BigDecimal netAsset = BigDecimal.ZERO;
+
+    @Column(name = "total_expense", nullable = false, precision = 15, scale = 2)
+    private BigDecimal totalExpense = BigDecimal.ZERO;
+
+    @Column(name = "expense_ratio", nullable = false, precision = 5, scale = 2)
+    private BigDecimal expenseRatio = BigDecimal.ZERO;
+
+    @Column(name = "saving_ratio", nullable = false, precision = 5, scale = 2)
+    private BigDecimal savingRatio = BigDecimal.ZERO;
+
     @Column(name = "diagnosis_grade", length = 20)
     private String diagnosisGrade;
 
@@ -88,12 +100,24 @@ public class FinancialProfile {
         this.totalLiability = totalLiability;
         this.cashAsset = cashAsset;
 
-        /*
-        투자 가능 금액 계산
-         */
+        this.totalExpense = this.monthlyFixedExpense
+                .add(this.monthlyVariableExpense);
+
         this.investableAmount = this.monthlyIncome
-                .subtract(this.monthlyFixedExpense)
-                .subtract(this.monthlyVariableExpense);
+                .subtract(this.totalExpense);
+
+        this.netAsset = this.totalAsset
+                .subtract(this.totalLiability);
+
+        this.expenseRatio = calculatePercent(
+                this.totalExpense,
+                this.monthlyIncome
+        );
+
+        this.savingRatio = calculatePercent(
+                this.investableAmount,
+                this.monthlyIncome
+        );
     }
 
     /*
@@ -122,5 +146,19 @@ public class FinancialProfile {
     protected void onUpdate() {
 
         this.updatedAt = LocalDateTime.now();
+    }
+
+    private BigDecimal calculatePercent(
+            BigDecimal numerator,
+            BigDecimal denominator
+    ) {
+
+        if (denominator == null || denominator.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return numerator
+                .multiply(BigDecimal.valueOf(100))
+                .divide(denominator, 2, java.math.RoundingMode.HALF_UP);
     }
 }

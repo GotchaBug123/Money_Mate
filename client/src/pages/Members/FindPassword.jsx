@@ -1,106 +1,148 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import styles from './FindPassword.module.css';
+import {resetPasswordApi} from "../../api/authApi.js";
 
 function FindPassword() {
     const navigate = useNavigate();
-    const [id, setId] = useState('');
-    const [phone, setPhone] = useState('');
-    const [code, setCode] = useState('');
+    const [formData, setFormData] = useState({
+        loginId: '',
+        email: '',
+        newPassword: '',
+        newPasswordConfirm: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
 
-    // 인증 완료 여부 상태
-    const [isVerified, setIsVerified] = useState(false);
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}[\]:;"'<>,.?/\\]).{8,}$/;
+    const isPasswordValid = passwordRegex.test(formData.newPassword);
 
-    // 인증 확인 로직 (테스트 번호: 123456)
-    const handleVerify = () => {
-        if (!id || !phone || !code) {
-            alert('아이디, 전화번호, 인증번호를 모두 입력해 주세요.');
-            return;
-        }
-
-        if (code === '123456') {
-            setIsVerified(true);
-            alert('인증이 완료되었습니다.\n[다음] 버튼을 눌러 비밀번호를 재설정해 주세요.');
-        } else {
-            setIsVerified(false);
-            alert('인증번호가 일치하지 않습니다.\n(테스트용 인증번호: 123456)');
-        }
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
-    // 다음 페이지 이동 로직
-    const handleNext = () => {
-        if (!isVerified) {
-            alert('먼저 휴대폰 인증을 완료해 주세요.');
-            return;
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+
+        if (!formData.loginId || !formData.email || !formData.newPassword || !formData.newPasswordConfirm) {
+            return alert('모든 항목을 입력해 주세요.');
         }
-        // 인증이 완료되면 다음 화면으로 넘어갑니다. (이때 누구의 비밀번호를 바꿀지 id를 같이 넘겨줍니다)
-        navigate('/reset-pw', {state: {userId: id}});
+        if (!isPasswordValid) {
+            return alert('비밀번호 형식을 확인해 주세요.');
+        }
+        if (formData.newPassword !== formData.newPasswordConfirm) {
+            return alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        }
+
+        setIsLoading(true);
+        try {
+            // API 호출
+            await resetPasswordApi(
+                formData.loginId,
+                formData.email,
+                formData.newPassword,
+                formData.newPasswordConfirm
+            );
+
+            alert('비밀번호가 성공적으로 재설정되었습니다.\n새로운 비밀번호로 로그인해 주세요!');
+            navigate('/login');
+        } catch (error) {
+            console.error('비밀번호 재설정 실패:', error);
+            const errorMsg = error.response?.data?.message || '입력하신 아이디 또는 이메일과 일치하는 계정을 찾을 수 없습니다.';
+            alert(errorMsg);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.card}>
-                <h2 className={styles.title}>비밀번호 찾기</h2>
+                <h2 className={styles.title}>비밀번호 재설정</h2>
+                <p style={{textAlign: 'center', marginBottom: '24px', color: 'var(--color-text-muted)'}}>
+                    가입하신 아이디와 이메일을 확인한 후, 새로운 비밀번호로 변경합니다.
+                </p>
 
-                <div className={styles.form}>
+                <form onSubmit={handleResetPassword} className={styles.form}>
                     {/* 아이디 입력 */}
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>아이디</label>
                         <input
                             type="text"
-                            value={id}
-                            onChange={(e) => setId(e.target.value)}
-                            placeholder="아이디 입력"
+                            name="loginId"
+                            value={formData.loginId}
+                            onChange={handleChange}
+                            placeholder="가입 시 등록한 아이디"
                             className={styles.input}
-                            disabled={isVerified}
                         />
                     </div>
 
-                    {/* 전화번호 입력 */}
+                    {/* 이메일 입력 */}
                     <div className={styles.inputGroup}>
-                        <label className={styles.label}>전화번호</label>
+                        <label className={styles.label}>이메일</label>
                         <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="010-0000-0000"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="example@email.com"
                             className={styles.input}
-                            disabled={isVerified}
                         />
                     </div>
 
-                    {/* 인증번호 입력 및 확인 버튼 */}
+                    {/* 새 비밀번호 입력 */}
                     <div className={styles.inputGroup}>
-                        <label className={styles.label}>인증번호</label>
-                        <div className={styles.verifyRow}>
-                            <input
-                                type="text"
-                                value={code}
-                                onChange={(e) => setCode(e.target.value)}
-                                placeholder="6자리"
-                                className={styles.verifyInput}
-                                maxLength={6}
-                                disabled={isVerified}
-                            />
-                            <button
-                                onClick={handleVerify}
-                                disabled={isVerified}
-                                className={isVerified ? styles.verifyBtnDone : styles.verifyBtn}
-                            >
-                                {isVerified ? '인증완료' : '인증확인'}
-                            </button>
-                        </div>
+                        <label className={styles.label}>새 비밀번호</label>
+                        <input
+                            type="password"
+                            name="newPassword"
+                            value={formData.newPassword}
+                            onChange={handleChange}
+                            className={styles.input}
+                            placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                        />
+                        {formData.newPassword && (
+                            <div
+                                className={`${styles.statusBox} ${isPasswordValid ? styles.statusSuccess : styles.statusWarning}`}>
+                                {isPasswordValid ? '✓ 사용 가능한 비밀번호입니다.' : '! 영문, 숫자, 특수문자 포함 8자 이상'}
+                            </div>
+                        )}
                     </div>
-                </div>
 
-                {/* 다음 단계 버튼 */}
-                <button
-                    onClick={handleNext}
-                    className={isVerified ? styles.nextBtnActive : styles.nextBtnDisabled}
-                    disabled={!isVerified}
-                >
-                    다음
-                </button>
+                    {/* 새 비밀번호 확인 */}
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>새 비밀번호 확인</label>
+                        <input
+                            type="password"
+                            name="newPasswordConfirm"
+                            value={formData.newPasswordConfirm}
+                            onChange={handleChange}
+                            className={styles.input}
+                            placeholder="새 비밀번호 재입력"
+                        />
+                        {formData.newPasswordConfirm && (
+                            <div
+                                className={`${styles.statusBox} ${formData.newPassword === formData.newPasswordConfirm ? styles.statusSuccess : styles.statusError}`}>
+                                {formData.newPassword === formData.newPasswordConfirm ? '✓ 비밀번호가 일치합니다.' : '✕ 비밀번호가 일치하지 않습니다.'}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 완료 버튼 */}
+                    <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+                        {isLoading ? '변경 중...' : '비밀번호 변경하기'}
+                    </button>
+                </form>
+
+                {/* 하단 이동 버튼 */}
+                <div style={{marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px'}}>
+                    <Link to="/find-id" style={{color: 'var(--color-text-muted)', textDecoration: 'none'}}>아이디 찾기</Link>
+                    <span style={{color: 'var(--color-border-light)'}}>|</span>
+                    <Link to="/login" style={{color: 'var(--color-text-muted)', textDecoration: 'none'}}>로그인하러 가기</Link>
+                </div>
             </div>
         </div>
     );

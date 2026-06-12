@@ -1,32 +1,27 @@
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 
-// persist 미들웨어를 사용하면 새로고침해도 로그인 상태가 유지됩니다!
 export const useAuthStore = create(
     persist(
         (set) => ({
             isLoggedIn: false,
-            user: null, // 예: { id: 'bestevan01', name: '김수형', role: 'user', tier: 'Gold' }
+            user: null,
 
-            // 로그인 액션
-            login: (userData) => set({
-                isLoggedIn: true,
-                user: userData
-            }),
+            // 로그인 모달 상태 (localStorage에 저장하지 않음 — partialize로 제외)
+            loginModalOpen: false,
+            loginRedirectTo: '/',
 
-            // 로그아웃 액션
-            logout: () => set({
-                isLoggedIn: false,
-                user: null
-            }),
+            login: (userData) => set({isLoggedIn: true, user: userData}),
+            logout: () => set({isLoggedIn: false, user: null}),
+            updateUser: (newData) => set((state) => ({user: {...state.user, ...newData}})),
 
-            // 유저 정보 업데이트 (마이페이지 등에서 사용)
-            updateUser: (newData) => set((state) => ({
-                user: {...state.user, ...newData}
-            })),
+            openLoginModal: (redirectTo = null) => set({loginModalOpen: true, loginRedirectTo: redirectTo}),
+            closeLoginModal: () => set({loginModalOpen: false, loginRedirectTo: '/'}),
         }),
         {
-            name: 'auth-storage', // localStorage에 저장될 키 이름
+            name: 'auth-storage',
+            // 모달 관련 상태는 새로고침 후에도 열려있으면 안 되므로 제외
+            partialize: (state) => ({isLoggedIn: state.isLoggedIn, user: state.user}),
         }
     )
 );
