@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate 게시글 확인</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .admin-detail-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+        .admin-secondary-btn {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 12px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 850;
+            border: none;
+            cursor: pointer;
+        }
+        .admin-danger-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 850;
+            border: none;
+            cursor: pointer;
+        }
+        .attachment-list { margin: 0; padding-left: 18px; }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <a href="/" class="admin-logo">MoneyMate</a>
+        <nav class="admin-menu">
+            <a href="/admin">관리자 홈</a>
+            <a href="/admin/members">회원정보 관리</a>
+            <a href="/admin/investment-info">투자정보 관리</a>
+            <a href="/admin/community" class="active">커뮤니티 관리</a>
+            <a href="/admin/notices">공지사항 관리</a>
+            <a href="/admin/inquiries">고객문의 관리</a>
+            <a href="/logout">로그아웃</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-top">
+            <div>
+                <h1>게시글 확인</h1>
+                <p>커뮤니티 게시글의 상세 내용을 확인합니다.</p>
+            </div>
+        </section>
+
+        <section class="admin-detail-card">
+            <div class="detail-header">
+                <div>
+                    <span class="status-badge" th:text="${post.category}">FREE</span>
+                    <h2>
+                        <span th:text="${post.title}">게시글 제목</span>
+                        <span th:if="${post.edited}" class="status-badge answered">수정됨</span>
+                    </h2>
+                </div>
+                <a class="admin-action-btn" href="/admin/community">목록으로</a>
+            </div>
+
+            <div class="detail-info-grid">
+                <div>
+                    <span>게시글 번호</span>
+                    <strong th:text="${post.postId}">1</strong>
+                </div>
+                <div>
+                    <span>작성자 ID</span>
+                    <strong th:text="${post.authorId}">1</strong>
+                </div>
+                <div>
+                    <span>작성자</span>
+                    <strong th:text="${post.authorName}">작성자</strong>
+                </div>
+                <div>
+                    <span>조회수</span>
+                    <strong th:text="${post.viewCount}">0</strong>
+                </div>
+                <div>
+                    <span>테마</span>
+                    <strong th:text="${post.themeName != null ? post.themeName : '-'}">테마</strong>
+                </div>
+                <div>
+                    <span>종목명</span>
+                    <strong th:text="${post.stockName != null ? post.stockName : '-'}">종목명</strong>
+                </div>
+                <div>
+                    <span>종목코드</span>
+                    <strong th:text="${post.stockSymbol != null ? post.stockSymbol : '-'}">종목코드</strong>
+                </div>
+                <div>
+                    <span>작성일</span>
+                    <strong th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</strong>
+                </div>
+            </div>
+
+            <div class="detail-content-box">
+                <h3>내용</h3>
+                <p th:text="${post.content}">게시글 내용</p>
+            </div>
+
+            <div class="detail-content-box answer">
+                <h3>첨부파일</h3>
+                <p th:if="${#lists.isEmpty(post.attachments)}">첨부파일이 없습니다.</p>
+                <ul th:if="${!#lists.isEmpty(post.attachments)}" class="attachment-list">
+                    <li th:each="attachment : ${post.attachments}">
+                        <a th:href="${attachment.attachmentUrl}"
+                           th:text="${attachment.attachmentName}"
+                           target="_blank">첨부파일</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="admin-detail-actions">
+                <a class="admin-secondary-btn" href="/admin/community">목록으로</a>
+                <a class="admin-submit-btn" th:href="@{/admin/community/posts/{postId}/edit(postId=${post.postId})}">수정</a>
+                <form th:action="@{/admin/community/posts/{postId}/delete(postId=${post.postId})}"
+                      method="post"
+                      onsubmit="return confirm('이 게시글을 삭제하시겠습니까?');">
+                    <button class="admin-danger-btn" type="submit">삭제</button>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

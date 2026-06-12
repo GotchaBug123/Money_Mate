@@ -1,0 +1,151 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+.join-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 0;
+}
+
+.join-box {
+    width: 460px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 42px;
+    box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+}
+
+.join-box h1 {
+    text-align: center;
+    font-size: 30px;
+    color: #111827;
+    margin-bottom: 10px;
+}
+
+.join-desc {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 32px;
+}
+
+form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    padding: 0 14px;
+    font-size: 14px;
+    margin-bottom: 18px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #155eef;
+    box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.12);
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.input-row input {
+    flex: 1;
+}
+
+.input-row button {
+    width: 120px;
+    height: 48px;
+    border: none;
+    border-radius: 9px;
+    background: #155eef;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.input-row .gray-btn {
+    background: #374151;
+}
+
+.terms-box {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 8px 0 24px;
+}
+
+.terms-box label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.terms-box label:last-child {
+    margin-bottom: 0;
+}
+
+.terms-box input {
+    width: auto;
+    height: auto;
+    margin: 0;
+}
+
+.terms-box span {
+    color: #155eef;
+    font-weight: 700;
+}
+
+.terms-box em {
+    color: #6b7280;
+    font-style: normal;
+}
+
+.join-submit {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    background: #155eef;
+    color: white;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.login-link {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.login-link a {
+    color: #155eef;
+    font-weight: 800;
+    text-decoration: none;
+}

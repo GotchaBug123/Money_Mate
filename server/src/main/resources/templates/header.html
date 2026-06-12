@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header class="header" th:fragment="header">
+
+    <div class="header-inner">
+
+        <a href="/main" class="logo">MoneyMate</a>
+
+        <nav class="nav">
+
+            <div class="nav-dropdown">
+                <span class="nav-link disabled-link">MY 자산</span>
+
+                <div class="dropdown-menu">
+                    <a href="/my-asset/financial">내 재무 정보</a>
+                    <a href="/my-investment">내 투자 정보</a>
+                </div>
+            </div>
+
+            <div class="nav-dropdown">
+                <span class="nav-link disabled-link">포트폴리오</span>
+
+                <div class="dropdown-menu">
+                    <a href="/rebalancing">리밸런싱</a>
+                    <a href="#">포트폴리오 생성</a>
+                </div>
+            </div>
+
+            <a href="/stock">투자정보</a>
+            <a href="/community">커뮤니티</a>
+
+            <div class="nav-dropdown">
+                <span class="nav-link disabled-link">고객센터</span>
+
+                <div class="dropdown-menu">
+                    <a href="/customer-center">고객문의</a>
+                    <a href="/notice">공지사항</a>
+                </div>
+            </div>
+
+        </nav>
+
+        <div class="header-buttons">
+
+            <div th:if="${session.loginUser == null}">
+                <a href="/login" class="login-btn">로그인</a>
+                <a href="/signup" class="join-btn">회원가입</a>
+            </div>
+
+            <div th:if="${session.loginUser != null}">
+                <span class="welcome-text"
+                      th:text="|${session.loginUser.name}님 환영합니다 👋|">
+                </span>
+
+                <a href="/mypage" class="mypage-btn">
+                    마이페이지
+                </a>
+
+                <a href="/logout" class="login-btn">
+                    로그아웃
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+</body>
+</html>
