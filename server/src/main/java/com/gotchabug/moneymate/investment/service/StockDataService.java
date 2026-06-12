@@ -50,6 +50,9 @@ public class StockDataService {
     private static final String YAHOO_CHART_URL =
             "https://query1.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=1mo";
 
+    private static final String YAHOO_DIVIDEND_URL =
+            "https://query1.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=1y&events=dividends";
+
     private static final String YAHOO_SUMMARY_URL =
             "https://query1.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryDetail";
 
@@ -361,8 +364,8 @@ public class StockDataService {
             String yahooSymbol = toYahooSymbol(asset);
 
             try {
-                // ── v8/chart API 호출 (syncAll과 동일한 엔드포인트) ──
-                String url = String.format(YAHOO_CHART_URL, yahooSymbol);
+                // v8/chart API에 events=dividends&range=1y 파라미터로 1년치 배당 이벤트 수집
+                String url = String.format(YAHOO_DIVIDEND_URL, yahooSymbol);
 
                 org.springframework.http.HttpHeaders headers = createYahooHeaders();
                 org.springframework.http.HttpEntity<String> entity =
@@ -385,19 +388,24 @@ public class StockDataService {
                     continue;
                 }
 
-                // ── meta 필드에서 trailingAnnualDividendYield 추출 ──
-                // 소수 형태 (예: 0.032 = 3.2%) → × 100 하여 % 단위로 저장
-                JsonNode meta      = result.path("meta");
-                JsonNode yieldNode = meta.path("trailingAnnualDividendYield");
+                // 현재가
+                double currentPrice = result.path("meta").path("regularMarketPrice").asDouble(0);
 
-                BigDecimal dividendYieldPct;
-                if (yieldNode.isMissingNode() || yieldNode.isNull()) {
-                    // 배당 없는 종목 (성장주 등) → 0.0 저장
-                    dividendYieldPct = BigDecimal.ZERO;
-                } else {
-                    dividendYieldPct = new BigDecimal(yieldNode.asText())
-                            .multiply(new BigDecimal("100"))
-                            .setScale(4, RoundingMode.HALF_UP);
+                // events.dividends: { "timestamp": { "amount": x, "date": y }, ... }
+                JsonNode dividendEvents = result.path("events").path("dividends");
+
+                BigDecimal dividendYieldPct = BigDecimal.ZERO;
+                if (!dividendEvents.isMissingNode() && dividendEvents.isObject()
+                        && currentPrice > 0) {
+                    // 1년치 배당금 합산
+                    double annualDividend = 0;
+                    for (JsonNode div : dividendEvents) {
+                        annualDividend += div.path("amount").asDouble(0);
+                    }
+                    if (annualDividend > 0) {
+                        dividendYieldPct = BigDecimal.valueOf(annualDividend / currentPrice * 100)
+                                .setScale(4, RoundingMode.HALF_UP);
+                    }
                 }
 
                 // 최신 asset_indicator 레코드에 dividend_yield_pct 업데이트
@@ -412,7 +420,9 @@ public class StockDataService {
                     AssetIndicator indicator = indicators.get(0);
                     indicator.setDividendYieldPct(dividendYieldPct);
                     assetIndicatorRepository.save(indicator);
-                    log.info("[배당싱크] {} → {}%", asset.getTicker(), dividendYieldPct);
+                    if (dividendYieldPct.compareTo(BigDecimal.ZERO) > 0) {
+                        log.info("[배당싱크] {} → {}%", asset.getTicker(), dividendYieldPct);
+                    }
                     success++;
                 }
 

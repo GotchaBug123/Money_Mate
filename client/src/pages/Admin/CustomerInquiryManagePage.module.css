@@ -1,0 +1,352 @@
+/* src/pages/Admin/CustomerInquiryManagePage.module.css */
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 상단 헤더 영역 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0 0 8px 0;
+}
+
+.desc {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* 요약 통계 그리드 */
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.summaryCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summaryLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-sub);
+}
+
+.summaryValue {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+.textPrimary {
+    color: var(--color-primary);
+}
+
+.textWarning {
+    color: var(--color-warning);
+}
+
+.textSuccess {
+    color: var(--color-success);
+}
+
+.textError {
+    color: var(--color-error);
+}
+
+/* 툴바 및 검색 영역 */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 24px;
+    box-shadow: var(--shadow-card);
+}
+
+.searchBox {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    max-width: 600px;
+}
+
+.select, .input {
+    padding: 10px 16px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    outline: none;
+    background: var(--color-bg-page);
+    color: var(--color-text-main);
+    transition: border-color 0.2s;
+}
+
+.input {
+    flex: 1;
+}
+
+.select:focus, .input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-card);
+}
+
+/* 공통 버튼 */
+.primaryBtn {
+    padding: 10px 24px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.primaryBtn:hover {
+    background: var(--color-primary-hover);
+}
+
+.secondaryBtn {
+    padding: 10px 24px;
+    background: var(--color-bg-card);
+    color: var(--color-text-main);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.secondaryBtn:hover {
+    background: var(--color-bg-input);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.dangerBtn {
+    padding: 8px 16px;
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dangerBtn:hover {
+    background: var(--color-error);
+    color: #fff;
+}
+
+.dangerBtn:disabled {
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+    cursor: not-allowed;
+}
+
+/* 테이블(리스트) 영역 */
+.tableWrapper {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.tableHead, .tableRow {
+    display: grid;
+    grid-template-columns: 80px 120px 1fr 100px 100px 120px;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.tableHead {
+    background: var(--color-bg-input);
+    font-weight: 700;
+    color: var(--color-text-sub);
+    font-size: 14px;
+}
+
+.tableRow {
+    font-size: 14px;
+    color: var(--color-text-main);
+    transition: background 0.2s;
+}
+
+.tableRow:hover {
+    background: var(--color-primary-light);
+}
+
+.tableRow:last-child {
+    border-bottom: none;
+}
+
+.colTitle {
+    text-align: left;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
+}
+
+.colTitle:hover {
+    color: var(--color-primary);
+}
+
+/* 상태 배지 */
+.statusBadge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.statusPending {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.statusCompleted {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.statusDeleted {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+}
+
+.actionGroup {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.actionBtn {
+    padding: 6px 12px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-sub);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.actionBtn:hover:not(:disabled) {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.actionBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 상세/답변 폼 영역 */
+.detailGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: var(--color-bg-input);
+    padding: 24px;
+    border-radius: var(--radius-md);
+}
+
+.detailField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detailField.full {
+    grid-column: 1 / -1;
+}
+
+.detailLabel {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.detailValue {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-main);
+    line-height: 1.5;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.formLabel {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-sub);
+}
+
+.textarea {
+    width: 100%;
+    padding: 16px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    outline: none;
+    min-height: 160px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.textarea:focus {
+    border-color: var(--color-primary);
+}
+
+.textarea:read-only {
+    background: var(--color-bg-input);
+    cursor: default;
+}

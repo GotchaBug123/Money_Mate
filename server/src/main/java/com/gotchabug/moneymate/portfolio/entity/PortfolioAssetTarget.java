@@ -1,5 +1,6 @@
 package com.gotchabug.moneymate.portfolio.entity;
 
+import com.gotchabug.moneymate.common.BaseTimeEntity; // 💡 상속 추가
 import com.gotchabug.moneymate.market.entity.Asset;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PortfolioAssetTarget {
+public class PortfolioAssetTarget extends BaseTimeEntity { // 💡 상속 구조 일치
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,24 +41,12 @@ public class PortfolioAssetTarget {
     @Column(name = "risk_score", precision = 10, scale = 4)
     private BigDecimal riskScore;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    // 💡 [수정] 중복되는 시간 컬럼 필드 삭제
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-
         if (this.targetWeightPct == null) {
             this.targetWeightPct = BigDecimal.ZERO;
         }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 }

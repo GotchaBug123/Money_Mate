@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoneyMate - 투자 성향 진단</title>
+
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+
+        <a href="/" class="logo">
+            MoneyMate
+        </a>
+
+        <nav class="nav">
+            <a href="/">홈</a>
+            <a href="/mypage">마이페이지</a>
+        </nav>
+
+        <div class="header-buttons">
+            <a href="/logout" class="login-btn">
+                로그아웃
+            </a>
+        </div>
+
+    </div>
+</header>
+
+<main style="max-width: 900px; margin:auto; padding:60px 20px;">
+
+    <h1 style="margin-bottom:10px;">
+        투자 성향 진단
+    </h1>
+
+    <p style="margin-bottom:40px; color:#666;">
+        간단한 설문을 통해 투자 성향을 분석합니다.
+    </p>
+
+    <form action="/risk/test"
+          method="post"
+          th:object="${riskTestRequest}">
+
+        <div style="display:flex; flex-direction:column; gap:40px;">
+
+            <!-- 질문 1 -->
+            <div>
+                <h3>1. 투자 경험이 얼마나 있으신가요?</h3>
+
+                <label>
+                    <input type="radio" th:field="*{question1}" value="1">
+                    투자 경험 없음
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question1}" value="3">
+                    ETF/펀드 경험 있음
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question1}" value="5">
+                    주식 투자 경험 많음
+                </label>
+            </div>
+
+            <!-- 질문 2 -->
+            <div>
+                <h3>2. 투자 손실 발생 시 어떻게 하시겠습니까?</h3>
+
+                <label>
+                    <input type="radio" th:field="*{question2}" value="1">
+                    바로 매도
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question2}" value="3">
+                    일부 유지
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question2}" value="5">
+                    추가 매수 고려
+                </label>
+            </div>
+
+            <!-- 질문 3 -->
+            <div>
+                <h3>3. 투자 목적은 무엇인가요?</h3>
+
+                <label>
+                    <input type="radio" th:field="*{question3}" value="1">
+                    원금 보존
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question3}" value="3">
+                    안정적 수익
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question3}" value="5">
+                    고수익 추구
+                </label>
+            </div>
+
+            <!-- 질문 4 -->
+            <div>
+                <h3>4. 투자 기간은 얼마나 생각하시나요?</h3>
+
+                <label>
+                    <input type="radio" th:field="*{question4}" value="1">
+                    1년 이하
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question4}" value="3">
+                    1~3년
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question4}" value="5">
+                    5년 이상
+                </label>
+            </div>
+
+            <!-- 질문 5 -->
+            <div>
+                <h3>5. 현재 금융 지식 수준은?</h3>
+
+                <label>
+                    <input type="radio" th:field="*{question5}" value="1">
+                    거의 없음
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question5}" value="3">
+                    기본 수준 이해
+                </label><br>
+
+                <label>
+                    <input type="radio" th:field="*{question5}" value="5">
+                    투자 분석 가능
+                </label>
+            </div>
+
+            <button type="submit"
+                    style="
+                    padding:16px;
+                    border:none;
+                    border-radius:10px;
+                    background:#2563eb;
+                    color:white;
+                    font-size:16px;
+                    cursor:pointer;
+                    ">
+                투자 성향 분석하기
+            </button>
+
+        </div>
+
+    </form>
+
+</main>
+
+</body>
+</html>

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/risk-profile")
+@RequestMapping("/api/risk-profile")
 @Tag(
         name = "Risk Profile",
         description = "투자 성향(위험 성향) 분석 API"

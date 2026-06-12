@@ -1,0 +1,458 @@
+/* src/pages/Admin/InvestmentManagePage.module.css */
+
+.container {
+    width: 100%;
+    max-width: 1200px; /* 💡 화면 중앙에 안정적으로 모이도록 너비 제한 */
+    margin: 0 auto; /* 가운데 정렬 */
+    padding: 48px 24px 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 상단 헤더 영역 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin: 0 0 8px 0;
+}
+
+.desc {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* 요약 통계 그리드 */
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.summaryCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summaryLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-sub);
+}
+
+.summaryValue {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-primary);
+}
+
+/* 탭 및 툴바 영역 */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 24px;
+    box-shadow: var(--shadow-card);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.tabGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.tabBtn {
+    padding: 10px 24px;
+    background: var(--color-bg-page);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tabBtn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.tabBtn:hover:not(.active) {
+    background: var(--color-bg-input);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* 검색 박스 */
+.searchBox {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    max-width: 500px;
+}
+
+.select, .input {
+    padding: 10px 16px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    outline: none;
+    background: var(--color-bg-page);
+    color: var(--color-text-main);
+    transition: border-color 0.2s;
+}
+
+.input {
+    flex: 1;
+}
+
+.select:focus, .input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-card);
+}
+
+.primaryBtn {
+    padding: 10px 24px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.primaryBtn:hover {
+    background: var(--color-primary-hover);
+}
+
+/* 소제목 (섹션 타이틀) */
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.sectionTitle h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+.sectionTitle span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+/* 투자 회원 카드 그리드 */
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+}
+
+.memberCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.memberCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-primary);
+}
+
+.memberHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.memberInfo strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin-bottom: 4px;
+}
+
+.memberInfo span {
+    font-size: 13px;
+    color: var(--color-text-sub);
+}
+
+.memberType {
+    padding: 6px 12px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.memberBody {
+    display: grid;
+    grid-template-columns: 1fr 140px;
+    gap: 12px;
+}
+
+.stockBox, .totalBox {
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stockBox h4, .totalBox h4 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-sub);
+    text-align: center;
+}
+
+.stockList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stockList li {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.moreBtn {
+    margin-top: auto;
+    padding-top: 12px;
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+}
+
+.moreBtn:hover {
+    text-decoration: underline;
+}
+
+.totalBox {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.totalAmount {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin-bottom: 8px;
+    word-break: keep-all;
+}
+
+.totalCount {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+/* 통계 화면 */
+.statCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    box-shadow: var(--shadow-card);
+    text-align: center;
+}
+
+.chartWrap {
+    width: 100%;
+    max-width: 800px;
+    margin: 32px auto;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+}
+
+.statGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.statItem {
+    background: var(--color-primary-light);
+    border-radius: var(--radius-lg);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.statAge {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+.statType {
+    font-size: 13px;
+    color: var(--color-text-sub);
+    font-weight: 600;
+}
+
+.statPct {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--color-primary);
+}
+
+/* 모달 */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(17, 24, 39, 0.48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modalContent {
+    background: var(--color-bg-card);
+    width: 100%;
+    max-width: 480px;
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-text-main);
+    line-height: 1.4;
+}
+
+.modalCloseBtn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.modalInfo {
+    background: var(--color-bg-input);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 24px;
+}
+
+.modalInfo span {
+    font-size: 13px;
+    color: var(--color-text-sub);
+}
+
+.modalInfo strong {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-top: 4px;
+}
+
+.modalStockList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.modalStockList li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.modalStockList li:last-child {
+    border-bottom: none;
+}
+
+.stockIndex {
+    width: 28px;
+    height: 28px;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.stockName {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-main);
+}

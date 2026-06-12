@@ -15,14 +15,20 @@ public class MemberResponse {
     private String email;
     private String name;
     private LocalDate birthDate;
+    private String phoneNumber;
     private String signupStatus;
 
     public static MemberResponse from(Member member) {
+        if (member == null) {
+            return null;
+        }
+
         return MemberResponse.builder()
                 .memberId(member.getMemberId())
                 .email(member.getEmail())
                 .name(member.getName())
                 .birthDate(member.getBirthDate())
+                .phoneNumber(member.getPhoneNumber())
                 .signupStatus(member.getSignupStatus())
                 .build();
     }

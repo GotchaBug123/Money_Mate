@@ -1,0 +1,113 @@
+/* src/components/common/Header.module.css */
+
+/* 헤더 전체 래퍼 (상단 고정) */
+.headerWrapper {
+    background-color: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* 스크롤 시 약간의 그림자를 주어 입체감을 더할 수도 있습니다 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.container {
+    width: 100%;
+    max-width: 1180px; /* 앱 메인 컨텐츠 영역과 동일한 너비 제한 */
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px; /* 기존 레이아웃 호환성을 위해 60px 유지 */
+}
+
+/* 왼쪽: 로고 및 내비게이션 메뉴 */
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logoImg {
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+
+.nav {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+/* 내비게이션 아이템 (Link 및 Button 공통) */
+.navItem {
+    color: var(--color-text-main);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.navItem:hover {
+    color: var(--color-primary); /* 호버 시 파란색 포인트 */
+}
+
+
+/* 오른쪽: 액션 버튼 영역 */
+.rightSection {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* 액션 버튼 공통 */
+.actionBtn {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+/* 주요 버튼 (파란색 배경) */
+.primaryBtn {
+    background-color: var(--color-primary);
+    color: #fff;
+    border: 1px solid var(--color-primary);
+}
+
+.primaryBtn:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* 보조 버튼 (흰색 배경) */
+.secondaryBtn {
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+}
+
+.secondaryBtn:hover {
+    background-color: var(--color-bg-input);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}

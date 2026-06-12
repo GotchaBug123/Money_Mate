@@ -31,6 +31,42 @@ public class MarketAssetSearchService {
             "https://query1.finance.yahoo.com/v1/finance/search?q=";
     private static final int SEARCH_LIMIT = 10;
 
+    // 한글 별칭 → 영문 검색어 매핑
+    private static final Map<String, String> KOREAN_ALIAS = Map.ofEntries(
+        Map.entry("엔비디아", "NVDA"),
+        Map.entry("애플", "AAPL"),
+        Map.entry("마이크로소프트", "MSFT"),
+        Map.entry("테슬라", "TSLA"),
+        Map.entry("구글", "GOOGL"),
+        Map.entry("알파벳", "GOOGL"),
+        Map.entry("아마존", "AMZN"),
+        Map.entry("메타", "META"),
+        Map.entry("넷플릭스", "NFLX"),
+        Map.entry("인텔", "INTC"),
+        Map.entry("AMD", "AMD"),
+        Map.entry("에이엠디", "AMD"),
+        Map.entry("퀄컴", "QCOM"),
+        Map.entry("브로드컴", "AVGO"),
+        Map.entry("TSMC", "TSM"),
+        Map.entry("대만반도체", "TSM"),
+        Map.entry("코카콜라", "KO"),
+        Map.entry("맥도날드", "MCD"),
+        Map.entry("월마트", "WMT"),
+        Map.entry("버크셔", "BRK-B"),
+        Map.entry("JP모건", "JPM"),
+        Map.entry("뱅크오브아메리카", "BAC"),
+        Map.entry("비자", "V"),
+        Map.entry("마스터카드", "MA"),
+        Map.entry("팔란티어", "PLTR"),
+        Map.entry("스포티파이", "SPOT"),
+        Map.entry("코인베이스", "COIN"),
+        Map.entry("리비안", "RIVN"),
+        Map.entry("루시드", "LCID"),
+        Map.entry("S&P500", "SPY"),
+        Map.entry("나스닥", "QQQ"),
+        Map.entry("미국채", "TLT")
+    );
+
     private final ObjectMapper objectMapper;
     private final AssetMasterRepository assetMasterRepository;
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -44,6 +80,12 @@ public class MarketAssetSearchService {
             return fallbackAssets("");
         }
 
+        // 한글 별칭이 매핑된 경우 영문 키워드로 변환하여 재검색
+        String translated = translateKoreanAlias(normalizedKeyword);
+        if (translated != null) {
+            return searchAssets(translated);
+        }
+
         List<MarketAssetSearchResponse> koreanAssets =
                 searchKoreanAssets(normalizedKeyword);
 
@@ -51,9 +93,14 @@ public class MarketAssetSearchService {
             return koreanAssets;
         }
 
-        if (containsHangul(normalizedKeyword)
-                || isNumericKeyword(normalizedKeyword)) {
+        if (isNumericKeyword(normalizedKeyword)) {
             return fallbackAssets(normalizedKeyword);
+        }
+
+        // 한글이더라도 별칭 미매핑이면 fallback 풀에서 찾고, 없으면 Yahoo 시도
+        if (containsHangul(normalizedKeyword)) {
+            List<MarketAssetSearchResponse> fallback = fallbackAssets(normalizedKeyword);
+            return fallback;
         }
 
         try {
@@ -70,6 +117,16 @@ public class MarketAssetSearchService {
         }
 
         return fallbackAssets(normalizedKeyword);
+    }
+
+    private String translateKoreanAlias(String keyword) {
+        String lower = keyword.toLowerCase(Locale.ROOT);
+        for (Map.Entry<String, String> entry : KOREAN_ALIAS.entrySet()) {
+            if (entry.getKey().toLowerCase(Locale.ROOT).equals(lower)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     private List<MarketAssetSearchResponse> searchKoreanAssets(String keyword) {

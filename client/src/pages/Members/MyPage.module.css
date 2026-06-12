@@ -1,0 +1,296 @@
+/* src/pages/Members/MyPage.module.css */
+
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    padding: 40px 24px 80px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.heroCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 42px 48px;
+    background: var(--color-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    color: #ffffff;
+}
+
+.heroLabel {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 900;
+    opacity: 0.9;
+}
+
+.heroTitle {
+    margin: 0;
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.heroDesc {
+    margin: 16px 0 0;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.heroTierCard {
+    min-width: 230px;
+    padding: 28px 32px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.heroTierCard span {
+    font-size: 15px;
+    font-weight: 800;
+    opacity: 0.9;
+}
+
+.heroTierCard strong {
+    font-size: 36px;
+    font-weight: 900;
+}
+
+.contentGrid {
+    display: grid;
+    grid-template-columns: 1.12fr 0.88fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+.leftPanel,
+.profileCard,
+.financeCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+}
+
+.leftPanel {
+    padding: 40px;
+}
+
+.panelHeader {
+    margin-bottom: 34px;
+}
+
+.panelLabel {
+    margin: 0 0 8px;
+    color: var(--color-primary);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.sectionTitle {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.label {
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.input {
+    width: 100%;
+    height: 56px;
+    padding: 0 18px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-input);
+    color: var(--color-text-main);
+    font-size: 16px;
+    font-weight: 700;
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-card);
+    box-shadow: 0 0 0 4px rgba(27, 94, 217, 0.08);
+}
+
+.noticeBox {
+    padding: 18px 20px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-light);
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.saveButton {
+    height: 58px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.saveButton:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+.rightPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profileCard {
+    padding: 32px;
+    text-align: center;
+}
+
+.profileTitle {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.profileTier {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.profileDesc {
+    display: block;
+    margin-top: 14px;
+    color: var(--color-text-sub);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.financeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.financeCard {
+    min-height: 190px;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.financeCard:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary);
+}
+
+.financeIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.financeTitle {
+    margin: 0;
+    color: var(--color-text-sub);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.financeValue {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+}
+
+.primary {
+    color: var(--color-primary);
+}
+
+@media (max-width: 1000px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .heroCard {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .heroTierCard {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .pageWrapper {
+        padding: 28px 16px 60px;
+    }
+
+    .heroCard,
+    .leftPanel {
+        padding: 28px 22px;
+    }
+
+    .heroTitle {
+        font-size: 30px;
+    }
+
+    .financeGrid {
+        grid-template-columns: 1fr;
+    }
+}

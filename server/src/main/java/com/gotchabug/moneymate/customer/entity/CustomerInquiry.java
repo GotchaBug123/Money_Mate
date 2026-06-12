@@ -18,7 +18,7 @@ public class CustomerInquiry {
     @Column(name = "inquiry_id")
     private Long inquiryId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -51,6 +51,7 @@ public class CustomerInquiry {
         this.status = "WAITING";
         this.createdAt = LocalDateTime.now();
     }
+
     public void answer(String answer) {
         this.answer = answer;
         this.status = "ANSWERED";

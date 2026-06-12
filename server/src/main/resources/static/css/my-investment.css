@@ -274,6 +274,36 @@ body {
     font-weight: 700;
 }
 
+.mi-qty-ctrl {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.mi-qty-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #475569;
+    transition: background .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mi-qty-btn:hover { background: #e2e8f0; }
+.mi-qty-num {
+    min-width: 28px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
 .watch-btn {
     border: none;
     background: #fff1f2;

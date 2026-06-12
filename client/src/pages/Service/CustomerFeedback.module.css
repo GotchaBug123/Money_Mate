@@ -1,0 +1,227 @@
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px 80px;
+}
+
+.container {
+    width: 100%;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.backButton {
+    align-self: flex-start;
+    padding: 12px 20px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 900;
+    box-shadow: var(--shadow-card);
+}
+
+.backButton:hover {
+    background: var(--color-primary);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.heroSection {
+    padding: 38px 42px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
+}
+
+.title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 800;
+}
+
+.formCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 42px;
+    box-shadow: var(--shadow-card);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.label {
+    color: var(--color-text-main);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.typeChips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    min-height: 46px;
+    padding: 0 22px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    color: var(--color-text-sub);
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: var(--shadow-card);
+}
+
+.chip:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.chipActive {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.22);
+}
+
+.chipActive:hover {
+    background: var(--color-primary-hover);
+    color: #ffffff;
+}
+
+.input {
+    width: 100%;
+    padding: 17px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
+    color: var(--color-text-main);
+    font-size: 15px;
+    font-weight: 700;
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-card);
+    box-shadow: 0 0 0 4px rgba(27, 94, 217, 0.12);
+}
+
+.input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.textarea {
+    min-height: 260px;
+    resize: vertical;
+    line-height: 1.65;
+    font-family: inherit;
+}
+
+.noticeBox {
+    padding: 20px 22px;
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 700;
+}
+
+.noticeBox p {
+    margin: 0;
+}
+
+.noticeBox p + p {
+    margin-top: 6px;
+}
+
+.submitBtn {
+    height: 58px;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 900;
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.2);
+}
+
+.submitBtn:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection,
+    .formCard {
+        padding: 30px 22px;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .typeChips {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .chip {
+        width: 100%;
+        padding: 0 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .typeChips {
+        grid-template-columns: 1fr;
+    }
+
+    .submitBtn {
+        width: 100%;
+    }
+}

@@ -3,19 +3,7 @@ package com.gotchabug.moneymate.portfolio.entity;
 import com.gotchabug.moneymate.common.BaseTimeEntity;
 import com.gotchabug.moneymate.enums.RebalanceCycle;
 import com.gotchabug.moneymate.member.entity.Member;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,14 +18,8 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "goal_strategy_result",
         indexes = {
-                @Index(
-                        name = "idx_goal_strategy_member",
-                        columnList = "member_id"
-                ),
-                @Index(
-                        name = "idx_goal_strategy_created_at",
-                        columnList = "created_at"
-                )
+                @Index(name = "idx_goal_strategy_member", columnList = "member_id"),
+                @Index(name = "idx_goal_strategy_created_at", columnList = "created_at")
         }
 )
 public class GoalStrategyResult extends BaseTimeEntity {
@@ -70,6 +52,8 @@ public class GoalStrategyResult extends BaseTimeEntity {
     @Column(name = "rebalance_cycle", nullable = false, length = 30)
     private RebalanceCycle rebalanceCycle;
 
+    // 💡 [수정] Oracle 21c 환경 호환성을 위해 MySQL용 'LONGTEXT' 명시 문법을 제거하고
+    // JPA 표준 @Lob 어노테이션을 활용하여 대용량 데이터(CLOB) 매핑을 안전하게 처리합니다.
     @Lob
     @Column(name = "selected_asset_summary", nullable = false)
     private String selectedAssetSummary;

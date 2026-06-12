@@ -64,16 +64,20 @@ async function addToCart(btn) {
     if (res.ok) {
       btn.style.color = '#155eef';
 
-      showToast('장바구니에 담겼습니다.');
-
-      if (!cartList.find(x => x.id === ticker)) {
+      const data = await res.json();
+      const existing = cartList.find(x => x.id === ticker);
+      if (existing) {
+        existing.qty = data.quantity;
+        showToast(`장바구니 수량이 ${data.quantity}개가 되었습니다.`);
+      } else {
         cartList.push({
           id: ticker,
           name: assetName,
           price,
           curr,
-          qty: 1
+          qty: data.quantity
         });
+        showToast('장바구니에 담겼습니다.');
       }
 
       renderCart();
@@ -164,7 +168,11 @@ function renderCart() {
     <div class="modal-item">
       <span class="mi-name">${i.name}</span>
       <span class="mi-price">${i.curr === 'USD' ? '$' : ''}${Number(i.price).toLocaleString()}${i.curr === 'KRW' ? '원' : ''}</span>
-      <input class="mi-qty" type="number" value="${i.qty}" min="1" onchange="updateQty('${i.id}',this.value)">
+      <div class="mi-qty-ctrl">
+        <button class="mi-qty-btn" onclick="updateQty('${i.id}', ${i.qty - 1})">-</button>
+        <span class="mi-qty-num">${i.qty}</span>
+        <button class="mi-qty-btn" onclick="updateQty('${i.id}', ${i.qty + 1})">+</button>
+      </div>
       <button class="mi-del" onclick="removeCart('${i.id}')">✕</button>
     </div>`).join('');
 }
@@ -182,9 +190,35 @@ function renderWatch() {
     </div>`).join('');
 }
 
-function updateQty(id, v) {
-  const i = cartList.find(x => x.id === id);
-  if (i) i.qty = parseInt(v) || 1;
+async function updateQty(id, newQty) {
+  if (newQty < 1) return;
+  const item = cartList.find(x => x.id === id);
+  if (!item) return;
+
+  try {
+    const listRes = await fetch('/api/holding');
+    if (!listRes.ok) return;
+    const list = await listRes.json();
+    const holding = list.find(h => h.ticker === id);
+    if (!holding) return;
+
+    const res = await fetch(`/api/holding/${holding.holdingId}/quantity`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quantity: newQty })
+    });
+    if (res.ok) {
+      item.qty = newQty;
+      renderCart();
+    } else if (res.status === 401) {
+      showToast('로그인이 필요합니다.');
+    } else {
+      showToast('수량 변경에 실패했습니다.');
+    }
+  } catch (e) {
+    console.error('수량 변경 오류:', e);
+    showToast('네트워크 오류가 발생했습니다.');
+  }
 }
 
 function removeCart(id) {
@@ -511,9 +545,12 @@ async function addThemeItems() {
 
       if (res.ok) {
         successCount++;
-        // 장바구니 로컬 배열에도 추가 (renderCart 반영)
-        if (!cartList.find(x => x.id === ticker)) {
-          cartList.push({ id: ticker, name: assetName, price, curr, qty: 1 });
+        const data = await res.json();
+        const existing = cartList.find(x => x.id === ticker);
+        if (existing) {
+          existing.qty = data.quantity;
+        } else {
+          cartList.push({ id: ticker, name: assetName, price, curr, qty: data.quantity });
         }
       } else if (res.status === 401) {
         showToast('로그인이 필요합니다.');
@@ -586,6 +623,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const volBtn   = document.getElementById('sortByVol');
     if (valueBtn) { valueBtn.textContent = '거래대금'; }
     if (volBtn)   { volBtn.textContent = '거래량'; }
+  })();
+
+  // 페이지 로드 시 장바구니 목록 DB에서 복원
+  (async function initCartList() {
+    try {
+      const res = await fetch('/api/holding');
+      if (!res.ok) return;
+      const list = await res.json();
+      cartList = list.map(h => ({
+        id:    h.ticker,
+        name:  h.assetName,
+        price: h.buyPrice != null ? String(h.buyPrice) : '0',
+        curr:  (h.market && (h.market.includes('NYSE') || h.market.includes('NASDAQ'))) ? 'USD' : 'KRW',
+        qty:   h.quantity
+      }));
+      renderCart();
+    } catch (e) {
+      // 네트워크 오류 등 무시
+    }
   })();
 
   // 페이지 로드 시 관심 버튼 상태 복원 (★/☆)

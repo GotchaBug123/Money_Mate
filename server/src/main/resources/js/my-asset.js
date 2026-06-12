@@ -5,6 +5,34 @@
         DELETE /api/watchlist/{watchlistId}
    ============================================================ */
 
+/* 보유 종목 수량 수정 (-/+) */
+async function updateHoldingQty(holdingId, newQty) {
+    if (newQty < 1) return;
+    try {
+        const res = await fetch('/api/holding/' + holdingId + '/quantity', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantity: newQty })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const qtySpan = document.getElementById('qty-' + holdingId);
+            if (qtySpan) {
+                qtySpan.textContent = data.quantity;
+                const btns = qtySpan.parentElement.querySelectorAll('.mi-qty-btn');
+                if (btns[0]) btns[0].setAttribute('onclick', 'updateHoldingQty(' + holdingId + ', ' + (data.quantity - 1) + ')');
+                if (btns[1]) btns[1].setAttribute('onclick', 'updateHoldingQty(' + holdingId + ', ' + (data.quantity + 1) + ')');
+            }
+        } else if (res.status === 401) {
+            showToast('로그인이 필요합니다.', 'error');
+        } else {
+            showToast('수량 변경에 실패했습니다.', 'error');
+        }
+    } catch (e) {
+        showToast('네트워크 오류가 발생했습니다.', 'error');
+    }
+}
+
 /* 장바구니 항목 삭제 */
 async function removeCart(cartId) {
     if (!confirm('장바구니에서 삭제하시겠습니까?')) return;

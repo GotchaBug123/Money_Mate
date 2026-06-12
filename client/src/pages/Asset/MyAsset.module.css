@@ -1,0 +1,378 @@
+.pageWrapper {
+    min-height: calc(100vh - 60px);
+    background: var(--color-bg-page);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px 80px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.topNavWrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.topNavLink {
+    padding: 12px 22px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+}
+
+.topNavLink:hover {
+    background: var(--color-primary);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.heroSection {
+    padding: 42px 44px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: center;
+    gap: 30px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 18px 42px rgba(27, 94, 217, 0.22);
+}
+
+.pageBadge {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0.9;
+}
+
+.pageTitle {
+    margin: 0;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.pageDesc {
+    margin: 14px 0 0;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 800;
+    opacity: 0.92;
+}
+
+.scoreCard {
+    min-height: 170px;
+    padding: 28px;
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.scoreLabel {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.86);
+    font-weight: 900;
+}
+
+.scoreValue {
+    font-size: 48px;
+    line-height: 1;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.chartCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 34px;
+    min-height: 360px;
+    box-shadow: var(--shadow-card);
+}
+
+.chartHeader {
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.chartHeader span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.chartHeader h3 {
+    margin: 0;
+    color: var(--color-text-main);
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.chartHeader strong {
+    padding: 9px 16px;
+    border-radius: var(--radius-xl);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.lineChartMock {
+    height: 260px;
+    border-radius: var(--radius-xl);
+    background:
+        linear-gradient(var(--color-border) 1px, transparent 1px) 0 0 / 100% 33.33%,
+        var(--color-bg-input);
+    overflow: hidden;
+}
+
+.assetLineChart {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.assetLine {
+    stroke: var(--color-primary);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.assetDotBg {
+    fill: rgba(27, 94, 217, 0.14);
+}
+
+.assetDot {
+    fill: var(--color-primary);
+}
+
+.assetMonthText {
+    fill: var(--color-text-muted);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.filterSection {
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+}
+
+.filterText {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filterText span {
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.filterText strong {
+    color: var(--color-text-main);
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.filterGroup {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filterBtn {
+    min-width: 92px;
+    height: 46px;
+    padding: 0 22px;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+}
+
+.filterBtn:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.activeFilterBtn {
+    background: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+    box-shadow: 0 14px 28px rgba(27, 94, 217, 0.22);
+}
+
+.summaryCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 42px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+}
+
+.investableRow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 34px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.investableLabel {
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--color-text-muted);
+}
+
+.investableValue {
+    font-size: 46px;
+    line-height: 1.1;
+    font-weight: 900;
+    color: var(--color-text-main);
+    letter-spacing: -1px;
+}
+
+.summaryGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 18px;
+    column-gap: 24px;
+}
+
+.gridItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 24px;
+    background: var(--color-bg-input);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+}
+
+.gridItem:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+.gridCategory {
+    display: inline-flex;
+    margin-bottom: 6px;
+    padding: 4px 9px;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.gridLabel {
+    display: block;
+    font-size: 16px;
+    color: var(--color-text-sub);
+    font-weight: 900;
+}
+
+.gridValue {
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--color-text-main);
+    text-align: right;
+}
+
+@media (max-width: 900px) {
+    .heroSection {
+        grid-template-columns: 1fr;
+    }
+
+    .scoreCard {
+        min-height: 130px;
+    }
+
+    .filterSection {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .summaryGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .pageWrapper {
+        padding: 30px 16px 70px;
+    }
+
+    .heroSection,
+    .chartCard,
+    .summaryCard {
+        padding: 28px 20px;
+    }
+
+    .pageTitle {
+        font-size: 30px;
+    }
+
+    .investableValue {
+        font-size: 34px;
+    }
+
+    .filterGroup {
+        width: 100%;
+    }
+
+    .filterBtn {
+        flex: 1;
+    }
+
+    .gridItem {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gridValue {
+        text-align: left;
+    }
+}
